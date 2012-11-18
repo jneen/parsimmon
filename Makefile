@@ -48,18 +48,30 @@ report: $(UGLY)
 
 # XXX this is kind of awful, but hey, it keeps the version info in the right place.
 VERSION = $(shell node -e 'console.log(require("./package.json").version)')
-PACKAGE = $(BUILD_DIR)/parsimmon-$(VERSION).tgz
+PACKAGE = tmp/parsimmon-$(VERSION).tgz
+DISTDIR = parsimmon-$(VERSION)
+DIST = $(DISTDIR).tgz
 CLEAN += parsimmon-*.tgz
 
-$(PACKAGE): $(COMMONJS) $(BROWSER) $(UGLY)
-	cd $(BUILD_DIR) && npm pack ../
+$(PACKAGE): all
+	mkdir -p tmp
+	cd tmp/ && npm pack ../
+
+$(DIST): all
+	tar -czf $(DIST) \
+		--xform 's:^\./build:$(DISTDIR):' \
+		--exclude='\.gitkeep' \
+		./build/
+
+.PHONY: dist
+dist: $(DIST)
 
 .PHONY: package
 package: $(PACKAGE)
 
 .PHONY: publish
 publish: clean test $(PACKAGE)
-	npm publish $(PACKAGE)
+	@echo npm publish $(PACKAGE)
 
 # -*- cleanup -*- #
 .PHONY: clean

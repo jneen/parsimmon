@@ -3,3 +3,5 @@
 
 npm-*.log
 /node_modules
+
+/tmp
