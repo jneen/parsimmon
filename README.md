@@ -9,12 +9,21 @@ Parsimmon is a small library for writing big parsers made up of lots of little p
 ``` js
 var regex = Parsimmon.regex;
 var string = Parsimmon.string;
+var optWhitespace = Parsimmon.optWhitespace;
 
 var id = regex(/^[a-z_]\w*/i);
 var number = regex(/^[0-9]+/).map(parseInt);
 
 var atom = number.or(id);
-var form = string('(').then(function() { return expr.many().skip(')') });
+
+var form = string('(').then(function() {
+  return expr.then(function(head) {
+    return whitespace.then(expr).many().then(function(tail) {
+      return head.concat(tail);
+    });
+  });
+});
+
 var expr = form.or(atom);
 
 expr.parse('3') // => 3
