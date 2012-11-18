@@ -1,5 +1,7 @@
 # Parsimmon
 
+(by @jayferd and @laughinghan)
+
 Parsimmon is a small library for writing big parsers made up of lots of little parsers.  The API is inspired by parsec and Promises/A.
 
 ## Quick Example
