@@ -20,7 +20,7 @@ BROWSER = $(BUILD_DIR)/parsimmon.browser.js
 UGLY = $(BUILD_DIR)/parsimmon.browser.min.js
 
 $(BUILD_DIR)/parsimmon.%.js: $(SRC_DIR)/%/pre.js $(SRC) $(SRC_DIR)/%/post.js
-	mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
 	cat $^ > $@
 
 .PHONY: commonjs
@@ -48,17 +48,17 @@ report: $(UGLY)
 
 # XXX this is kind of awful, but hey, it keeps the version info in the right place.
 VERSION = $(shell node -e 'console.log(require("./package.json").version)')
-PACKAGE = parsimmon-$(VERSION).tgz
+PACKAGE = $(BUILD_DIR)/parsimmon-$(VERSION).tgz
 CLEAN += parsimmon-*.tgz
 
-$(PACKAGE): clean commonjs test
-	npm pack .
+$(PACKAGE): $(COMMONJS) $(BROWSER) $(UGLY)
+	cd $(BUILD_DIR) && npm pack ../
 
 .PHONY: package
 package: $(PACKAGE)
 
 .PHONY: publish
-publish: $(PACKAGE)
+publish: clean test $(PACKAGE)
 	npm publish $(PACKAGE)
 
 # -*- cleanup -*- #
