@@ -5,23 +5,19 @@ CLEAN += $(BUILD_DIR)/*
 SRC = $(SRC_DIR)/parsimmon.js
 
 .PHONY: all
-all: minify commonjs report
+all: browser commonjs report
 
 # -*- minification -*- #
 UGLIFYJS ?= ./node_modules/.bin/uglifyjs
 UGLIFY_OPTS += --lift-vars --unsafe
-UGLY = $(BUILD_DIR)/parsimmon.min.js
-
-$(UGLY): $(SRC)
-	$(UGLIFYJS) $(UGLIFY_OPTS) $< > $@
 
 %.min.js: %.js
 	$(UGLIFYJS) $(UGLIFY_OPTS) $< > $@
 
-minify: $(UGLY)
-
 # special builds
 COMMONJS = $(BUILD_DIR)/parsimmon.commonjs.js
+BROWSER = $(BUILD_DIR)/parsimmon.browser.js
+UGLY = $(BUILD_DIR)/parsimmon.browser.min.js
 
 $(BUILD_DIR)/parsimmon.%.js: $(SRC_DIR)/%/pre.js $(SRC) $(SRC_DIR)/%/post.js
 	cat $^ > $@
@@ -29,12 +25,11 @@ $(BUILD_DIR)/parsimmon.%.js: $(SRC_DIR)/%/pre.js $(SRC) $(SRC_DIR)/%/post.js
 .PHONY: commonjs
 commonjs: $(COMMONJS)
 
-.PHONY: amd
-amd: $(BUILD_DIR)/parsimmon.amd.js $(BUILD_DIR)/parsimmon.amd.min.js
+.PHONY: browser
+browser: $(BROWSER) $(UGLY)
 
-.PHONY: report
-report: $(UGLY)
-	wc -c $(UGLY)
+$(BROWSER): $(SRC_DIR)/browser/pre.js node_modules/pjs/src/p.js $(SRC) $(SRC_DIR)/browser/post.js
+	cat $^ > $@
 
 # -*- testing -*- #
 MOCHA ?= ./node_modules/.bin/mocha
@@ -43,6 +38,10 @@ TESTS = ./test/*.test.js
 .PHONY: test
 test: $(COMMONJS)
 	$(MOCHA) $(MOCHA_OPTS) $(TESTS)
+
+.PHONY: report
+report: $(UGLY)
+	wc -c $(UGLY)
 
 # -*- packaging -*- #
 
