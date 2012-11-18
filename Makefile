@@ -20,6 +20,7 @@ BROWSER = $(BUILD_DIR)/parsimmon.browser.js
 UGLY = $(BUILD_DIR)/parsimmon.browser.min.js
 
 $(BUILD_DIR)/parsimmon.%.js: $(SRC_DIR)/%/pre.js $(SRC) $(SRC_DIR)/%/post.js
+	mkdir -p $(BUILD_DIR)
 	cat $^ > $@
 
 .PHONY: commonjs
