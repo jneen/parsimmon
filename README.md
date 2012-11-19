@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/jayferd/parsimmon.png)](http://travis-ci.org/jayferd/parsimmon)
+
 # Parsimmon
 
 (by @jayferd and @laughinghan)
