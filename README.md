@@ -18,15 +18,9 @@ var number = regex(/^[0-9]+/).map(parseInt);
 
 var atom = number.or(id);
 
-var form = string('(').then(function() {
-  return expr.then(function(head) {
-    return whitespace.then(expr).many().then(function(tail) {
-      return head.concat(tail);
-    });
-  });
-});
+var form = string('(').then(function() { return expr.many().skip(')'); });
 
-var expr = form.or(atom);
+var expr = form.or(atom).skip(optWhitespace);
 
 expr.parse('3') // => 3
 expr.parse('(add (mul 10 (add 3 4)) (add 7 8))')
@@ -35,7 +29,54 @@ expr.parse('(add (mul 10 (add 3 4)) (add 7 8))')
 
 ## Explanation
 
-TODO
+A Parsimmon parser is an object that represents an action on a stream
+of text, and the promise of either an object yielded by that action on
+success or a message in case of failure.  Under the hood, this is
+represented by a function that takes a stream and calls one of two
+callbacks with an error or a result.  For example, `string('foo')`
+yields the string `'foo'` if the beginning of the stream is `'foo'`,
+and otherwise fails.
+
+The combinator method `.map` is used to transform the yielded value.
+For example, `string('foo').map(function(x) { return x + 'bar'; })`
+will yield `'foobar'` if the stream starts with `'foo'`.  The parser
+`digits.map(function(x) { return parseInt(x) * 2; })` will yield
+the number 24 when it encounters the string '12'.  The method
+`.result` can be used to set a constant result.
+
+The two core ways to combine parsers are `.then` and `.or`.  The
+method `.then` provides a way to decide how to continue the parse
+based on the result of a previous parser.  For a kind of contrived
+example,
+
+``` js
+var sentence = regex(/[\w\s]+/).then(function(contents) {
+  var ending;
+
+  if (contents.indexOf('bang')) {
+    ending = '!';
+  }
+  else {
+    ending = '.'
+  }
+
+  return string(ending).result(contents + ending);
+});
+
+sentence.parse('quick brown dogs and things.') // => 'quick brown dogs and things.'
+sentence.parse('shebang.') // parse error
+sentence.parse('shebang!') // => 'shebang!'
+```
+
+For the monad-loving crowd, `.then` is the `bind` operation on
+the parser monad (much like Parsec).  For others, this is very
+similar to the Promises/A spec, implemented by jQuery's deferred
+objects.
+
+The method `.or` allows a parser to continue by trying another parser
+if it fails.  So `string('a').or(string('b'))` will yield an `'a'` if
+the stream starts with an `'a'`, and a `'b'` if the stream starts with
+a `'b'`, and fail otherwise.
 
 ## Full API
 
