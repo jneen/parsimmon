@@ -18,7 +18,9 @@ var number = regex(/^[0-9]+/).map(parseInt);
 
 var atom = number.or(id);
 
-var form = string('(').then(function() { return expr.many().skip(')'); });
+var form = string('(').skip(optWhitespace).then(function() {
+  return expr.many().skip(string(')'));
+});
 
 var expr = form.or(atom).skip(optWhitespace);
 
