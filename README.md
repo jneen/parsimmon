@@ -108,6 +108,9 @@ a `'b'`, and fail otherwise.
     returns a new parser which tries `parser`, and on success calls the
     given function with the result of the parse, which is expected to
     return another parser.
+  - `parser.then(anotherParser)`:
+    expects `anotherParser` to follow `parser`, and yields the result
+    of `anotherParser`.  NB: the result of `parser` here is ignored.
   - `parser.map(function(result) { return anotherResult; })`:
     transforms the output of `parser` with the given function.
   - `parser.skip(otherParser)`
