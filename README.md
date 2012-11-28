@@ -57,7 +57,7 @@ example,
 var sentence = regex(/[\w\s]+/).then(function(contents) {
   var ending;
 
-  if (contents.indexOf('bang')) {
+  if (contents.indexOf('bang') >= 0) {
     ending = '!';
   }
   else {
