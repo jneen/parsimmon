@@ -68,7 +68,7 @@ var sentence = regex(/[\w\s]+/).then(function(contents) {
 });
 
 sentence.parse('quick brown dogs and things.') // => 'quick brown dogs and things.'
-sentence.parse('shebang.') // parse error
+sentence.parse('shebang.') // parse error: expected '!'
 sentence.parse('shebang!') // => 'shebang!'
 ```
 
@@ -86,10 +86,10 @@ a `'b'`, and fail otherwise.
 
 ### Included parsers / parser generators:
   - `Parsimmon.string("my-string")` is a parser that expects to find
-    `"mystring"`, and will yield the same.
+    `"my-string"`, and will yield the same.
   - `Parsimmon.regex(/^myregex/)` is a parser that expects the stream
-    to match the given regex.  *Due to limitations in javascript's regex
-    API, the regex must be anchored (with `^` at the beginning).*
+    to match the given regex.  **Due to limitations in javascript's regex
+    API, the regex must be anchored (with `^` at the beginning).**
   - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
     the string, and yields `result`.
   - `Parsimmon.fail(message)`
