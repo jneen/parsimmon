@@ -9,10 +9,10 @@ all: browser commonjs report
 
 # -*- minification -*- #
 UGLIFYJS ?= ./node_modules/.bin/uglifyjs
-UGLIFY_OPTS += --lift-vars --unsafe
+UGLIFY_OPTS += --lift-vars --unsafe --mangle
 
 %.min.js: %.js
-	$(UGLIFYJS) $(UGLIFY_OPTS) $< > $@
+	$(UGLIFYJS) $(UGLIFY_OPTS) < $< > $@
 
 # special builds
 COMMONJS = $(BUILD_DIR)/parsimmon.commonjs.js

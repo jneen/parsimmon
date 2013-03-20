@@ -10,7 +10,7 @@
   "main": "index.js",
   "devDependencies": {
     "mocha": "*",
-    "uglify-js": "*"
+    "uglify-js": "2.x"
   },
   "dependencies": {
     "pjs": "*"
