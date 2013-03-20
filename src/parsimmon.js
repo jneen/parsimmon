@@ -8,6 +8,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   // construct your Parser from the base parsers and the
   // parser combinator methods.
 
+  var ParseError = Parsimmon.ParseError = P(Error, {});
+
   function parseError(stream, message) {
     if (stream) {
       stream = "'"+stream+"'";
@@ -16,7 +18,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       stream = 'EOF';
     }
 
-    throw 'Parse Error: '+message+' at '+stream;
+    throw ParseError('Parse Error: '+message+' at '+stream);
   }
 
   _.init = function(body) { this._ = body; };
