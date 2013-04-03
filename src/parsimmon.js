@@ -116,12 +116,12 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       var result = true;
       var failure;
 
-      for (var i = 0; i < min; i += 1) {
+      for (var times = 0; times < min; times += 1) {
         result = self._(stream, success, firstFailure);
         if (!result) return onFailure(stream, failure);
       }
 
-      for (; i < max && result; i += 1) {
+      for (; times < max && result; times += 1) {
         result = self._(stream, success, secondFailure);
       }
 
