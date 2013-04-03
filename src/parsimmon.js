@@ -1,5 +1,29 @@
 var Parsimmon = {};
 
+var Thunk = P(function(_) {
+  _.init = function(fn, args) {
+    this.fn = fn;
+    this.args = args;
+  };
+
+  _.call = function() {
+    return this.fn.apply(null, this.args);
+  };
+
+  _.trampoline = function() {
+    var thunk = this;
+
+    for (;;) {
+      if (thunk instanceof Thunk) {
+        thunk = thunk.call();
+      }
+      else {
+        return thunk;
+      }
+    }
+  };
+});
+
 Parsimmon.Parser = P(function(_, _super, Parser) {
   // The Parser object is a wrapper for a parser function.
   // Externally, you use one to parse a string by calling
@@ -19,10 +43,15 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     throw 'Parse Error: '+message+' at '+stream;
   }
 
-  _.init = function(body) { this._ = body; };
+  _.init = function(body) { this.fn = body; };
+
+  _._ = function() {
+    debugger;
+    return Thunk(this.fn, arguments);
+  };
 
   _.parse = function(stream) {
-    return this.skip(eof)._(stream, success, parseError);
+    return this.skip(eof)._(stream, success, parseError).trampoline();
 
     function success(stream, result) { return result; }
   };
@@ -59,7 +88,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
     return Parser(function(stream, onSuccess, onFailure) {
       var xs = [];
-      while (self._(stream, success, failure));
+      while (self._(stream, success, failure).trampoline());
       return onSuccess(stream, xs);
 
       function success(newStream, x) {
@@ -84,12 +113,12 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       var failure;
 
       for (var i = 0; i < min; i += 1) {
-        result = self._(stream, success, firstFailure);
+        result = self._(stream, success, firstFailure).trampoline();
         if (!result) return onFailure(stream, failure);
       }
 
       for (; i < max && result; i += 1) {
-        result = self._(stream, success, secondFailure);
+        result = self._(stream, success, secondFailure).trampoline();
       }
 
       return onSuccess(stream, xs);
