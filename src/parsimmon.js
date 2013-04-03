@@ -54,6 +54,19 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   // -*- optimized iterative combinators -*- //
+  // equivalent to:
+  // _.many = function() {
+  //   return this.times(0, Infinity);
+  // };
+  // or, more explicitly:
+  // _.many = function() {
+  //   var self = this;
+  //   return self.then(function(x) {
+  //     return self.many().then(function(xs) {
+  //       return [x].concat(xs);
+  //     });
+  //   }).or(succeed([]));
+  // };
   _.many = function() {
     var self = this;
 
@@ -74,6 +87,26 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     });
   };
 
+  // equivalent to:
+  // _.times = function(min, max) {
+  //   if (arguments.length < 2) max = min;
+  //   var self = this;
+  //   if (min > 0) {
+  //     return self.then(function(x) {
+  //       return self.times(min - 1, max - 1).then(function(xs) {
+  //         return [x].concat(xs);
+  //       });
+  //     });
+  //   }
+  //   else if (max > 0) {
+  //     return self.then(function(x) {
+  //       return self.times(0, max - 1).then(function(xs) {
+  //         return [x].concat(xs);
+  //       });
+  //     }).or(succeed([]));
+  //   }
+  //   else return succeed([]);
+  // };
   _.times = function(min, max) {
     if (arguments.length < 2) max = min;
     var self = this;
