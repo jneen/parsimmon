@@ -9,14 +9,16 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   // parser combinator methods.
 
   function parseError(stream, i, expected) {
-    if (i < stream.length) {
-      stream = "'"+stream.slice(i)+"'";
+    if (i === stream.length) {
+      var message = 'expected ' + expected + ', got the end of the string';
     }
     else {
-      stream = 'EOF';
+      var prefix = (i > 0 ? "'..." : "'");
+      var suffix = (stream.length - i > 12 ? "...'" : "'");
+      var message = 'expected ' + expected + ' at character ' + i + ', got '
+        + prefix + stream.slice(i, i+12) + suffix;
     }
-
-    throw 'Parse Error: expected '+expected+' at '+stream;
+    throw 'Parse Error: ' + message + "\n    parsing: '" + stream + "'";
   }
 
   _.init = function(body) { this._ = body; };
