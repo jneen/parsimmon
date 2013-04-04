@@ -211,7 +211,7 @@ suite('parser', function() {
         .then(string('+').or(string('*')))
         .then(function(operator) {
           if (operator === allowedOperator) return succeed(operator);
-          else return fail('expected '+allowedOperator);
+          else return fail(allowedOperator);
         })
         .skip(string('y'))
       ;

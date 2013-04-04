@@ -8,7 +8,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   // construct your Parser from the base parsers and the
   // parser combinator methods.
 
-  function parseError(stream, i, message) {
+  function parseError(stream, i, expected) {
     if (i < stream.length) {
       stream = "'"+stream.slice(i)+"'";
     }
@@ -16,7 +16,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       stream = 'EOF';
     }
 
-    throw 'Parse Error: '+message+' at '+stream;
+    throw 'Parse Error: expected '+expected+' at '+stream;
   }
 
   _.init = function(body) { this._ = body; };
@@ -168,7 +168,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   // -*- primitive parsers -*- //
   var string = Parsimmon.string = function(str) {
     var len = str.length;
-    var expected = "expected '"+str+"'";
+    var expected = "'"+str+"'";
 
     return Parser(function(stream, i, onSuccess, onFailure) {
       var head = stream.slice(i, i+len);
@@ -185,7 +185,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   var regex = Parsimmon.regex = function(re) {
     if (re.source[0] !== '^') throw 'regex '+re+' must be anchored';
 
-    var expected = 'expected '+re;
+    var expected = ''+re;
 
     return Parser(function(stream, i, onSuccess, onFailure) {
       var match = re.exec(stream.slice(i));
@@ -206,9 +206,9 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     });
   };
 
-  var fail = Parsimmon.fail = function(msg) {
+  var fail = Parsimmon.fail = function(expected) {
     return Parser(function(stream, i, _, onFailure) {
-      return onFailure(stream, i, msg);
+      return onFailure(stream, i, expected);
     });
   };
 
@@ -220,7 +220,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   var optWhitespace = Parsimmon.optWhitespace = regex(/^\s*/);
 
   var any = Parsimmon.any = Parser(function(stream, i, onSuccess, onFailure) {
-    if (i >= stream.length) return onFailure(stream, i, 'expected any character');
+    if (i >= stream.length) return onFailure(stream, i, 'any character');
 
     return onSuccess(stream, i+1, stream.charAt(i));
   });
@@ -230,7 +230,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   });
 
   var eof = Parsimmon.eof = Parser(function(stream, i, onSuccess, onFailure) {
-    if (i < stream.length) return onFailure(stream, i, 'expected EOF');
+    if (i < stream.length) return onFailure(stream, i, 'EOF');
 
     return onSuccess(stream, i, '');
   });
