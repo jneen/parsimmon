@@ -204,11 +204,11 @@ suite('parser', function() {
 
     test('use Parsimmon.fail to fail dynamically', function() {
       var parser = any.then(function(ch) {
-        return fail('character '+ch+' not allowed');
+        return fail('a character besides ' + ch);
       }).or(string('x'));
 
       assert.throws(function() { parser.parse('y'); },
-        partialEquals("Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'"));
+        partialEquals("Parse Error: expected a character besides y, got the end of the string\n    parsing: 'y'"));
       assert.equal(parser.parse('x'), 'x');
     });
 
@@ -242,5 +242,26 @@ suite('parser', function() {
 
     assert.equal(parser.parse('  '), '  ')
     assert.equal(parser.parse('x'), 'default');
+  });
+
+  suite('smart error messages', function() {
+    // this is mainly about .or(), .many(), and .times(), but not about
+    // their core functionality, so it's in its own test suite
+
+    suite('or', function() {
+      test('prefer longest branch', function() {
+        var parser = string('abc').then(string('def')).or(string('ab').then(string('cd')));
+
+        assert.throws(function() { parser.parse('abc'); },
+          partialEquals("Parse Error: expected 'def', got the end of the string\n    parsing: 'abc'"));
+      });
+
+      test('prefer last of equal length branches', function() {
+        var parser = string('abc').then(string('def')).or(string('abc').then(string('d')));
+
+        assert.throws(function() { parser.parse('abc'); },
+          partialEquals("Parse Error: expected 'd', got the end of the string\n    parsing: 'abc'"));
+      });
+    });
   });
 });

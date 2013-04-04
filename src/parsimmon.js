@@ -36,8 +36,13 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i, onSuccess, onFailure) {
       return self._(stream, i, onSuccess, failure);
 
-      function failure(stream, newI) {
-        return alternative._(stream, i, onSuccess, onFailure);
+      function failure(stream, newI, expected) {
+        return alternative._(stream, i, onSuccess, altFailure);
+
+        function altFailure(stream, altI, altExpected) {
+          if (newI > altI) return onFailure(stream, newI, expected);
+          else return onFailure(stream, altI, altExpected);
+        }
       }
     });
   };
