@@ -262,6 +262,14 @@ suite('parser', function() {
         assert.throws(function() { parser.parse('abc'); },
           partialEquals("Parse Error: expected 'd', got the end of the string\n    parsing: 'abc'"));
       });
+
+      test('prefer longest branch even after a success', function() {
+        var parser = string('abcdef').then(string('g')).or(string('ab'))
+          .then(string('cd')).then(string('xyz'));
+
+        assert.throws(function() { parser.parse('abcdef'); },
+          partialEquals("Parse Error: expected 'g', got the end of the string\n    parsing: 'abcdef'"));
+      });
     });
   });
 });
