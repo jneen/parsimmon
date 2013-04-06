@@ -271,5 +271,29 @@ suite('parser', function() {
           partialEquals("Parse Error: expected 'g', got the end of the string\n    parsing: 'abcdef'"));
       });
     });
+
+    suite('many', function() {
+      test('prefer longest branch even in a .many()', function() {
+        var atom = regex(/^[^()\s]+/);
+        var sexpr = string('(').then(function() { return list; }).skip(string(')'));
+        var list = optWhitespace.then(atom.or(sexpr)).skip(optWhitespace).many();
+
+        assert.deepEqual(list.parse('(a b) (c ((() d)))'), [['a', 'b'], ['c', [[[], 'd']]]]);
+
+        assert.throws(function() { list.parse('(a b ()) c)'); },
+          partialEquals("Parse Error: expected EOF at character 10, got '...)'\n    parsing: '(a b ()) c)'"));
+        assert.throws(function() { list.parse('(a (b)) (() c'); },
+          partialEquals("Parse Error: expected ')', got the end of the string\n    parsing: '(a (b)) (() c'"));
+      });
+
+      test('prefer longest branch in .or() nested in .many()', function() {
+        var parser = string('abc').then(string('def')).or(string('a')).many();
+
+        assert.deepEqual(parser.parse('aaabcdefaa'), ['a', 'a', 'def', 'a', 'a']);
+
+        assert.throws(function() { parser.parse('aaabcde'); },
+          partialEquals("Parse Error: expected 'def' at character 5, got '...de'\n    parsing: 'aaabcde'"));
+      });
+    });
   });
 });

@@ -95,15 +95,22 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i, onSuccess, onFailure) {
       var xs = [];
       while (self._(stream, i, success, failure));
-      return onSuccess(stream, i, xs);
+      var furthestFailureI, furthestExpected;
+      return onSuccess(stream, i, xs, furthestFailureI, furthestExpected);
 
-      function success(stream, newI, x) {
+      function success(stream, newI, x, successFurthestFailureI, successFurthestExpected) {
         i = newI;
         xs.push(x);
+        furthestFailureI = successFurthestFailureI;
+        furthestExpected = successFurthestExpected;
         return true;
       }
 
-      function failure() {
+      function failure(stream, newI, expected) {
+        if (!(furthestFailureI > newI)) {
+          furthestFailureI = newI;
+          furthestExpected = expected;
+        }
         return false;
       }
     });
