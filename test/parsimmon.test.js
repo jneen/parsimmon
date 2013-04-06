@@ -295,5 +295,17 @@ suite('parser', function() {
           partialEquals("Parse Error: expected 'def' at character 5, got '...de'\n    parsing: 'aaabcde'"));
       });
     });
+
+    suite('times', function() {
+      test('prefer longest branch in .times() too', function() {
+        var parser = string('abc').then(string('def')).or(string('a')).times(3, 6);
+
+        assert.throws(function() { parser.parse('aabcde'); },
+          partialEquals("Parse Error: expected 'def' at character 4, got '...de'\n    parsing: 'aabcde'"));
+
+        assert.throws(function() { parser.parse('aaaaabcde'); },
+            partialEquals("Parse Error: expected 'def' at character 7, got '...de'\n    parsing: 'aaaaabcde'"));
+      });
+    });
   });
 });
