@@ -157,14 +157,14 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       return onSuccess(stream, i, xs);
 
       function success(stream, newI, x) {
-        xs.push(x);
         i = newI;
+        xs.push(x);
         return true;
       }
 
       function firstFailure(stream, newI, msg) {
-        expected = msg;
         i = newI;
+        expected = msg;
         return false;
       }
 
