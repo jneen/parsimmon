@@ -143,11 +143,11 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i, onSuccess, onFailure) {
       var xs = [];
       var result = true;
-      var failure;
+      var expected;
 
       for (var times = 0; times < min; times += 1) {
         result = self._(stream, i, success, firstFailure);
-        if (!result) return onFailure(stream, i, failure);
+        if (!result) return onFailure(stream, i, expected);
       }
 
       for (; times < max && result; times += 1) {
@@ -163,7 +163,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       }
 
       function firstFailure(stream, newI, msg) {
-        failure = msg;
+        expected = msg;
         i = newI;
         return false;
       }
