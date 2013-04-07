@@ -3,6 +3,10 @@ var assert = require('assert')
   , mocha = require('mocha')
 ;
 
+function partialEquals(x) {
+  return function(y) { return x === y; }
+}
+
 suite('parser', function() {
   var string = Parsimmon.string;
   var regex = Parsimmon.regex;
@@ -17,7 +21,8 @@ suite('parser', function() {
   test('Parsimmon.string', function() {
     var parser = string('x');
     assert.equal(parser.parse('x'), 'x');
-    assert.throws(function() { parser.parse('y') })
+    assert.throws(function() { parser.parse('y') },
+      partialEquals("Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'"));
   });
 
   test('Parsimmon.regex', function() {
@@ -25,7 +30,8 @@ suite('parser', function() {
 
     assert.equal(parser.parse('1'), '1');
     assert.equal(parser.parse('4'), '4');
-    assert.throws(function() { parser.parse('x'); });
+    assert.throws(function() { parser.parse('x'); },
+      partialEquals("Parse Error: expected /^[0-9]/ at character 0, got 'x'\n    parsing: 'x'"));
     assert.throws(function() { regex(/./) }, 'must be anchored');
   });
 
@@ -33,8 +39,10 @@ suite('parser', function() {
     test('with a parser, uses the last return value', function() {
       var parser = string('x').then(string('y'));
       assert.equal(parser.parse('xy'), 'y');
-      assert.throws(function() { parser.parse('y'); });
-      assert.throws(function() { parser.parse('xz'); });
+      assert.throws(function() { parser.parse('y'); },
+        partialEquals("Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'"));
+      assert.throws(function() { parser.parse('xz'); },
+        partialEquals("Parse Error: expected 'y' at character 1, got '...z'\n    parsing: 'xz'"));
     });
 
     test('asserts that a parser is returned', function() {
@@ -199,7 +207,8 @@ suite('parser', function() {
         return fail('character '+ch+' not allowed');
       }).or(string('x'));
 
-      assert.throws(function() { parser.parse('y'); });
+      assert.throws(function() { parser.parse('y'); },
+        partialEquals("Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'"));
       assert.equal(parser.parse('x'), 'x');
     });
 
@@ -211,18 +220,20 @@ suite('parser', function() {
         .then(string('+').or(string('*')))
         .then(function(operator) {
           if (operator === allowedOperator) return succeed(operator);
-          else return fail('expected '+allowedOperator);
+          else return fail(allowedOperator);
         })
         .skip(string('y'))
       ;
 
       allowedOperator = '+';
       assert.equal(parser.parse('x+y'), '+');
-      assert.throws(function() { parser.parse('x*y'); });
+      assert.throws(function() { parser.parse('x*y'); },
+        partialEquals("Parse Error: expected + at character 2, got '...y'\n    parsing: 'x*y'"));
 
       allowedOperator = '*';
       assert.equal(parser.parse('x*y'), '*');
-      assert.throws(function() { parser.parse('x+y'); });
+      assert.throws(function() { parser.parse('x+y'); },
+        partialEquals("Parse Error: expected * at character 2, got '...y'\n    parsing: 'x+y'"));
     });
   });
 
