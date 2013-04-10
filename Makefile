@@ -20,7 +20,7 @@ BROWSER = $(BUILD_DIR)/parsimmon.browser.js
 UGLY = $(BUILD_DIR)/parsimmon.browser.min.js
 
 $(BUILD_DIR)/parsimmon.%.js: $(SRC_DIR)/%/pre.js $(SRC) $(SRC_DIR)/%/post.js
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	cat $^ > $@
 
 .PHONY: commonjs
@@ -30,6 +30,7 @@ commonjs: $(COMMONJS)
 browser: $(BROWSER) $(UGLY)
 
 $(BROWSER): $(SRC_DIR)/browser/pre.js node_modules/pjs/src/p.js $(SRC) $(SRC_DIR)/browser/post.js
+	mkdir -p $(dir $@)
 	cat $^ > $@
 
 # -*- testing -*- #
