@@ -4,3 +4,5 @@
 * Specify pjs 3.x
 * added "use strict"
 * Stopped trying to subclass Error (was silencing all parse errors :\ )
+
+(Note: v0.0.3 is completely b0rken, and was unpublished from npm)
