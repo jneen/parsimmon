@@ -1,3 +1,7 @@
+## version 0.0.5 (2013-04-10)
+
+* Fix a "build directory nonexistent" bug :\
+
 ## version 0.0.4 (2013-04-09)
 
 * Started a CHANGELOG
