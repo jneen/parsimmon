@@ -9,7 +9,7 @@
   "files": ["index.js", "src", "test", "Makefile", "package.json"],
   "main": "index.js",
   "devDependencies": {
-    "mocha": "*",
+    "mocha": "1.8.x",
     "uglify-js": "2.x"
   },
   "dependencies": {
