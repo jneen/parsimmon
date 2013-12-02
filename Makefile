@@ -72,7 +72,7 @@ package: $(PACKAGE)
 
 .PHONY: publish
 publish: clean test $(PACKAGE)
-	@echo npm publish $(PACKAGE)
+	npm publish $(PACKAGE)
 
 # -*- cleanup -*- #
 .PHONY: clean
