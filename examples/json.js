@@ -46,7 +46,18 @@ var json = (function() {
       return out;
     });
 
-  var json = object.or(array).or(stringLiteral).or(numberLiteral).skip(regex(/^\s*/m));
+  var nullLiteral = string('null').result(null);
+  var trueLiteral = string('true').result(true);
+  var falseLiteral = string('false').result(false);
+
+  var json = object
+    .or(array)
+    .or(stringLiteral)
+    .or(numberLiteral)
+    .or(nullLiteral)
+    .or(trueLiteral)
+    .or(falseLiteral)
+    .skip(regex(/^\s*/m));
 
   return json;
 })();
