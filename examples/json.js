@@ -46,9 +46,9 @@ var json = (function() {
       return out;
     });
 
-  var nullLiteral = string('null').map(function () {return null;});
-  var trueLiteral = string('true').map(function () {return true;});
-  var falseLiteral = string('false').map(function () {return false;});
+  var nullLiteral = string('null').result(null);
+  var trueLiteral = string('true').result(true);
+  var falseLiteral = string('false').result(false);
 
   var json = object
     .or(array)
