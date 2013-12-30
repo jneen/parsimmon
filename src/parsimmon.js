@@ -28,6 +28,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   }
 
   function parseError(stream, result) {
+    if (result.furthestBacktrack) result = result.furthestBacktrack;
+
     var expected = result.value;
     var i = result.index;
 
@@ -67,6 +69,25 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     };
   }
 
+  function furthestBacktrackFor(result, last) {
+    if (!last) return result;
+
+    var currentBacktrack = result.status ? result.furthestBacktrack : result;
+    var lastBacktrack = last.status ? last.furthestBacktrack : last;
+
+    var currentIndex = currentBacktrack ? currentBacktrack.index : -1;
+    var lastIndex = lastBacktrack ? lastBacktrack.index : -1;
+
+    var furthestBacktrack = currentIndex >= lastIndex ? currentBacktrack : lastBacktrack;
+
+    return {
+      status: result.status,
+      index: result.index,
+      value: result.value,
+      furthestBacktrack: furthestBacktrack
+    };
+  }
+
   // -*- primitive combinators -*- //
   _.or = function(alternative) {
     var self = this;
@@ -74,7 +95,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i) {
       var result = self._(stream, i);
 
-      return result.status ? result : alternative._(stream, i);
+      return result.status ? result : furthestBacktrackFor(alternative._(stream, i), result);
     });
   };
 
@@ -86,7 +107,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
       if (result.status) {
         var nextParser = (next instanceof Parser ? next : next(result.value));
-        return nextParser._(stream, result.index);
+        return furthestBacktrackFor(nextParser._(stream, result.index), result);
       }
       else {
         return result;
@@ -114,15 +135,17 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i) {
       var accum = [];
       var result;
+      var prevResult;
 
       for (;;) {
         result = self._(stream, i);
         if (result.status) {
           i = result.index;
           accum.push(result.value);
+          prevResult = furthestBacktrackFor(result, prevResult);
         }
         else {
-          return makeSuccess(i, accum);
+          return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
         }
       }
     });
@@ -156,20 +179,23 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       var accum = [];
       var start = i;
       var result;
+      var prevResult;
 
       for (var times = 0; times < min; times += 1) {
         result = self._(stream, i);
+        prevResult = furthestBacktrackFor(result, prevResult);
         if (result.status) {
           i = result.index;
           accum.push(result.value);
         }
         else {
-          return makeFailure(start, result.value);
+          return prevResult;
         }
       }
 
       for (; times < max && result; times += 1) {
         result = self._(stream, i);
+        prevResult = furthestBacktrackFor(result, prevResult);
         if (result.status) {
           i = result.index;
           accum.push(result.value);
@@ -179,7 +205,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
         }
       }
 
-      return makeSuccess(i, accum);
+      return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
     });
   };
 
