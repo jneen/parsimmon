@@ -9,12 +9,13 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   // construct your Parser from the base parsers and the
   // parser combinator methods.
 
-  function makeSuccess(index, value, furthestBacktrack) {
+  function makeSuccess(index, value) {
     return {
       status: true,
       index: index,
       value: value,
-      furthestBacktrack: furthestBacktrack || null
+      furthest: -1,
+      expected: ''
     };
   }
 
@@ -23,15 +24,27 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       status: false,
       index: index,
       value: expected,
-      furthestBacktrack: null
+      furthest: index,
+      expected: expected
+    };
+  }
+
+  function furthestBacktrackFor(result, last) {
+    if (!last) return result;
+    if (result.furthest >= last.furthest) return result;
+
+    return {
+      status: result.status,
+      index: result.index,
+      value: result.value,
+      furthest: last.furthest,
+      expected: last.expected
     }
   }
 
   function parseError(stream, result) {
-    if (result.furthestBacktrack) result = result.furthestBacktrack;
-
-    var expected = result.value;
-    var i = result.index;
+    var expected = result.expected;
+    var i = result.furthest;
 
     if (i === stream.length) {
       var message = 'expected ' + expected + ', got the end of the string';
@@ -52,25 +65,6 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
     return result.status ? result.value : parseError(stream, result);
   };
-
-  function furthestBacktrackFor(result, last) {
-    if (!last) return result;
-
-    var currentBacktrack = result.status ? result.furthestBacktrack : result;
-    var lastBacktrack = last.status ? last.furthestBacktrack : last;
-
-    var currentIndex = currentBacktrack ? currentBacktrack.index : -1;
-    var lastIndex = lastBacktrack ? lastBacktrack.index : -1;
-
-    var furthestBacktrack = currentIndex >= lastIndex ? currentBacktrack : lastBacktrack;
-
-    return {
-      status: result.status,
-      index: result.index,
-      value: result.value,
-      furthestBacktrack: furthestBacktrack
-    };
-  }
 
   // -*- primitive combinators -*- //
   _.or = function(alternative) {
