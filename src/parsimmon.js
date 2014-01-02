@@ -139,10 +139,11 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
       for (;;) {
         result = self._(stream, i);
+        prevResult = furthestBacktrackFor(result, prevResult);
+
         if (result.status) {
           i = result.index;
           accum.push(result.value);
-          prevResult = furthestBacktrackFor(result, prevResult);
         }
         else {
           return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
