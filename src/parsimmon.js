@@ -53,22 +53,6 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return result.status ? result.value : parseError(stream, result);
   };
 
-  function furthestFailure(onFailure, myI, myExpected) {
-    return function(stream, yourI, yourExpected) {
-      if (myI > yourI) return onFailure(stream, myI, myExpected);
-      else return onFailure.apply(this, arguments);
-    };
-  }
-
-  function furthestFailureSuccess(onSuccess, myFurthestFailureI, myFurthestExpected) {
-    return function(stream, i, result, yourFurthestFailureI, yourFurthestExpected) {
-      if (myFurthestFailureI > yourFurthestFailureI) {
-        return onSuccess(stream, i, result, myFurthestFailureI, myFurthestExpected);
-      }
-      else return onSuccess.apply(this, arguments);
-    };
-  }
-
   function furthestBacktrackFor(result, last) {
     if (!last) return result;
 
