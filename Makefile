@@ -39,7 +39,7 @@ MOCHA_OPTS += -u tdd
 TESTS = ./test/*.test.js
 .PHONY: test
 test: $(COMMONJS)
-	$(MOCHA) $(MOCHA_OPTS) $(TESTS)
+	$(MOCHA) $(MOCHA_OPTS) ./test/intro.js $(TESTS)
 
 .PHONY: report
 report: $(UGLY)
