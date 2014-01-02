@@ -22,8 +22,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   function makeFailure(index, expected) {
     return {
       status: false,
-      index: index,
-      value: expected,
+      index: -1,
+      value: null,
       furthest: index,
       expected: expected
     };
