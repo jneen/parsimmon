@@ -1,12 +1,3 @@
-var assert = require('assert')
-  , Parsimmon = require('./../index')
-  , mocha = require('mocha')
-;
-
-function partialEquals(x) {
-  return function(y) { return x === y; }
-}
-
 suite('parser', function() {
   var string = Parsimmon.string;
   var regex = Parsimmon.regex;
@@ -22,7 +13,7 @@ suite('parser', function() {
     var parser = string('x');
     assert.equal(parser.parse('x'), 'x');
     assert.throws(function() { parser.parse('y') },
-      partialEquals("Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'"));
+      "Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'");
   });
 
   test('Parsimmon.regex', function() {
@@ -31,7 +22,7 @@ suite('parser', function() {
     assert.equal(parser.parse('1'), '1');
     assert.equal(parser.parse('4'), '4');
     assert.throws(function() { parser.parse('x'); },
-      partialEquals("Parse Error: expected /^[0-9]/ at character 0, got 'x'\n    parsing: 'x'"));
+      "Parse Error: expected /^[0-9]/ at character 0, got 'x'\n    parsing: 'x'");
     assert.throws(function() { regex(/./) }, 'must be anchored');
   });
 
@@ -40,9 +31,9 @@ suite('parser', function() {
       var parser = string('x').then(string('y'));
       assert.equal(parser.parse('xy'), 'y');
       assert.throws(function() { parser.parse('y'); },
-        partialEquals("Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'"));
+        "Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'");
       assert.throws(function() { parser.parse('xz'); },
-        partialEquals("Parse Error: expected 'y' at character 1, got '...z'\n    parsing: 'xz'"));
+        "Parse Error: expected 'y' at character 1, got '...z'\n    parsing: 'xz'");
     });
 
     test('asserts that a parser is returned', function() {
@@ -208,7 +199,7 @@ suite('parser', function() {
       }).or(string('x'));
 
       assert.throws(function() { parser.parse('y'); },
-        partialEquals("Parse Error: expected a character besides y, got the end of the string\n    parsing: 'y'"));
+        "Parse Error: expected a character besides y, got the end of the string\n    parsing: 'y'");
       assert.equal(parser.parse('x'), 'x');
     });
 
@@ -228,12 +219,12 @@ suite('parser', function() {
       allowedOperator = '+';
       assert.equal(parser.parse('x+y'), '+');
       assert.throws(function() { parser.parse('x*y'); },
-        partialEquals("Parse Error: expected + at character 2, got '...y'\n    parsing: 'x*y'"));
+        "Parse Error: expected + at character 2, got '...y'\n    parsing: 'x*y'");
 
       allowedOperator = '*';
       assert.equal(parser.parse('x*y'), '*');
       assert.throws(function() { parser.parse('x+y'); },
-        partialEquals("Parse Error: expected * at character 2, got '...y'\n    parsing: 'x+y'"));
+        "Parse Error: expected * at character 2, got '...y'\n    parsing: 'x+y'");
     });
   });
 
@@ -253,14 +244,14 @@ suite('parser', function() {
         var parser = string('abc').then(string('def')).or(string('ab').then(string('cd')));
 
         assert.throws(function() { parser.parse('abc'); },
-          partialEquals("Parse Error: expected 'def', got the end of the string\n    parsing: 'abc'"));
+          "Parse Error: expected 'def', got the end of the string\n    parsing: 'abc'");
       });
 
       test('prefer last of equal length branches', function() {
         var parser = string('abc').then(string('def')).or(string('abc').then(string('d')));
 
         assert.throws(function() { parser.parse('abc'); },
-          partialEquals("Parse Error: expected 'd', got the end of the string\n    parsing: 'abc'"));
+          "Parse Error: expected 'd', got the end of the string\n    parsing: 'abc'");
       });
 
       test('prefer longest branch even after a success', function() {
@@ -268,7 +259,7 @@ suite('parser', function() {
           .then(string('cd')).then(string('xyz'));
 
         assert.throws(function() { parser.parse('abcdef'); },
-          partialEquals("Parse Error: expected 'g', got the end of the string\n    parsing: 'abcdef'"));
+          "Parse Error: expected 'g', got the end of the string\n    parsing: 'abcdef'");
       });
     });
 
@@ -281,9 +272,10 @@ suite('parser', function() {
         assert.deepEqual(list.parse('(a b) (c ((() d)))'), [['a', 'b'], ['c', [[[], 'd']]]]);
 
         assert.throws(function() { list.parse('(a b ()) c)'); },
-          partialEquals("Parse Error: expected EOF at character 10, got '...)'\n    parsing: '(a b ()) c)'"));
+          "Parse Error: expected EOF at character 10, got '...)'\n    parsing: '(a b ()) c)'");
+
         assert.throws(function() { list.parse('(a (b)) (() c'); },
-          partialEquals("Parse Error: expected ')', got the end of the string\n    parsing: '(a (b)) (() c'"));
+          "Parse Error: expected ')', got the end of the string\n    parsing: '(a (b)) (() c'");
       });
 
       test('prefer longest branch in .or() nested in .many()', function() {
@@ -292,7 +284,7 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('aaabcdefaa'), ['a', 'a', 'def', 'a', 'a']);
 
         assert.throws(function() { parser.parse('aaabcde'); },
-          partialEquals("Parse Error: expected 'def' at character 5, got '...de'\n    parsing: 'aaabcde'"));
+          "Parse Error: expected 'def' at character 5, got '...de'\n    parsing: 'aaabcde'");
       });
     });
 
@@ -301,10 +293,10 @@ suite('parser', function() {
         var parser = string('abc').then(string('def')).or(string('a')).times(3, 6);
 
         assert.throws(function() { parser.parse('aabcde'); },
-          partialEquals("Parse Error: expected 'def' at character 4, got '...de'\n    parsing: 'aabcde'"));
+          "Parse Error: expected 'def' at character 4, got '...de'\n    parsing: 'aabcde'");
 
         assert.throws(function() { parser.parse('aaaaabcde'); },
-            partialEquals("Parse Error: expected 'def' at character 7, got '...de'\n    parsing: 'aaaaabcde'"));
+            "Parse Error: expected 'def' at character 7, got '...de'\n    parsing: 'aaaaabcde'");
       });
     });
   });
