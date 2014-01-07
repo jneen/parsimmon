@@ -1,6 +1,7 @@
 var Parsimmon = require('./../index');
 var string = Parsimmon.string;
 var regex = Parsimmon.regex;
+var succeed = Parsimmon.succeed;
 
 var json = (function() {
   var escapes = {
@@ -26,7 +27,7 @@ var json = (function() {
       return regex(/^,\s*/m).then(parser).many().map(function(xs) {
         return [x].concat(xs);
       });
-    });
+    }).or(succeed([]));
   }
 
   var array = regex(/^\[\s*/m).then(function() {
