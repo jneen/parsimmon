@@ -190,10 +190,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.atMost = function(n) { return this.times(0, n); };
   _.atLeast = function(n) {
     var self = this;
-    return self.times(n).then(function(start) {
-      return self.many().map(function(end) {
-        return start.concat(end);
-      });
+    return seq([this.times(n), this.many()]).map(function(results) {
+      return results[0].concat(results[1]);
     });
   };
 
@@ -201,8 +199,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return this.then(function(result) { return succeed(fn(result)); });
   };
 
-  _.skip = function(two) {
-    return this.then(function(result) { return two.result(result); });
+  _.skip = function(next) {
+    return seq([this, next]).map(function(results) { return results[0]; });
   };
 
   // -*- primitive parsers -*- //
