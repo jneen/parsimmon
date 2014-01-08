@@ -8,6 +8,10 @@
 
 Parsimmon is a small library for writing big parsers made up of lots of little parsers.  The API is inspired by parsec and Promises/A.
 
+[fantasyland]: https://github.com/fantasyland/fantasy-land "Fantasyland"
+
+Parsimmon is also compatible with [fantasyland][].  It is a Semigroup, an Applicative Functor and a Monad.
+
 ## Quick Example
 
 ``` js
