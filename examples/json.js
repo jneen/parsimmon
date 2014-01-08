@@ -63,4 +63,7 @@ var json = (function() {
   return json;
 })();
 
-console.log(json.parse(require('fs').readFileSync(__dirname+'/../package.json', 'utf-8')));
+var source = process.argv[2] || __dirname+'/../package.json';
+var result = json.parse(require('fs').readFileSync(source, 'utf-8'));
+
+console.log(result);
