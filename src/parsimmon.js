@@ -276,6 +276,15 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return makeSuccess(i, null);
   });
 
+  var lazy = Parsimmon.lazy = function(f) {
+    var parser = Parser(function(stream, i) {
+      parser._ = f()._;
+      return parser._(stream, i);
+    });
+
+    return parser;
+  };
+
   // [Parser a] -> Parser [a]
   var seq = Parsimmon.seq = function(parsers) {
     return Parser(function(stream, i) {
