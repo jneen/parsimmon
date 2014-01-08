@@ -9,7 +9,43 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   // construct your Parser from the base parsers and the
   // parser combinator methods.
 
-  function parseError(stream, i, expected) {
+  function makeSuccess(index, value) {
+    return {
+      status: true,
+      index: index,
+      value: value,
+      furthest: -1,
+      expected: ''
+    };
+  }
+
+  function makeFailure(index, expected) {
+    return {
+      status: false,
+      index: -1,
+      value: null,
+      furthest: index,
+      expected: expected
+    };
+  }
+
+  function furthestBacktrackFor(result, last) {
+    if (!last) return result;
+    if (result.furthest >= last.furthest) return result;
+
+    return {
+      status: result.status,
+      index: result.index,
+      value: result.value,
+      furthest: last.furthest,
+      expected: last.expected
+    }
+  }
+
+  function parseError(stream, result) {
+    var expected = result.expected;
+    var i = result.furthest;
+
     if (i === stream.length) {
       var message = 'expected ' + expected + ', got the end of the string';
     }
@@ -25,53 +61,34 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.init = function(body) { this._ = body; };
 
   _.parse = function(stream) {
-    return this.skip(eof)._(stream, 0, success, parseError);
+    var result = this.skip(eof)._(stream, 0);
 
-    function success(stream, i, result) { return result; }
+    return result.status ? result.value : parseError(stream, result);
   };
-
-  function furthestFailure(onFailure, myI, myExpected) {
-    return function(stream, yourI, yourExpected) {
-      if (myI > yourI) return onFailure(stream, myI, myExpected);
-      else return onFailure.apply(this, arguments);
-    };
-  }
-
-  function furthestFailureSuccess(onSuccess, myFurthestFailureI, myFurthestExpected) {
-    return function(stream, i, result, yourFurthestFailureI, yourFurthestExpected) {
-      if (myFurthestFailureI > yourFurthestFailureI) {
-        return onSuccess(stream, i, result, myFurthestFailureI, myFurthestExpected);
-      }
-      else return onSuccess.apply(this, arguments);
-    };
-  }
 
   // -*- primitive combinators -*- //
   _.or = function(alternative) {
     var self = this;
 
-    return Parser(function(stream, i, onSuccess, onFailure) {
-      return self._(stream, i, onSuccess, failure);
+    return Parser(function(stream, i) {
+      var result = self._(stream, i);
 
-      function failure(stream, newI, expected) {
-        var altSuccess = furthestFailureSuccess(onSuccess, newI, expected);
-        var altFailure = furthestFailure(onFailure, newI, expected);
-        return alternative._(stream, i, altSuccess, altFailure);
-      }
+      return result.status ? result : furthestBacktrackFor(alternative._(stream, i), result);
     });
   };
 
   _.then = function(next) {
     var self = this;
 
-    return Parser(function(stream, i, onSuccess, onFailure) {
-      return self._(stream, i, success, onFailure);
+    return Parser(function(stream, i) {
+      var result = self._(stream, i);
 
-      function success(stream, newI, result, furthestFailureI, furthestExpected) {
-        var nextParser = (next instanceof Parser ? next : next(result));
-        var nextSuccess = furthestFailureSuccess(onSuccess, furthestFailureI, furthestExpected);
-        var nextFailure = furthestFailure(onFailure, furthestFailureI, furthestExpected);
-        return nextParser._(stream, newI, nextSuccess, nextFailure);
+      if (result.status) {
+        var nextParser = (next instanceof Parser ? next : next(result.value));
+        return furthestBacktrackFor(nextParser._(stream, result.index), result);
+      }
+      else {
+        return result;
       }
     });
   };
@@ -93,26 +110,22 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.many = function() {
     var self = this;
 
-    return Parser(function(stream, i, onSuccess, onFailure) {
-      var xs = [];
-      while (self._(stream, i, success, failure));
-      var furthestFailureI, furthestExpected;
-      return onSuccess(stream, i, xs, furthestFailureI, furthestExpected);
+    return Parser(function(stream, i) {
+      var accum = [];
+      var result;
+      var prevResult;
 
-      function success(stream, newI, x, successFurthestFailureI, successFurthestExpected) {
-        i = newI;
-        xs.push(x);
-        furthestFailureI = successFurthestFailureI;
-        furthestExpected = successFurthestExpected;
-        return true;
-      }
+      for (;;) {
+        result = self._(stream, i);
+        prevResult = furthestBacktrackFor(result, prevResult);
 
-      function failure(stream, newI, expected) {
-        if (!(furthestFailureI > newI)) {
-          furthestFailureI = newI;
-          furthestExpected = expected;
+        if (result.status) {
+          i = result.index;
+          accum.push(result.value);
         }
-        return false;
+        else {
+          return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
+        }
       }
     });
   };
@@ -141,37 +154,37 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     if (arguments.length < 2) max = min;
     var self = this;
 
-    return Parser(function(stream, i, onSuccess, onFailure) {
-      var xs = [];
-      var result = true;
-      var furthestFailureI, furthestExpected;
+    return Parser(function(stream, i) {
+      var accum = [];
+      var start = i;
+      var result;
+      var prevResult;
 
       for (var times = 0; times < min; times += 1) {
-        result = self._(stream, i, success, failure);
-        if (!result) return onFailure(stream, furthestFailureI, furthestExpected);
+        result = self._(stream, i);
+        prevResult = furthestBacktrackFor(result, prevResult);
+        if (result.status) {
+          i = result.index;
+          accum.push(result.value);
+        }
+        else {
+          return prevResult;
+        }
       }
 
       for (; times < max && result; times += 1) {
-        result = self._(stream, i, success, failure);
-      }
-
-      return onSuccess(stream, i, xs, furthestFailureI, furthestExpected);
-
-      function success(stream, newI, x, successFurthestFailureI, successFurthestExpected) {
-        i = newI;
-        xs.push(x);
-        furthestFailureI = successFurthestFailureI;
-        furthestExpected = successFurthestExpected;
-        return true;
-      }
-
-      function failure(stream, newI, expected) {
-        if (!(furthestFailureI > newI)) {
-          furthestFailureI = newI;
-          furthestExpected = expected;
+        result = self._(stream, i);
+        prevResult = furthestBacktrackFor(result, prevResult);
+        if (result.status) {
+          i = result.index;
+          accum.push(result.value);
         }
-        return false;
+        else {
+          break;
+        }
       }
+
+      return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
     });
   };
 
@@ -200,14 +213,14 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     var len = str.length;
     var expected = "'"+str+"'";
 
-    return Parser(function(stream, i, onSuccess, onFailure) {
+    return Parser(function(stream, i) {
       var head = stream.slice(i, i+len);
 
       if (head === str) {
-        return onSuccess(stream, i+len, head, -1);
+        return makeSuccess(i+len, head);
       }
       else {
-        return onFailure(stream, i, expected);
+        return makeFailure(i, expected);
       }
     });
   };
@@ -217,29 +230,27 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
     var expected = ''+re;
 
-    return Parser(function(stream, i, onSuccess, onFailure) {
+    return Parser(function(stream, i) {
       var match = re.exec(stream.slice(i));
 
       if (match) {
         var result = match[0];
-        return onSuccess(stream, i+result.length, result, -1);
+        return makeSuccess(i+result.length, result);
       }
       else {
-        return onFailure(stream, i, expected);
+        return makeFailure(i, re);
       }
     });
   };
 
-  var succeed = Parsimmon.succeed = function(result) {
-    return Parser(function(stream, i, onSuccess) {
-      return onSuccess(stream, i, result);
+  var succeed = Parsimmon.succeed = function(value) {
+    return Parser(function(stream, i) {
+      return makeSuccess(i, value);
     });
   };
 
   var fail = Parsimmon.fail = function(expected) {
-    return Parser(function(stream, i, _, onFailure) {
-      return onFailure(stream, i, expected);
-    });
+    return Parser(function(stream, i) { return makeFailure(i, expected); });
   };
 
   var letter = Parsimmon.letter = regex(/^[a-z]/i);
@@ -249,19 +260,19 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   var whitespace = Parsimmon.whitespace = regex(/^\s+/);
   var optWhitespace = Parsimmon.optWhitespace = regex(/^\s*/);
 
-  var any = Parsimmon.any = Parser(function(stream, i, onSuccess, onFailure) {
-    if (i >= stream.length) return onFailure(stream, i, 'any character');
+  var any = Parsimmon.any = Parser(function(stream, i) {
+    if (i >= stream.length) return makeFailure(i, 'any character');
 
-    return onSuccess(stream, i+1, stream.charAt(i), -1);
+    return makeSuccess(i+1, stream.charAt(i));
   });
 
-  var all = Parsimmon.all = Parser(function(stream, i, onSuccess, onFailure) {
-    return onSuccess(stream, stream.length, stream.slice(i), -1);
+  var all = Parsimmon.all = Parser(function(stream, i) {
+    return makeSuccess(stream.length, stream.slice(i));
   });
 
-  var eof = Parsimmon.eof = Parser(function(stream, i, onSuccess, onFailure) {
-    if (i < stream.length) return onFailure(stream, i, 'EOF');
+  var eof = Parsimmon.eof = Parser(function(stream, i) {
+    if (i < stream.length) return makeFailure(i, 'EOF');
 
-    return onSuccess(stream, i, '', -1);
+    return makeSuccess(i, null);
   });
 });
