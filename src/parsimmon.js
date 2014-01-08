@@ -196,7 +196,12 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   _.map = function(fn) {
-    return this.then(function(result) { return succeed(fn(result)); });
+    var self = this;
+    return Parser(function(stream, i) {
+      var result = self._(stream, i);
+      if (!result.status) return result;
+      return furthestBacktrackFor(makeSuccess(result.index, fn(result.value)), result);
+    });
   };
 
   _.skip = function(next) {
