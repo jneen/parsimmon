@@ -8,6 +8,7 @@ suite('parser', function() {
   var eof = Parsimmon.eof;
   var succeed = Parsimmon.succeed;
   var all = Parsimmon.all;
+  var index = Parsimmon.index;
 
   test('Parsimmon.string', function() {
     var parser = string('x');
@@ -233,6 +234,13 @@ suite('parser', function() {
 
     assert.equal(parser.parse('  '), '  ')
     assert.equal(parser.parse('x'), 'default');
+  });
+
+  test('index', function() {
+    var parser = regex(/^x*/).then(index);
+    assert.equal(parser.parse(''), 0);
+    assert.equal(parser.parse('xx'), 2);
+    assert.equal(parser.parse('xxxx'), 4);
   });
 
   suite('smart error messages', function() {

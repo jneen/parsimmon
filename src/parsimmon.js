@@ -275,4 +275,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
     return makeSuccess(i, null);
   });
+
+  var index = Parsimmon.index = Parser(function(stream, i) {
+    return makeSuccess(i, i);
+  });
 });
