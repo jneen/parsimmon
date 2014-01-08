@@ -83,13 +83,10 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i) {
       var result = self._(stream, i);
 
-      if (result.status) {
-        var nextParser = (next instanceof Parser ? next : next(result.value));
-        return furthestBacktrackFor(nextParser._(stream, result.index), result);
-      }
-      else {
-        return result;
-      }
+      if (!result.status) return result;
+
+      var nextParser = (next instanceof Parser ? next : next(result.value));
+      return furthestBacktrackFor(nextParser._(stream, result.index), result);
     });
   };
 
