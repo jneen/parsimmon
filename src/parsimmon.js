@@ -272,4 +272,21 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
     return makeSuccess(i, null);
   });
+
+  // [Parser a] -> Parser [a]
+  var seq = Parsimmon.seq = function(parsers) {
+    return Parser(function(stream, i) {
+      var result;
+      var accum = new Array(parsers.length);
+
+      for (var j = 0; j < parsers.length; j += 1) {
+        result = furthestBacktrackFor(parsers[j]._(stream, i), result);
+        if (!result.status) return result;
+        accum[j] = result.value
+        i = result.index;
+      }
+
+      return furthestBacktrackFor(makeSuccess(i, accum), result);
+    });
+  }
 });
