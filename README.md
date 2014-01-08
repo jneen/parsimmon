@@ -102,6 +102,7 @@ a `'b'`, and fail otherwise.
   - `Parsimmon.any` consumes and yields the next character of the stream.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
+  - `Parsimmon.index` is a parser that yields the current index of the parse.
 
 ### Parser methods
   - `parser.or(otherParser)`:
@@ -131,5 +132,8 @@ a `'b'`, and fail otherwise.
     expects `parser` at most `n` times.  Yields an array of the results.
   - `parser.atLeast(n)`:
     expects `parser` at least `n` times.  Yields an array of the results.
+  - `parser.mark()` yields an object with `start`, `value`, and `end` keys, where
+    `value` is the original value yielded by the parser, and `start` and `end` are
+    the indices in the stream that contain the parsed text.
 
 
