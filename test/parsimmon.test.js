@@ -243,6 +243,13 @@ suite('parser', function() {
     assert.equal(parser.parse('xxxx'), 4);
   });
 
+  test('mark', function() {
+    var ys = regex(/^y*/).mark()
+    var parser = optWhitespace.then(ys).skip(optWhitespace);
+    assert.deepEqual(parser.parse(''), { start: 0, value: '', end: 0 });
+    assert.deepEqual(parser.parse(' yy '), { start: 1, value: 'yy', end: 3 });
+  });
+
   suite('smart error messages', function() {
     // this is mainly about .or(), .many(), and .times(), but not about
     // their core functionality, so it's in its own test suite

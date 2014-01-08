@@ -208,6 +208,18 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return this.then(function(result) { return two.result(result); });
   };
 
+  // TODO: this would be better implemented with `seq`
+  _.mark = function() {
+    var self = this;
+    return index.then(function(start) {
+      return self.then(function(value) {
+        return index.map(function(end) {
+          return { start: start, value: value, end: end };
+        });
+      });
+    });
+  };
+
   // -*- primitive parsers -*- //
   var string = Parsimmon.string = function(str) {
     var len = str.length;
