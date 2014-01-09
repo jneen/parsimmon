@@ -238,10 +238,12 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   var regex = Parsimmon.regex = function(re) {
-    return Parser(function(stream, i) {
-      var match = re.exec(stream.slice(i));
+    var anchored = RegExp('^(?:'+re.source+')', (''+re).slice(re.source.length+2));
 
-      if (match && match.index === 0) {
+    return Parser(function(stream, i) {
+      var match = anchored.exec(stream.slice(i));
+
+      if (match) {
         var result = match[0];
         return makeSuccess(i+result.length, result);
       }
