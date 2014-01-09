@@ -238,14 +238,10 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   var regex = Parsimmon.regex = function(re) {
-    if (re.source[0] !== '^') throw 'regex '+re+' must be anchored';
-
-    var expected = ''+re;
-
     return Parser(function(stream, i) {
       var match = re.exec(stream.slice(i));
 
-      if (match) {
+      if (match && match.index === 0) {
         var result = match[0];
         return makeSuccess(i+result.length, result);
       }
