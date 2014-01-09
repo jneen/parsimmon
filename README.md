@@ -15,8 +15,8 @@ var regex = Parsimmon.regex;
 var string = Parsimmon.string;
 var optWhitespace = Parsimmon.optWhitespace;
 
-var id = regex(/^[a-z_]\w*/i);
-var number = regex(/^[0-9]+/).map(parseInt);
+var id = regex(/[a-z_]\w*/i);
+var number = regex(/[0-9]+/).map(parseInt);
 
 var atom = number.or(id);
 
@@ -87,18 +87,17 @@ a `'b'`, and fail otherwise.
 ### Included parsers / parser generators:
   - `Parsimmon.string("my-string")` is a parser that expects to find
     `"my-string"`, and will yield the same.
-  - `Parsimmon.regex(/^myregex/)` is a parser that expects the stream
-    to match the given regex.  **Due to limitations in javascript's regex
-    API, the regex must be anchored (with `^` at the beginning).**
+  - `Parsimmon.regex(/myregex/)` is a parser that expects the stream
+    to match the given regex.
   - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
     the string, and yields `result`.
   - `Parsimmon.fail(message)`
-  - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/^[a-z]/i)`
-  - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/^[a-z]*/i)`
-  - `Parsimmon.digit` is equivalent to `Parsimmon.regex(/^[0-9]/)`
-  - `Parsimmon.digits` is equivalent to `Parsimmon.regex(/^[0-9]*/)`
-  - `Parsimmon.whitespace` is equivalent to `Parsimmon.regex(/^\s+/)`
-  - `Parsimmon.optWhitespace` is equivalent to `Parsimmon.regex(/^\s*/)`
+  - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/[a-z]/i)`
+  - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/[a-z]*/i)`
+  - `Parsimmon.digit` is equivalent to `Parsimmon.regex(/[0-9]/)`
+  - `Parsimmon.digits` is equivalent to `Parsimmon.regex(/[0-9]*/)`
+  - `Parsimmon.whitespace` is equivalent to `Parsimmon.regex(/\s+/)`
+  - `Parsimmon.optWhitespace` is equivalent to `Parsimmon.regex(/\s*/)`
   - `Parsimmon.any` consumes and yields the next character of the stream.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
