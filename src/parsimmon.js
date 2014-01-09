@@ -291,4 +291,24 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   var index = Parsimmon.index = Parser(function(stream, i) {
     return makeSuccess(i, i);
   });
+
+  //- fantasyland compat
+
+  //- Semigroup
+  _.concat = _.then;
+
+  //- Applicative
+  _.of = Parser.of = Parsimmon.of = succeed
+
+  // TODO: this could be better implemented with `seq`
+  _.ap = function(other) {
+    return this.then(function(fn) {
+      return other.then(function(val) {
+        return fn(val);
+      });
+    });
+  };
+
+  //- Monad
+  _.chain = _.then;
 });
