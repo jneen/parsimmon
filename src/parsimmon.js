@@ -208,15 +208,9 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return seq([this, next]).map(function(results) { return results[0]; });
   };
 
-  // TODO: this would be better implemented with `seq`
   _.mark = function() {
-    var self = this;
-    return index.then(function(start) {
-      return self.then(function(value) {
-        return index.map(function(end) {
-          return { start: start, value: value, end: end };
-        });
-      });
+    return seq([index, this, index]).map(function(results) {
+      return { start: results[0], value: results[1], end: results[2] };
     });
   };
 
@@ -326,12 +320,9 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   //- Applicative
   _.of = Parser.of = Parsimmon.of = succeed
 
-  // TODO: this could be better implemented with `seq`
   _.ap = function(other) {
-    return this.then(function(fn) {
-      return other.then(function(val) {
-        return fn(val);
-      });
+    return seq([this, other]).map(function(results) {
+      return results[0](results[1]);
     });
   };
 
