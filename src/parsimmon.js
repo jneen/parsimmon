@@ -208,6 +208,18 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return seq([this, next]).map(function(results) { return results[0]; });
   };
 
+  // TODO: this would be better implemented with `seq`
+  _.mark = function() {
+    var self = this;
+    return index.then(function(start) {
+      return self.then(function(value) {
+        return index.map(function(end) {
+          return { start: start, value: value, end: end };
+        });
+      });
+    });
+  };
+
   // -*- primitive parsers -*- //
   var string = Parsimmon.string = function(str) {
     var len = str.length;
@@ -301,4 +313,28 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       return furthestBacktrackFor(makeSuccess(i, accum), result);
     });
   }
+
+  var index = Parsimmon.index = Parser(function(stream, i) {
+    return makeSuccess(i, i);
+  });
+
+  //- fantasyland compat
+
+  //- Semigroup
+  _.concat = _.then;
+
+  //- Applicative
+  _.of = Parser.of = Parsimmon.of = succeed
+
+  // TODO: this could be better implemented with `seq`
+  _.ap = function(other) {
+    return this.then(function(fn) {
+      return other.then(function(val) {
+        return fn(val);
+      });
+    });
+  };
+
+  //- Monad
+  _.chain = _.then;
 });
