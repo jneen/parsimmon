@@ -238,7 +238,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   var regex = Parsimmon.regex = function(re) {
-    var anchored = RegExp('^(?:'+re.source+')', (''+re).slice(re.source.length+2));
+    var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
 
     return Parser(function(stream, i) {
       var match = anchored.exec(stream.slice(i));
