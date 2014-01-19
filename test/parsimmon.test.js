@@ -18,13 +18,14 @@ suite('parser', function() {
   });
 
   test('Parsimmon.regex', function() {
-    var parser = regex(/^[0-9]/);
+    var parser = regex(/[0-9]/);
 
     assert.equal(parser.parse('1'), '1');
     assert.equal(parser.parse('4'), '4');
     assert.throws(function() { parser.parse('x'); },
-      "Parse Error: expected /^[0-9]/ at character 0, got 'x'\n    parsing: 'x'");
-    assert.throws(function() { regex(/./) }, 'must be anchored');
+      "Parse Error: expected /[0-9]/ at character 0, got 'x'\n    parsing: 'x'");
+    assert.throws(function() { parser.parse('x0'); },
+      "Parse Error: expected /[0-9]/ at character 0, got 'x0'\n    parsing: 'x0'");
   });
 
   suite('then', function() {
