@@ -263,12 +263,12 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i) { return makeFailure(i, expected); });
   };
 
-  var letter = Parsimmon.letter = regex(/^[a-z]/i);
-  var letters = Parsimmon.letters = regex(/^[a-z]*/i);
-  var digit = Parsimmon.digit = regex(/^[0-9]/);
-  var digits = Parsimmon.digits = regex(/^[0-9]*/);
-  var whitespace = Parsimmon.whitespace = regex(/^\s+/);
-  var optWhitespace = Parsimmon.optWhitespace = regex(/^\s*/);
+  var letter = Parsimmon.letter = regex(/[a-z]/i);
+  var letters = Parsimmon.letters = regex(/[a-z]*/i);
+  var digit = Parsimmon.digit = regex(/[0-9]/);
+  var digits = Parsimmon.digits = regex(/[0-9]*/);
+  var whitespace = Parsimmon.whitespace = regex(/\s+/);
+  var optWhitespace = Parsimmon.optWhitespace = regex(/\s*/);
 
   var any = Parsimmon.any = Parser(function(stream, i) {
     if (i >= stream.length) return makeFailure(i, 'any character');
