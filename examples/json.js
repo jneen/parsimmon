@@ -2,8 +2,21 @@ var Parsimmon = require('./../index');
 var string = Parsimmon.string;
 var regex = Parsimmon.regex;
 var succeed = Parsimmon.succeed;
+var seq = Parsimmon.seq;
+var lazy = Parsimmon.lazy;
 
 var json = (function() {
+  var json = lazy(function() {
+    return object
+      .or(array)
+      .or(stringLiteral)
+      .or(numberLiteral)
+      .or(nullLiteral)
+      .or(trueLiteral)
+      .or(falseLiteral)
+      .skip(regex(/^\s*/m));
+  });
+
   var escapes = {
     b: '\b',
     f: '\f',
@@ -23,42 +36,30 @@ var json = (function() {
   var numberLiteral = regex(/^\d+(([.]|e[+-]?)\d+)?/i).map(parseFloat)
 
   function commaSep(parser) {
-    return parser.then(function(x) {
-      return regex(/^,\s*/m).then(parser).many().map(function(xs) {
-        return [x].concat(xs);
-      });
+    var commaParser = regex(/^,\s*/m).then(parser).many()
+    return seq([parser, commaParser]).map(function(results) {
+      return [results[0]].concat(results[1]);
     }).or(succeed([]));
   }
 
-  var array = regex(/^\[\s*/m).then(function() {
-    return commaSep(json).skip(string(']'));
+  var array = seq([regex(/^\[\s*/m), commaSep(json), string(']')]).map(function(results) {
+    return results[1];
   });
 
-  var pair = stringLiteral.then(function(key) {
-    return regex(/^\s*:\s*/m).then(json).map(function(res) { return [key, res]; });
-  });
+  var pair = seq([stringLiteral.skip(regex(/^\s*:\s*/m)), json]);
 
-  var object = regex(/^[{]\s*/m).then(commaSep(pair)).skip(string('}'))
-    .map(function(pairs) {
-      var out = {};
-      for (var i = pairs.length-1; i >= 0; i -= 1) {
-        out[pairs[i][0]] = pairs[i][1]
-      }
-      return out;
-    });
+  var object = seq([regex(/^[{]\s*/m), commaSep(pair), string('}')]).map(function(results) {
+    var pairs = results[1];
+    var out = {};
+    for (var i = pairs.length-1; i >= 0; i -= 1) {
+      out[pairs[i][0]] = pairs[i][1];
+    }
+    return out;
+  });
 
   var nullLiteral = string('null').result(null);
   var trueLiteral = string('true').result(true);
   var falseLiteral = string('false').result(false);
-
-  var json = object
-    .or(array)
-    .or(stringLiteral)
-    .or(numberLiteral)
-    .or(nullLiteral)
-    .or(trueLiteral)
-    .or(falseLiteral)
-    .skip(regex(/^\s*/m));
 
   return json;
 })();

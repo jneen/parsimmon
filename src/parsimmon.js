@@ -83,13 +83,10 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i) {
       var result = self._(stream, i);
 
-      if (result.status) {
-        var nextParser = (next instanceof Parser ? next : next(result.value));
-        return furthestBacktrackFor(nextParser._(stream, result.index), result);
-      }
-      else {
-        return result;
-      }
+      if (!result.status) return result;
+
+      var nextParser = (next instanceof Parser ? next : next(result.value));
+      return furthestBacktrackFor(nextParser._(stream, result.index), result);
     });
   };
 
@@ -116,15 +113,14 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       var prevResult;
 
       for (;;) {
-        result = self._(stream, i);
-        prevResult = furthestBacktrackFor(result, prevResult);
+        result = furthestBacktrackFor(self._(stream, i), result);
 
         if (result.status) {
           i = result.index;
           accum.push(result.value);
         }
         else {
-          return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
+          return furthestBacktrackFor(makeSuccess(i, accum), result);
         }
       }
     });
@@ -193,30 +189,27 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.atMost = function(n) { return this.times(0, n); };
   _.atLeast = function(n) {
     var self = this;
-    return self.times(n).then(function(start) {
-      return self.many().map(function(end) {
-        return start.concat(end);
-      });
+    return seq([this.times(n), this.many()]).map(function(results) {
+      return results[0].concat(results[1]);
     });
   };
 
   _.map = function(fn) {
-    return this.then(function(result) { return succeed(fn(result)); });
-  };
-
-  _.skip = function(two) {
-    return this.then(function(result) { return two.result(result); });
-  };
-
-  // TODO: this would be better implemented with `seq`
-  _.mark = function() {
     var self = this;
-    return index.then(function(start) {
-      return self.then(function(value) {
-        return index.map(function(end) {
-          return { start: start, value: value, end: end };
-        });
-      });
+    return Parser(function(stream, i) {
+      var result = self._(stream, i);
+      if (!result.status) return result;
+      return furthestBacktrackFor(makeSuccess(result.index, fn(result.value)), result);
+    });
+  };
+
+  _.skip = function(next) {
+    return seq([this, next]).map(function(results) { return results[0]; });
+  };
+
+  _.mark = function() {
+    return seq([index, this, index]).map(function(results) {
+      return { start: results[0], value: results[1], end: results[2] };
     });
   };
 
@@ -286,6 +279,32 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return makeSuccess(i, null);
   });
 
+  var lazy = Parsimmon.lazy = function(f) {
+    var parser = Parser(function(stream, i) {
+      parser._ = f()._;
+      return parser._(stream, i);
+    });
+
+    return parser;
+  };
+
+  // [Parser a] -> Parser [a]
+  var seq = Parsimmon.seq = function(parsers) {
+    return Parser(function(stream, i) {
+      var result;
+      var accum = new Array(parsers.length);
+
+      for (var j = 0; j < parsers.length; j += 1) {
+        result = furthestBacktrackFor(parsers[j]._(stream, i), result);
+        if (!result.status) return result;
+        accum[j] = result.value
+        i = result.index;
+      }
+
+      return furthestBacktrackFor(makeSuccess(i, accum), result);
+    });
+  }
+
   var index = Parsimmon.index = Parser(function(stream, i) {
     return makeSuccess(i, i);
   });
@@ -298,12 +317,9 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   //- Applicative
   _.of = Parser.of = Parsimmon.of = succeed
 
-  // TODO: this could be better implemented with `seq`
   _.ap = function(other) {
-    return this.then(function(fn) {
-      return other.then(function(val) {
-        return fn(val);
-      });
+    return seq([this, other]).map(function(results) {
+      return results[0](results[1]);
     });
   };
 

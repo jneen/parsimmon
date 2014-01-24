@@ -91,6 +91,11 @@ a `'b'`, and fail otherwise.
     to match the given regex.
   - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
     the string, and yields `result`.
+  - `Parsimmon.seq(parsers)` accepts an array of parsers that it expects to find in order,
+    yielding an array of the results.
+  - `Parsimmon.lazy(f)` accepts a function that returns a parser, which is evaluated the
+    first time the parser is used.  This is useful for referencing parsers that haven't yet
+    been defined.
   - `Parsimmon.fail(message)`
   - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/[a-z]/i)`
   - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/[a-z]*/i)`
