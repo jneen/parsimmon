@@ -280,7 +280,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
   //- Monoid (Alternative, really)
   _.concat = _.or;
-  _.empty = _.fail('empty')
+  _.empty = fail('empty')
 
   //- Applicative
   _.of = Parser.of = Parsimmon.of = succeed
