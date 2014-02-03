@@ -278,8 +278,9 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
   //- fantasyland compat
 
-  //- Semigroup
-  _.concat = _.then;
+  //- Monoid (Alternative, really)
+  _.concat = _.or;
+  _.empty = _.fail('empty')
 
   //- Applicative
   _.of = Parser.of = Parsimmon.of = succeed
