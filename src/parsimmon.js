@@ -168,7 +168,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
         }
       }
 
-      for (; times < max && result; times += 1) {
+      for (; times < max; times += 1) {
         result = self._(stream, i);
         prevResult = furthestBacktrackFor(result, prevResult);
         if (result.status) {

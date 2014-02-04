@@ -182,6 +182,15 @@ suite('parser', function() {
       assert.throws(function() { thenDigit.parse('x1'); });
     });
 
+    test('atMost', function() {
+      var atMostTwo = letter.atMost(2);
+      debugger
+      assertEqualArray(atMostTwo.parse(''), []);
+      assertEqualArray(atMostTwo.parse('a'), ['a']);
+      assertEqualArray(atMostTwo.parse('ab'), ['a', 'b']);
+      assert.throws(function() { atMostTwo.parse('abc'); });
+    });
+
     test('atLeast', function() {
       var atLeastTwo = letter.atLeast(2);
 
