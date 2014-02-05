@@ -48,7 +48,7 @@ report: $(UGLY)
 # -*- packaging -*- #
 
 # XXX this is kind of awful, but hey, it keeps the version info in the right place.
-VERSION = $(shell node -e 'console.log(require("./package.json").version)')
+VERSION = $(shell node -p 'require("./package.json").version')
 PACKAGE = tmp/parsimmon-$(VERSION).tgz
 DISTDIR = parsimmon-$(VERSION)
 DIST = $(DISTDIR).tgz
