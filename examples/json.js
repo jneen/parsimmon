@@ -7,14 +7,15 @@ var lazy = Parsimmon.lazy;
 
 var json = (function() {
   var json = lazy(function() {
-    return object
-      .or(array)
-      .or(stringLiteral)
-      .or(numberLiteral)
-      .or(nullLiteral)
-      .or(trueLiteral)
-      .or(falseLiteral)
-      .skip(regex(/^\s*/m));
+    return alt([
+      object,
+      array,
+      stringLiteral,
+      numberLiteral,
+      nullLiteral,
+      trueLiteral,
+      falseLiteral
+    ]).skip(regex(/^\s*/m));
   });
 
   var escapes = {

@@ -68,13 +68,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
   // -*- primitive combinators -*- //
   _.or = function(alternative) {
-    var self = this;
-
-    return Parser(function(stream, i) {
-      var result = self._(stream, i);
-
-      return result.status ? result : furthestBacktrackFor(alternative._(stream, i), result);
-    });
+    return alt([this, alternative]);
   };
 
   _.then = function(next) {
@@ -303,7 +297,18 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
       return furthestBacktrackFor(makeSuccess(i, accum), result);
     });
-  }
+  };
+
+  var alt = Parsimmon.alt = function(parsers) {
+    return Parser(function(stream, i) {
+      var result;
+      for (var j = 0; j < parsers.length; j += 1) {
+        result = furthestBacktrackFor(parsers[j]._(stream, i), result);
+        if (result.status) return result;
+      }
+      return result;
+    });
+  };
 
   var index = Parsimmon.index = Parser(function(stream, i) {
     return makeSuccess(i, i);
