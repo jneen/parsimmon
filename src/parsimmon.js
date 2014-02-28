@@ -183,7 +183,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.atMost = function(n) { return this.times(0, n); };
   _.atLeast = function(n) {
     var self = this;
-    return seq([this.times(n), this.many()]).map(function(results) {
+    return seq(this.times(n), this.many()).map(function(results) {
       return results[0].concat(results[1]);
     });
   };
@@ -198,11 +198,11 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   _.skip = function(next) {
-    return seq([this, next]).map(function(results) { return results[0]; });
+    return seq(this, next).map(function(results) { return results[0]; });
   };
 
   _.mark = function() {
-    return seq([index, this, index]).map(function(results) {
+    return seq(index, this, index).map(function(results) {
       return { start: results[0], value: results[1], end: results[2] };
     });
   };
@@ -284,6 +284,10 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
   // [Parser a] -> Parser [a]
   var seq = Parsimmon.seq = function(parsers) {
+    if (parsers.length === undefined) {
+      parsers = arguments;
+    }
+
     return Parser(function(stream, i) {
       var result;
       var accum = new Array(parsers.length);
@@ -324,7 +328,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.of = Parser.of = Parsimmon.of = succeed
 
   _.ap = function(other) {
-    return seq([this, other]).map(function(results) {
+    return seq(this, other).map(function(results) {
       return results[0](results[1]);
     });
   };
