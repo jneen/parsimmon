@@ -14,7 +14,7 @@
     "uglify-js": "2.x"
   },
   "dependencies": {
-    "pjs": "3.x"
+    "pjs": "5.x"
   },
   "scripts": {
     "prepublish": "make commonjs",
