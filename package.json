@@ -6,7 +6,12 @@
   "author": "Jay Adkisson <jjmadkisson at gmail dot com>",
   "repository": "git://github.com/jayferd/parsimmon",
 
-  "files": ["index.js", "src", "test", "Makefile", "package.json", "build/parsimmon.commonjs.js"],
+  "files": [
+    "index.js", "src", "test", "Makefile", "package.json",
+    "build/parsimmon.commonjs.js",
+    "build/parsimmon.browser.js",
+    "build/parsimmon.browser.min.js"
+  ],
   "main": "index.js",
   "devDependencies": {
     "mocha": "1.8.x",
@@ -17,7 +22,7 @@
     "pjs": "5.x"
   },
   "scripts": {
-    "prepublish": "make commonjs",
+    "prepublish": "make commonjs browser",
     "test": "make test"
   }
 }
