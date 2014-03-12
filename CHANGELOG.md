@@ -1,3 +1,7 @@
+## version 0.3.1 (2014-03-12)
+
+* add browser files to the npm package
+
 ## version 0.3.0 (2014-03-12)
 
 * started updating the changelog again :x
