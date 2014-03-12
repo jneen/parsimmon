@@ -1,3 +1,8 @@
+## version 0.3.0 (2014-03-12)
+
+* started updating the changelog again :x
+* breaking from 0.2.x: `seq` and `alt` now take varargs instead of a single list argument.
+
 ## version 0.1.0 (2014-01-09)
 
 * Uses less stack space with a non-cps implementation
