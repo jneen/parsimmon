@@ -22,7 +22,6 @@
     "pjs": "5.x"
   },
   "scripts": {
-    "prepublish": "make commonjs browser",
     "test": "make test"
   }
 }
