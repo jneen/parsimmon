@@ -55,7 +55,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       var message = 'expected ' + expected + ' at character ' + i + ', got '
         + prefix + stream.slice(i, i+12) + suffix;
     }
-    throw 'Parse Error: ' + message + "\n    parsing: '" + stream + "'";
+    throw new Error('Parse Error: ' + message + "\n    parsing: '" + stream + "'");
   }
 
   _.init = function(body) { this._ = body; };
