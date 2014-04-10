@@ -46,28 +46,40 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
   }
 
-  function parseError(stream, result) {
-    var expected = result.expected;
-    var i = result.furthest;
+  var formatError = Parsimmon.formatError = function(stream, error) {
+    var expected = error.expected;
+    var i = error.index;
 
     if (i === stream.length) {
-      var message = 'expected ' + expected + ', got the end of the string';
+      return 'expected ' + expected + ', got the end of the string';
     }
-    else {
-      var prefix = (i > 0 ? "'..." : "'");
-      var suffix = (stream.length - i > 12 ? "...'" : "'");
-      var message = 'expected ' + expected + ' at character ' + i + ', got '
-        + prefix + stream.slice(i, i+12) + suffix;
-    }
-    throw 'Parse Error: ' + message + "\n    parsing: '" + stream + "'";
-  }
+
+    var prefix = (i > 0 ? "'..." : "'");
+    var suffix = (stream.length - i > 12 ? "...'" : "'");
+    return (
+      'expected ' + expected + ' at character ' + i + ', got ' +
+      prefix + stream.slice(i, i+12) + suffix
+    );
+  };
 
   _.init = function(body) { this._ = body; };
 
   _.parse = function(stream) {
     var result = this.skip(eof)._(stream, 0);
 
-    return result.status ? result.value : parseError(stream, result);
+    if (result.status) {
+      return {
+        status: true,
+        value: result.value
+      };
+    }
+    else {
+      return {
+        status: false,
+        index: result.furthest,
+        expected: result.expected
+      };
+    }
   };
 
   // -*- primitive combinators -*- //
