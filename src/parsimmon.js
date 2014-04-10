@@ -42,6 +42,10 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     }
   }
 
+  function assertParser(p) {
+    if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
+  }
+
   function parseError(stream, result) {
     var expected = result.expected;
     var i = result.furthest;
@@ -72,16 +76,12 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   _.then = function(next) {
-    var self = this;
+    if (typeof next === 'function') {
+      throw new Error('chaining features of .then are no longer supported');
+    }
 
-    return Parser(function(stream, i) {
-      var result = self._(stream, i);
-
-      if (!result.status) return result;
-
-      var nextParser = (next instanceof Parser ? next : next(result.value));
-      return furthestBacktrackFor(nextParser._(stream, result.index), result);
-    });
+    assertParser(next);
+    return seq(this, next).map(function(results) { return results[1]; });
   };
 
   // -*- optimized iterative combinators -*- //
@@ -337,5 +337,13 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   //- Monad
-  _.chain = _.then;
+  _.chain = function(f) {
+    var self = this;
+    return Parser(function(stream, i) {
+      var result = self._(stream, i);
+      if (!result.status) return result;
+      var nextParser = f(result.value);
+      return furthestBacktrackFor(nextParser._(stream, result.index), result);
+    });
+  };
 });
