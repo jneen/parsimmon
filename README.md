@@ -14,20 +14,23 @@ Parsimmon is a small library for writing big parsers made up of lots of little p
 var regex = Parsimmon.regex;
 var string = Parsimmon.string;
 var optWhitespace = Parsimmon.optWhitespace;
+var lazy = Parsimmon.lazy;
 
-var id = regex(/[a-z_]\w*/i);
-var number = regex(/[0-9]+/).map(parseInt);
+function lexeme(p) { return p.skip(optWhitespace); }
+
+var lparen = lexeme(string('('));
+var rparen = lexeme(string(')'));
+
+var expr = lazy(function() { return form.or(atom) });
+
+var number = lexeme(regex(/[0-9]+/).map(parseInt));
+var id = lexeme(regex(/[a-z_]\w*/i));
 
 var atom = number.or(id);
+var form = lparen.then(expr.many()).skip(rparen);
 
-var form = string('(').skip(optWhitespace).then(function() {
-  return expr.many().skip(string(')'));
-});
-
-var expr = form.or(atom).skip(optWhitespace);
-
-expr.parse('3') // => 3
-expr.parse('(add (mul 10 (add 3 4)) (add 7 8))')
+expr.parse('3').value // => 3
+expr.parse('(add (mul 10 (add 3 4)) (add 7 8))').value
   // => ['add', ['mul', 10, ['add', 3, 4]], ['add', 7, 8]]
 ```
 
@@ -35,52 +38,34 @@ expr.parse('(add (mul 10 (add 3 4)) (add 7 8))')
 
 A Parsimmon parser is an object that represents an action on a stream
 of text, and the promise of either an object yielded by that action on
-success or a message in case of failure.  Under the hood, this is
-represented by a function that takes a stream and calls one of two
-callbacks with an error or a result.  For example, `string('foo')`
+success or a message in case of failure.  For example, `string('foo')`
 yields the string `'foo'` if the beginning of the stream is `'foo'`,
 and otherwise fails.
 
 The combinator method `.map` is used to transform the yielded value.
-For example, `string('foo').map(function(x) { return x + 'bar'; })`
-will yield `'foobar'` if the stream starts with `'foo'`.  The parser
-`digits.map(function(x) { return parseInt(x) * 2; })` will yield
-the number 24 when it encounters the string '12'.  The method
-`.result` can be used to set a constant result.
-
-The two core ways to combine parsers are `.then` and `.or`.  The
-method `.then` provides a way to decide how to continue the parse
-based on the result of a previous parser.  For a kind of contrived
-example,
+For example,
 
 ``` js
-var sentence = regex(/[\w\s]+/).then(function(contents) {
-  var ending;
-
-  if (contents.indexOf('bang') >= 0) {
-    ending = '!';
-  }
-  else {
-    ending = '.'
-  }
-
-  return string(ending).result(contents + ending);
-});
-
-sentence.parse('quick brown dogs and things.') // => 'quick brown dogs and things.'
-sentence.parse('shebang.') // parse error: expected '!'
-sentence.parse('shebang!') // => 'shebang!'
+string('foo').map(function(x) { return x + 'bar'; })
 ```
 
-For the monad-loving crowd, `.then` is the `bind` operation on
-the parser monad (much like Parsec).  For others, this is very
-similar to the Promises/A spec, implemented by jQuery's deferred
-objects.
+will yield `'foobar'` if the stream starts with `'foo'`.  The parser
 
-The method `.or` allows a parser to continue by trying another parser
-if it fails.  So `string('a').or(string('b'))` will yield an `'a'` if
-the stream starts with an `'a'`, and a `'b'` if the stream starts with
-a `'b'`, and fail otherwise.
+``` js
+digits.map(function(x) { return parseInt(x) * 2; })
+```
+
+will yield the number 24 when it encounters the string '12'.  The method
+`.result` can be used to set a constant result.
+
+Calling `.parse(str)` on a parser parses the string, and returns an
+object with a `status` flag, indicating whether the parse succeeded.
+If it succeeded, the `value` attribute will contain the yielded value.
+Otherwise, the `index` and `expected` attributes will contain the
+index of the parse error, and a message indicating what was expected.
+The error object can be passed along with the original source to
+`Parsimmon.formatError(source, error)` to obtain a human-readable
+error string.
 
 ## Full API
 
@@ -93,9 +78,11 @@ a `'b'`, and fail otherwise.
     the string, and yields `result`.
   - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers 
     that it expects to find in order, yielding an array of the results.
-  - `Parsimmon.lazy(f)` accepts a function that returns a parser, which is evaluated the
-    first time the parser is used.  This is useful for referencing parsers that haven't yet
-    been defined.
+  - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
+    and yields the value of the first one that succeeds, backtracking in between.
+  - `Parsimmon.lazy(f)` accepts a function that returns a parser, which
+    is evaluated the first time the parser is used.  This is useful for
+    referencing parsers that haven't yet been defined.
   - `Parsimmon.fail(message)`
   - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/[a-z]/i)`
   - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/[a-z]*/i)`
@@ -111,10 +98,12 @@ a `'b'`, and fail otherwise.
 ### Parser methods
   - `parser.or(otherParser)`:
     returns a new parser which tries `parser`, and if it fails uses `otherParser`.
-  - `parser.then(function(result) { return anotherParser; })`:
+  - `parser.chain(function(result) { return anotherParser; })`:
     returns a new parser which tries `parser`, and on success calls the
     given function with the result of the parse, which is expected to
-    return another parser.
+    return another parser, which will be tried next.  This allows you
+    to dynamically decide how to continue the parse, which is impossible
+    with the other combinators.
   - `parser.then(anotherParser)`:
     expects `anotherParser` to follow `parser`, and yields the result
     of `anotherParser`.  NB: the result of `parser` here is ignored.
@@ -139,6 +128,53 @@ a `'b'`, and fail otherwise.
   - `parser.mark()` yields an object with `start`, `value`, and `end` keys, where
     `value` is the original value yielded by the parser, and `start` and `end` are
     the indices in the stream that contain the parsed text.
+
+## Tips and patterns
+
+These apply to most parsers for traditional langauges - it's possible
+you may need to do something different for yours!
+
+For most parsers, the following format is helpful:
+
+1. define a `lexeme` function to skip all the stuff you don't care
+   about (whitespace, comments, etc).  You may need multiple types of lexemes.
+   For example,
+
+    ``` js
+    var ignore = whitespace.or(comment.many());
+    function lexeme(p) { return p.skip(ignore); }
+    ```
+
+1. Define all your lexemes first.  These should yield native javascript values.
+
+    ``` js
+    var lparen = lexeme(string('('));
+    var rparen = lexeme(string(')'));
+    var number = lexeme(regex(/[0-9]+/)).map(parseInt);
+    ```
+
+1. Forward-declare one or more top-level expressions with `lazy`,
+   referring to parsers that have not yet been defined.  Generally, this
+   takes the form of a large `.alt()` call
+
+    ``` js
+    var expr = lazy(function() { return Parsimmon.alt(p1, p2, ...); });
+    ```
+
+1. Then build your parsers from the inside out - these should return
+   AST nodes or other objects specific to your domain.
+
+    ``` js
+    var p1 = ...
+    var p2 = ...
+    ```
+
+1. Finally, export your top-level parser.  Remember to skip ignored
+   stuff at the beginning.
+
+    ``` js
+    return ignore.then(expr.many());
+    ```
 
 ### Fantasyland
 
