@@ -9,53 +9,77 @@ suite('parser', function() {
   var succeed = Parsimmon.succeed;
   var all = Parsimmon.all;
   var index = Parsimmon.index;
+  var lazy = Parsimmon.lazy;
 
   test('Parsimmon.string', function() {
     var parser = string('x');
-    assert.equal(parser.parse('x'), 'x');
-    assert.throws(function() { parser.parse('y') },
-      "Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'");
+    var res = parser.parse('x');
+    assert.ok(res.status);
+    assert.equal(res.value, 'x');
+
+    res = parser.parse('y')
+    assert.ok(!res.status)
+    assert.equal("'x'", res.expected);
+    assert.equal(0, res.index);
+
+    assert.equal(
+      "expected 'x' at character 0, got 'y'",
+      Parsimmon.formatError('y', res)
+    );
   });
 
   test('Parsimmon.regex', function() {
     var parser = regex(/[0-9]/);
 
-    assert.equal(parser.parse('1'), '1');
-    assert.equal(parser.parse('4'), '4');
-    assert.throws(function() { parser.parse('x'); },
-      "Parse Error: expected /[0-9]/ at character 0, got 'x'\n    parsing: 'x'");
-    assert.throws(function() { parser.parse('x0'); },
-      "Parse Error: expected /[0-9]/ at character 0, got 'x0'\n    parsing: 'x0'");
+    assert.equal(parser.parse('1').value, '1');
+    assert.equal(parser.parse('4').value, '4');
+    assert.deepEqual(parser.parse('x0'), {
+      status: false,
+      index: 0,
+      expected: /[0-9]/
+    });
+    assert.deepEqual(parser.parse('0x'), {
+      status: false,
+      index: 1,
+      expected: 'EOF'
+    });
   });
 
   suite('then', function() {
     test('with a parser, uses the last return value', function() {
       var parser = string('x').then(string('y'));
-      assert.equal(parser.parse('xy'), 'y');
-      assert.throws(function() { parser.parse('y'); },
-        "Parse Error: expected 'x' at character 0, got 'y'\n    parsing: 'y'");
-      assert.throws(function() { parser.parse('xz'); },
-        "Parse Error: expected 'y' at character 1, got '...z'\n    parsing: 'xz'");
+      assert.deepEqual(parser.parse('xy'), { status: true, value: 'y' });
+      assert.deepEqual(parser.parse('y'), {
+        status: false,
+        expected: "'x'",
+        index: 0
+      })
+      assert.deepEqual(parser.parse('xz'), {
+        status: false,
+        expected: "'y'",
+        index: 1
+      });
     });
+  });
 
+  suite('chain', function() {
     test('asserts that a parser is returned', function() {
-      var parser1 = letter.then(function() { return 'not a parser' });
+      var parser1 = letter.chain(function() { return 'not a parser' });
       assert.throws(function() { parser1.parse('x'); });
 
-      var parser2 = letter.then('x');
-      assert.throws(function() { letter.parse('xx'); });
+      assert.throws(function() { letter.then('x'); });
     });
 
     test('with a function that returns a parser, continues with that parser', function() {
       var piped;
-      var parser = string('x').then(function(x) {
+      var parser = string('x').chain(function(x) {
         piped = x;
         return string('y');
       });
 
-      assert.equal(parser.parse('xy'), 'y');
+      assert.deepEqual(parser.parse('xy'), { status: true, value: 'y'});
       assert.equal(piped, 'x');
-      assert.throws(function() { parser.parse('x'); });
+      assert.ok(!parser.parse('x').status);
     });
   });
 
@@ -68,22 +92,15 @@ suite('parser', function() {
         return 'y';
       });
 
-      assert.equal(parser.parse('x'), 'y')
+      assert.deepEqual(parser.parse('x'), { status: true, value: 'y' });
       assert.equal(piped, 'x');
     });
   });
 
   suite('result', function() {
     test('returns a constant result', function() {
-      var myResult = 1;
       var oneParser = string('x').result(1);
-
-      assert.equal(oneParser.parse('x'), 1);
-
-      var myFn = function() {};
-      var fnParser = string('x').result(myFn);
-
-      assert.equal(fnParser.parse('x'), myFn);
+      assert.deepEqual(oneParser.parse('x'), { status: true, value: 1 });
     });
   });
 
@@ -91,8 +108,8 @@ suite('parser', function() {
     test('uses the previous return value', function() {
       var parser = string('x').skip(string('y'));
 
-      assert.equal(parser.parse('xy'), 'x');
-      assert.throws(function() { parser.parse('x'); });
+      assert.deepEqual(parser.parse('xy'), { status: true, value: 'x' });
+      assert.ok(!parser.parse('x').status);
     });
   });
 
@@ -100,44 +117,40 @@ suite('parser', function() {
     test('two parsers', function() {
       var parser = string('x').or(string('y'));
 
-      assert.equal(parser.parse('x'), 'x');
-      assert.equal(parser.parse('y'), 'y');
-      assert.throws(function() { parser.parse('z') });
+      assert.equal(parser.parse('x').value, 'x');
+      assert.equal(parser.parse('y').value, 'y');
+      assert.ok(!parser.parse('z').status);
     });
 
-    test('with then', function() {
+    test('with chain', function() {
       var parser = string('\\')
-        .then(function() {
-          return string('y')
+        .chain(function(x) {
+          return string('y');
         }).or(string('z'));
 
-      assert.equal(parser.parse('\\y'), 'y');
-      assert.equal(parser.parse('z'), 'z');
-      assert.throws(function() { parser.parse('\\z') });
+      assert.equal(parser.parse('\\y').value, 'y');
+      assert.equal(parser.parse('z').value, 'z');
+      assert.ok(!parser.parse('\\z').status);
     });
   });
-
-  function assertEqualArray(arr1, arr2) {
-    assert.equal(arr1.join(), arr2.join());
-  }
 
   suite('many', function() {
     test('simple case', function() {
       var letters = letter.many();
 
-      assertEqualArray(letters.parse('x'), ['x']);
-      assertEqualArray(letters.parse('xyz'), ['x','y','z']);
-      assertEqualArray(letters.parse(''), []);
-      assert.throws(function() { letters.parse('1'); });
-      assert.throws(function() { letters.parse('xyz1'); });
+      assert.deepEqual(letters.parse('x').value, ['x']);
+      assert.deepEqual(letters.parse('xyz').value, ['x','y','z']);
+      assert.deepEqual(letters.parse('').value, []);
+      assert.ok(!letters.parse('1').status);
+      assert.ok(!letters.parse('xyz1').status);
     });
 
     test('followed by then', function() {
       var parser = string('x').many().then(string('y'));
 
-      assert.equal(parser.parse('y'), 'y');
-      assert.equal(parser.parse('xy'), 'y');
-      assert.equal(parser.parse('xxxxxy'), 'y');
+      assert.equal(parser.parse('y').value, 'y');
+      assert.equal(parser.parse('xy').value, 'y');
+      assert.equal(parser.parse('xxxxxy').value, 'y');
     });
   });
 
@@ -145,58 +158,57 @@ suite('parser', function() {
     test('zero case', function() {
       var zeroLetters = letter.times(0);
 
-      assertEqualArray(zeroLetters.parse(''), []);
-      assert.throws(function() { zeroLetters.parse('x'); });
+      assert.deepEqual(zeroLetters.parse('').value, []);
+      assert.ok(!zeroLetters.parse('x').status);
     });
 
     test('nonzero case', function() {
       var threeLetters = letter.times(3);
 
-      assertEqualArray(threeLetters.parse('xyz'), ['x', 'y', 'z']);
-      assert.throws(function() { threeLetters.parse('xy'); });
-      assert.throws(function() { threeLetters.parse('xyzw'); });
+      assert.deepEqual(threeLetters.parse('xyz').value, ['x', 'y', 'z']);
+      assert.ok(!threeLetters.parse('xy').status);
+      assert.ok(!threeLetters.parse('xyzw').status);
 
       var thenDigit = threeLetters.then(digit);
-      assert.equal(thenDigit.parse('xyz1'), '1');
-      assert.throws(function() { thenDigit.parse('xy1'); });
-      assert.throws(function() { thenDigit.parse('xyz'); });
-      assert.throws(function() { thenDigit.parse('xyzw'); });
+      assert.equal(thenDigit.parse('xyz1').value, '1');
+      assert.ok(!thenDigit.parse('xy1').status);
+      assert.ok(!thenDigit.parse('xyz').status);
+      assert.ok(!thenDigit.parse('xyzw').status);
     });
 
     test('with a min and max', function() {
       var someLetters = letter.times(2, 4);
 
-      assertEqualArray(someLetters.parse('xy'), ['x', 'y']);
-      assertEqualArray(someLetters.parse('xyz'), ['x', 'y', 'z']);
-      assertEqualArray(someLetters.parse('xyzw'), ['x', 'y', 'z', 'w']);
-      assert.throws(function() { someLetters.parse('xyzwv'); });
-      assert.throws(function() { someLetters.parse('x'); });
+      assert.deepEqual(someLetters.parse('xy').value, ['x', 'y']);
+      assert.deepEqual(someLetters.parse('xyz').value, ['x', 'y', 'z']);
+      assert.deepEqual(someLetters.parse('xyzw').value, ['x', 'y', 'z', 'w']);
+      assert.ok(!someLetters.parse('xyzwv').status);
+      assert.ok(!someLetters.parse('x').status);
 
       var thenDigit = someLetters.then(digit);
-      assert.equal(thenDigit.parse('xy1'), '1');
-      assert.equal(thenDigit.parse('xyz1'), '1');
-      assert.equal(thenDigit.parse('xyzw1'), '1');
-      assert.throws(function() { thenDigit.parse('xy'); });
-      assert.throws(function() { thenDigit.parse('xyzw'); });
-      assert.throws(function() { thenDigit.parse('xyzwv1'); });
-      assert.throws(function() { thenDigit.parse('x1'); });
+      assert.equal(thenDigit.parse('xy1').value, '1');
+      assert.equal(thenDigit.parse('xyz1').value, '1');
+      assert.equal(thenDigit.parse('xyzw1').value, '1');
+      assert.ok(!thenDigit.parse('xy').status);
+      assert.ok(!thenDigit.parse('xyzw').status);
+      assert.ok(!thenDigit.parse('xyzwv1').status);
+      assert.ok(!thenDigit.parse('x1').status);
     });
 
     test('atMost', function() {
       var atMostTwo = letter.atMost(2);
-      debugger
-      assertEqualArray(atMostTwo.parse(''), []);
-      assertEqualArray(atMostTwo.parse('a'), ['a']);
-      assertEqualArray(atMostTwo.parse('ab'), ['a', 'b']);
-      assert.throws(function() { atMostTwo.parse('abc'); });
+      assert.deepEqual(atMostTwo.parse('').value, []);
+      assert.deepEqual(atMostTwo.parse('a').value, ['a']);
+      assert.deepEqual(atMostTwo.parse('ab').value, ['a', 'b']);
+      assert.ok(!atMostTwo.parse('abc').status);
     });
 
     test('atLeast', function() {
       var atLeastTwo = letter.atLeast(2);
 
-      assertEqualArray(atLeastTwo.parse('xy'), ['x', 'y']);
-      assertEqualArray(atLeastTwo.parse('xyzw'), ['x', 'y', 'z', 'w']);
-      assert.throws(function() { atLeastTwo.parse('x'); });
+      assert.deepEqual(atLeastTwo.parse('xy').value, ['x', 'y']);
+      assert.deepEqual(atLeastTwo.parse('xyzw').value, ['x', 'y', 'z', 'w']);
+      assert.ok(!atLeastTwo.parse('x').status);
     });
   });
 
@@ -205,13 +217,16 @@ suite('parser', function() {
     var succeed = Parsimmon.succeed;
 
     test('use Parsimmon.fail to fail dynamically', function() {
-      var parser = any.then(function(ch) {
+      var parser = any.chain(function(ch) {
         return fail('a character besides ' + ch);
       }).or(string('x'));
 
-      assert.throws(function() { parser.parse('y'); },
-        "Parse Error: expected a character besides y, got the end of the string\n    parsing: 'y'");
-      assert.equal(parser.parse('x'), 'x');
+      assert.deepEqual(parser.parse('y'), {
+        status: false,
+        index: 1,
+        expected: 'a character besides y'
+      });
+      assert.equal(parser.parse('x').value, 'x');
     });
 
     test('use Parsimmon.succeed or Parsimmon.fail to branch conditionally', function() {
@@ -220,7 +235,7 @@ suite('parser', function() {
       var parser =
         string('x')
         .then(string('+').or(string('*')))
-        .then(function(operator) {
+        .chain(function(operator) {
           if (operator === allowedOperator) return succeed(operator);
           else return fail(allowedOperator);
         })
@@ -228,36 +243,42 @@ suite('parser', function() {
       ;
 
       allowedOperator = '+';
-      assert.equal(parser.parse('x+y'), '+');
-      assert.throws(function() { parser.parse('x*y'); },
-        "Parse Error: expected + at character 2, got '...y'\n    parsing: 'x*y'");
+      assert.equal(parser.parse('x+y').value, '+');
+      assert.deepEqual(parser.parse('x*y'), {
+        status: false,
+        index: 2,
+        expected: '+'
+      });
 
       allowedOperator = '*';
-      assert.equal(parser.parse('x*y'), '*');
-      assert.throws(function() { parser.parse('x+y'); },
-        "Parse Error: expected * at character 2, got '...y'\n    parsing: 'x+y'");
+      assert.equal(parser.parse('x*y').value, '*');
+      assert.deepEqual(parser.parse('x+y'), {
+        status: false,
+        index: 2,
+        expected: '*'
+      });
     });
   });
 
   test('eof', function() {
     var parser = optWhitespace.skip(eof).or(all.result('default'));
 
-    assert.equal(parser.parse('  '), '  ')
-    assert.equal(parser.parse('x'), 'default');
+    assert.equal(parser.parse('  ').value, '  ')
+    assert.equal(parser.parse('x').value, 'default');
   });
 
   test('index', function() {
     var parser = regex(/^x*/).then(index);
-    assert.equal(parser.parse(''), 0);
-    assert.equal(parser.parse('xx'), 2);
-    assert.equal(parser.parse('xxxx'), 4);
+    assert.equal(parser.parse('').value, 0);
+    assert.equal(parser.parse('xx').value, 2);
+    assert.equal(parser.parse('xxxx').value, 4);
   });
 
   test('mark', function() {
     var ys = regex(/^y*/).mark()
     var parser = optWhitespace.then(ys).skip(optWhitespace);
-    assert.deepEqual(parser.parse(''), { start: 0, value: '', end: 0 });
-    assert.deepEqual(parser.parse(' yy '), { start: 1, value: 'yy', end: 3 });
+    assert.deepEqual(parser.parse('').value, { start: 0, value: '', end: 0 });
+    assert.deepEqual(parser.parse(' yy ').value, { start: 1, value: 'yy', end: 3 });
   });
 
   suite('smart error messages', function() {
@@ -268,48 +289,70 @@ suite('parser', function() {
       test('prefer longest branch', function() {
         var parser = string('abc').then(string('def')).or(string('ab').then(string('cd')));
 
-        assert.throws(function() { parser.parse('abc'); },
-          "Parse Error: expected 'def', got the end of the string\n    parsing: 'abc'");
+        assert.deepEqual(parser.parse('abc'), {
+          status: false,
+          index: 3,
+          expected: "'def'"
+        });
       });
 
       test('prefer last of equal length branches', function() {
         var parser = string('abc').then(string('def')).or(string('abc').then(string('d')));
 
-        assert.throws(function() { parser.parse('abc'); },
-          "Parse Error: expected 'd', got the end of the string\n    parsing: 'abc'");
+        assert.deepEqual(parser.parse('abc'), {
+          status: false,
+          index: 3,
+          expected: "'d'"
+        });
       });
 
       test('prefer longest branch even after a success', function() {
         var parser = string('abcdef').then(string('g')).or(string('ab'))
           .then(string('cd')).then(string('xyz'));
 
-        assert.throws(function() { parser.parse('abcdef'); },
-          "Parse Error: expected 'g', got the end of the string\n    parsing: 'abcdef'");
+        assert.deepEqual(parser.parse('abcdef'), {
+          status: false,
+          index: 6,
+          expected: "'g'"
+        });
       });
     });
 
     suite('many', function() {
       test('prefer longest branch even in a .many()', function() {
+        var list = lazy(function() {
+          return optWhitespace.then(atom.or(sexpr)).skip(optWhitespace).many();
+        });
         var atom = regex(/^[^()\s]+/);
-        var sexpr = string('(').then(function() { return list; }).skip(string(')'));
-        var list = optWhitespace.then(atom.or(sexpr)).skip(optWhitespace).many();
+        var sexpr = string('(').then(list).skip(string(')'));
 
-        // assert.deepEqual(list.parse('(a b) (c ((() d)))'), [['a', 'b'], ['c', [[[], 'd']]]]);
+        assert.deepEqual(list.parse('(a b) (c ((() d)))').value,
+                         [['a', 'b'], ['c', [[[], 'd']]]]);
 
-        assert.throws(function() { list.parse('(a b ()) c)'); },
-          "Parse Error: expected EOF at character 10, got '...)'\n    parsing: '(a b ()) c)'");
+        assert.deepEqual(list.parse('(a b ()) c)'), {
+          status: false,
+          index: 10,
+          expected: 'EOF'
+        });
 
-        assert.throws(function() { list.parse('(a (b)) (() c'); },
-          "Parse Error: expected ')', got the end of the string\n    parsing: '(a (b)) (() c'");
+        assert.deepEqual(list.parse('(a (b)) (() c'), {
+          status: false,
+          index: 13,
+          expected: "')'"
+        });
       });
 
       test('prefer longest branch in .or() nested in .many()', function() {
         var parser = string('abc').then(string('def')).or(string('a')).many();
 
-        assert.deepEqual(parser.parse('aaabcdefaa'), ['a', 'a', 'def', 'a', 'a']);
+        assert.deepEqual(parser.parse('aaabcdefaa').value,
+                         ['a', 'a', 'def', 'a', 'a']);
 
-        assert.throws(function() { parser.parse('aaabcde'); },
-          "Parse Error: expected 'def' at character 5, got '...de'\n    parsing: 'aaabcde'");
+        assert.deepEqual(parser.parse('aaabcde'), {
+          status: false,
+          index: 5,
+          expected: "'def'"
+        });
       });
     });
 
@@ -317,11 +360,17 @@ suite('parser', function() {
       test('prefer longest branch in .times() too', function() {
         var parser = string('abc').then(string('def')).or(string('a')).times(3, 6);
 
-        assert.throws(function() { parser.parse('aabcde'); },
-          "Parse Error: expected 'def' at character 4, got '...de'\n    parsing: 'aabcde'");
+        assert.deepEqual(parser.parse('aabcde'), {
+          status: false,
+          index: 4,
+          expected: "'def'"
+        });
 
-        assert.throws(function() { parser.parse('aaaaabcde'); },
-            "Parse Error: expected 'def' at character 7, got '...de'\n    parsing: 'aaaaabcde'");
+        assert.deepEqual(parser.parse('aaaaabcde'), {
+          status: false,
+          index: 7,
+          expected: "'def'"
+        });
       });
     });
   });

@@ -42,28 +42,44 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     }
   }
 
-  function parseError(stream, result) {
-    var expected = result.expected;
-    var i = result.furthest;
+  function assertParser(p) {
+    if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
+  }
+
+  var formatError = Parsimmon.formatError = function(stream, error) {
+    var expected = error.expected;
+    var i = error.index;
 
     if (i === stream.length) {
-      var message = 'expected ' + expected + ', got the end of the string';
+      return 'expected ' + expected + ', got the end of the string';
     }
-    else {
-      var prefix = (i > 0 ? "'..." : "'");
-      var suffix = (stream.length - i > 12 ? "...'" : "'");
-      var message = 'expected ' + expected + ' at character ' + i + ', got '
-        + prefix + stream.slice(i, i+12) + suffix;
-    }
-    throw new Error('Parse Error: ' + message + "\n    parsing: '" + stream + "'");
-  }
+
+    var prefix = (i > 0 ? "'..." : "'");
+    var suffix = (stream.length - i > 12 ? "...'" : "'");
+    return (
+      'expected ' + expected + ' at character ' + i + ', got ' +
+      prefix + stream.slice(i, i+12) + suffix
+    );
+  };
 
   _.init = function(body) { this._ = body; };
 
   _.parse = function(stream) {
     var result = this.skip(eof)._(stream, 0);
 
-    return result.status ? result.value : parseError(stream, result);
+    if (result.status) {
+      return {
+        status: true,
+        value: result.value
+      };
+    }
+    else {
+      return {
+        status: false,
+        index: result.furthest,
+        expected: result.expected
+      };
+    }
   };
 
   // -*- primitive combinators -*- //
@@ -72,16 +88,12 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   _.then = function(next) {
-    var self = this;
+    if (typeof next === 'function') {
+      throw new Error('chaining features of .then are no longer supported');
+    }
 
-    return Parser(function(stream, i) {
-      var result = self._(stream, i);
-
-      if (!result.status) return result;
-
-      var nextParser = (next instanceof Parser ? next : next(result.value));
-      return furthestBacktrackFor(nextParser._(stream, result.index), result);
-    });
+    assertParser(next);
+    return seq(this, next).map(function(results) { return results[1]; });
   };
 
   // -*- optimized iterative combinators -*- //
@@ -337,5 +349,13 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   //- Monad
-  _.chain = _.then;
+  _.chain = function(f) {
+    var self = this;
+    return Parser(function(stream, i) {
+      var result = self._(stream, i);
+      if (!result.status) return result;
+      var nextParser = f(result.value);
+      return furthestBacktrackFor(nextParser._(stream, result.index), result);
+    });
+  };
 });

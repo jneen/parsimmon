@@ -3,11 +3,12 @@ var string = Parsimmon.string;
 var regex = Parsimmon.regex;
 var succeed = Parsimmon.succeed;
 var seq = Parsimmon.seq;
+var alt = Parsimmon.alt;
 var lazy = Parsimmon.lazy;
 
 var json = (function() {
   var json = lazy(function() {
-    return alt([
+    return alt(
       object,
       array,
       stringLiteral,
@@ -15,7 +16,7 @@ var json = (function() {
       nullLiteral,
       trueLiteral,
       falseLiteral
-    ]).skip(regex(/^\s*/m));
+    ).skip(regex(/^\s*/m));
   });
 
   var escapes = {
@@ -26,7 +27,7 @@ var json = (function() {
     t: '\t'
   }
 
-  var stringLiteral = regex(/^"(\\.|.)*?"/).map(function(str) {
+  var stringLiteral = regex(/"(\\.|.)*?"/).map(function(str) {
     return str.slice(1, -1).replace(/\\u(\d{4})/, function(_, hex) {
       return String.fromCharCode(parseInt(hex, 16));
     }).replace(/\\(.)/, function(_, ch) {
@@ -34,22 +35,22 @@ var json = (function() {
     });
   });
 
-  var numberLiteral = regex(/^\d+(([.]|e[+-]?)\d+)?/i).map(parseFloat)
+  var numberLiteral = regex(/\d+(([.]|e[+-]?)\d+)?/i).map(parseFloat)
 
   function commaSep(parser) {
     var commaParser = regex(/^,\s*/m).then(parser).many()
-    return seq([parser, commaParser]).map(function(results) {
+    return seq(parser, commaParser).map(function(results) {
       return [results[0]].concat(results[1]);
     }).or(succeed([]));
   }
 
-  var array = seq([regex(/^\[\s*/m), commaSep(json), string(']')]).map(function(results) {
+  var array = seq(regex(/\[\s*/m), commaSep(json), string(']')).map(function(results) {
     return results[1];
   });
 
-  var pair = seq([stringLiteral.skip(regex(/^\s*:\s*/m)), json]);
+  var pair = seq(stringLiteral.skip(regex(/^\s*:\s*/m)), json);
 
-  var object = seq([regex(/^[{]\s*/m), commaSep(pair), string('}')]).map(function(results) {
+  var object = seq(regex(/^[{]\s*/m), commaSep(pair), string('}')).map(function(results) {
     var pairs = results[1];
     var out = {};
     for (var i = pairs.length-1; i >= 0; i -= 1) {
