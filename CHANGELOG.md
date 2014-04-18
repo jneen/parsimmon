@@ -1,3 +1,8 @@
+## version 0.3.2 (2014-04-18)
+
+* never throw strings, always throw error objects
+* add the MIT license
+
 ## version 0.3.1 (2014-03-12)
 
 * add browser files to the npm package
