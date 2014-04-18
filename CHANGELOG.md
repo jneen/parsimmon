@@ -1,3 +1,9 @@
+## version 0.4.0 (2014-04-18)
+
+* breaking: deprecated use of `.then(function(result) { ... })`.  Use `chain` instead.
+* breaking: errors are no longer thrown on invalid parses.  Instead, `.parse(str)` returns
+  an object with a `status` tag, indicating whether the parse was successful.
+
 ## version 0.3.2 (2014-04-18)
 
 * never throw strings, always throw error objects
