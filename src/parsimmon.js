@@ -67,19 +67,14 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.parse = function(stream) {
     var result = this.skip(eof)._(stream, 0);
 
-    if (result.status) {
-      return {
-        status: true,
-        value: result.value
-      };
-    }
-    else {
-      return {
-        status: false,
-        index: result.furthest,
-        expected: result.expected
-      };
-    }
+    return result.status ? {
+      status: true,
+      value: result.value
+    } : {
+      status: false,
+      index: result.furthest,
+      expected: result.expected
+    };
   };
 
   // -*- primitive combinators -*- //
