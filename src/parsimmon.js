@@ -249,6 +249,10 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     });
   };
 
+  _.desc = function(expected) {
+    return this.or(fail(expected))
+  };
+
   // -*- primitive parsers -*- //
   var string = Parsimmon.string = function(str) {
     var len = str.length;
@@ -292,11 +296,11 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return Parser(function(stream, i) { return makeFailure(i, expected); });
   };
 
-  var letter = Parsimmon.letter = regex(/[a-z]/i);
-  var letters = Parsimmon.letters = regex(/[a-z]*/i);
-  var digit = Parsimmon.digit = regex(/[0-9]/);
-  var digits = Parsimmon.digits = regex(/[0-9]*/);
-  var whitespace = Parsimmon.whitespace = regex(/\s+/);
+  var letter = Parsimmon.letter = regex(/[a-z]/i).desc('a letter')
+  var letters = Parsimmon.letters = regex(/[a-z]*/i)
+  var digit = Parsimmon.digit = regex(/[0-9]/).desc('a digit');
+  var digits = Parsimmon.digits = regex(/[0-9]*/)
+  var whitespace = Parsimmon.whitespace = regex(/\s+/).desc('whitespace');
   var optWhitespace = Parsimmon.optWhitespace = regex(/\s*/);
 
   var any = Parsimmon.any = Parser(function(stream, i) {
@@ -315,11 +319,18 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return makeSuccess(i, null);
   });
 
-  var lazy = Parsimmon.lazy = function(f) {
+  var lazy = Parsimmon.lazy = function(desc, f) {
+    if (arguments.length < 2) {
+      f = desc;
+      desc = undefined;
+    }
+
     var parser = Parser(function(stream, i) {
       parser._ = f()._;
       return parser._(stream, i);
     });
+
+    if (desc) parser = parser.desc(desc)
 
     return parser;
   };
