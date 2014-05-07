@@ -373,5 +373,43 @@ suite('parser', function() {
         });
       });
     });
+
+    suite('desc', function() {
+      test('allows custom error messages', function() {
+        var x = string('x').desc('the letter x')
+        var y = string('y').desc('the letter y')
+        var parser = x.then(y)
+
+        assert.deepEqual(parser.parse('a'), {
+          status: false,
+          index: 0,
+          expected: 'the letter x'
+        });
+
+        assert.deepEqual(parser.parse('xa'), {
+          status: false,
+          index: 1,
+          expected: 'the letter y'
+        });
+      });
+
+      test('allows tagging with `lazy`', function() {
+        var x = lazy('the letter x', function() { return string('x'); });
+        var y = lazy('the letter y', function() { return string('y'); });
+        var parser = x.then(y)
+
+        assert.deepEqual(parser.parse('a'), {
+          status: false,
+          index: 0,
+          expected: 'the letter x'
+        });
+
+        assert.deepEqual(parser.parse('xa'), {
+          status: false,
+          index: 1,
+          expected: 'the letter y'
+        });
+      });
+    });
   });
 });

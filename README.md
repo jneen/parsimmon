@@ -21,7 +21,7 @@ function lexeme(p) { return p.skip(optWhitespace); }
 var lparen = lexeme(string('('));
 var rparen = lexeme(string(')'));
 
-var expr = lazy(function() { return form.or(atom) });
+var expr = lazy('an s-expression', function() { return form.or(atom) });
 
 var number = lexeme(regex(/[0-9]+/).map(parseInt));
 var id = lexeme(regex(/[a-z_]\w*/i));
@@ -83,6 +83,8 @@ error string.
   - `Parsimmon.lazy(f)` accepts a function that returns a parser, which
     is evaluated the first time the parser is used.  This is useful for
     referencing parsers that haven't yet been defined.
+  - `Parsimmon.lazy(desc, f)` is the same as `Parsimmon.lazy` but also
+    sets `desc` as the expected value (see `.desc()` below)
   - `Parsimmon.fail(message)`
   - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/[a-z]/i)`
   - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/[a-z]*/i)`
@@ -128,6 +130,9 @@ error string.
   - `parser.mark()` yields an object with `start`, `value`, and `end` keys, where
     `value` is the original value yielded by the parser, and `start` and `end` are
     the indices in the stream that contain the parsed text.
+  - `parser.desc(description)` returns a new parser whose failure message is the passed
+    description.  For example, `string('x').desc('the letter x')` will indicate that
+    'the letter x' was expected.
 
 ## Tips and patterns
 
@@ -158,7 +163,7 @@ For most parsers, the following format is helpful:
    takes the form of a large `.alt()` call
 
     ``` js
-    var expr = lazy(function() { return Parsimmon.alt(p1, p2, ...); });
+    var expr = lazy('an expression', function() { return Parsimmon.alt(p1, p2, ...); });
     ```
 
 1. Then build your parsers from the inside out - these should return
