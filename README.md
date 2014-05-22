@@ -1,10 +1,10 @@
-[![Build Status](https://secure.travis-ci.org/jayferd/parsimmon.png)](http://travis-ci.org/jayferd/parsimmon)
+[![Build Status](https://secure.travis-ci.org/jneen/parsimmon.png)](http://travis-ci.org/jneen/parsimmon)
 
 # Parsimmon
 
-[![Parsimmon](http://i.imgur.com/wyKOf.png)](http://github.com/jayferd/parsimmon)
+[![Parsimmon](http://i.imgur.com/wyKOf.png)](http://github.com/jneen/parsimmon)
 
-(by @jayferd and @laughinghan)
+(by @jneen and @laughinghan)
 
 Parsimmon is a small library for writing big parsers made up of lots of little parsers.  The API is inspired by parsec and Promises/A.
 
