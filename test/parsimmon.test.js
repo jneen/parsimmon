@@ -7,6 +7,7 @@ suite('parser', function() {
   var optWhitespace = Parsimmon.optWhitespace;
   var eof = Parsimmon.eof;
   var succeed = Parsimmon.succeed;
+  var seq = Parsimmon.seq;
   var all = Parsimmon.all;
   var index = Parsimmon.index;
   var lazy = Parsimmon.lazy;
@@ -43,6 +44,22 @@ suite('parser', function() {
       index: 1,
       expected: 'EOF'
     });
+  });
+
+  test('Parsimmon.seq', function() {
+      var parser = seq(string('('), regex(/[^\)]/).many(), string(')'));
+
+      assert.deepEqual(parser.parse('(string between parens)').value, ['(', 'string between parens', ')']);
+      assert.deepEqual(parser.parse('(string'), {
+          status: false,
+          index: 7,
+          expected: "')'"
+      });
+      assert.deepEqual(parser.parse('starts wrong (string between parens)'), {
+          status: false,
+          index: 0,
+          expected: "'('"
+      });
   });
 
   suite('then', function() {
