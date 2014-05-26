@@ -8,6 +8,7 @@ suite('parser', function() {
   var eof = Parsimmon.eof;
   var succeed = Parsimmon.succeed;
   var seq = Parsimmon.seq;
+  var alt = Parsimmon.alt;
   var all = Parsimmon.all;
   var index = Parsimmon.index;
   var lazy = Parsimmon.lazy;
@@ -61,6 +62,27 @@ suite('parser', function() {
           expected: "'('"
       });
   });
+
+  test('Parsimmon.alt', function(){
+      var toNode = function(nodeType){
+          return function(value) {
+              return { type: nodeType, value: value}
+          }
+      };
+
+      var stringParser = seq(string('"'), regex(/[^"]*/), string('"')).map(toNode('string'));
+      var identifierParser = regex(/[a-zA-Z]*/).map(toNode('identifier'));
+      var parser = alt(stringParser, identifierParser);
+
+      assert.deepEqual(parser.parse('"a string, to be sure"').value, {
+          type: 'string',
+          value: ['"', 'a string, to be sure', '"']
+      });
+      assert.deepEqual(parser.parse('anIdentifier').value, {
+         type: 'identifier',
+         value: 'anIdentifier'
+      });
+  })
 
   suite('then', function() {
     test('with a parser, uses the last return value', function() {
