@@ -1,3 +1,7 @@
+## version 0.5.0 (2014-06-15)
+
+* Added `.desc()` for custom parse error messages
+
 ## version 0.4.0 (2014-04-18)
 
 * breaking: deprecated use of `.then(function(result) { ... })`.  Use `chain` instead.
