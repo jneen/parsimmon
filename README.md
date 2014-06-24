@@ -76,7 +76,7 @@ error string.
     to match the given regex.
   - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
     the string, and yields `result`.
-  - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers 
+  - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
     that it expects to find in order, yielding an array of the results.
   - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
     and yields the value of the first one that succeeds, backtracking in between.
@@ -96,6 +96,33 @@ error string.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
   - `Parsimmon.index` is a parser that yields the current index of the parse.
+
+### Adding base parsers
+
+You can add a primitive parser (similar to the included ones) by using
+`Parsimmon.custom`. This is an example of how to create a parser that matches
+any character except the one provided:
+
+```js
+function notChar(char) {
+  return Parsimmon.custom(function(success, failure) {
+    return function(stream, i) {
+      if (stream.charAt(i) !== char && stream.length <= i) {
+        return success(i+1, stream.charAt(i));
+      }
+      return failure(i, 'anything different than "' + char + '"');
+    }
+  });
+}
+```
+
+This parser can then be used and composed the same way all the existing ones are
+used and composed, for example:
+
+```js
+var parser = seq(string('a'), notChar('b').times(5));
+parser.parse('accccc');
+```
 
 ### Parser methods
   - `parser.or(otherParser)`:

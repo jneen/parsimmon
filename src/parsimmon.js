@@ -97,6 +97,13 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     });
   };
 
+  /**
+   * Allows to add custom primitive parsers
+   */
+  var custom = Parsimmon.custom = function(parsingFunction) {
+    return Parser(parsingFunction(makeSuccess, makeFailure));
+  };
+
   var alt = Parsimmon.alt = function() {
     var parsers = [].slice.call(arguments);
     var numParsers = parsers.length;
