@@ -66,8 +66,10 @@ suite('parser', function() {
   suite('Parsimmon.custom', function(){
     test('simple parser definition', function(){
       function customAny() {
-        return Parsimmon.custom(function(stream, i, success, failure){
-          return success(i+1, stream.charAt(i));
+        return Parsimmon.custom(function(success, failure){
+          return function(stream, i) {
+            return success(i+1, stream.charAt(i));
+          }
         });
       }
 
@@ -81,8 +83,10 @@ suite('parser', function() {
 
     test('failing parser', function(){
       function failer() {
-        return Parsimmon.custom(function(stream, i, success, failure){
-          return failure(i, 'nothing');
+        return Parsimmon.custom(function(success, failure){
+          return function(stream, i) {
+            return failure(i, 'nothing');
+          }
         });
       }
 
@@ -91,11 +95,13 @@ suite('parser', function() {
 
     test('composes with existing parsers', function(){
       function notChar(char) {
-        return Parsimmon.custom(function(stream, i, success, failure) {
-          if (stream.charCodeAt(i) !== char.charCodeAt(0)) {
-            return success(i+1, stream.charAt(i));
+        return Parsimmon.custom(function(success, failure) {
+          return function(stream, i) {
+            if (stream.charCodeAt(i) !== char.charCodeAt(0)) {
+              return success(i+1, stream.charAt(i));
+            }
+            return failure(i, 'something different than "' + stream.charAt(i)) + '"';
           }
-          return failure(i, 'something different than "' + stream.charAt(i)) + '"';
         });
       }
 

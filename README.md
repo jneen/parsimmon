@@ -105,11 +105,13 @@ any character except the one provided:
 
 ```js
 function notChar(char) {
-  return Parsimmon.custom(function(stream, i, success, failure) {
-    if (stream.charAt(i) !== char && stream.length <= i) {
-      return success(i+1, stream.charAt(i));
+  return Parsimmon.custom(function(success, failure) {
+    return function(stream, i) {
+      if (stream.charAt(i) !== char && stream.length <= i) {
+        return success(i+1, stream.charAt(i));
+      }
+      return failure(i, 'anything different than "' + char + '"');
     }
-    return failure(i, 'anything different than "' + char + '"');
   });
 }
 ```
