@@ -3,8 +3,8 @@
   "version": "0.5.0",
   "description": "A monadic LL(infinity) parser combinator library",
   "keywords": ["parsing", "parse", "parser combinators"],
-  "author": "Jay Adkisson <jjmadkisson at gmail dot com>",
-  "repository": "git://github.com/jayferd/parsimmon",
+  "author": "Jeanine Adkisson <jneen at jneen dot net>",
+  "repository": "git://github.com/jneen/parsimmon",
 
   "files": [
     "index.js", "src", "test", "Makefile", "package.json",
