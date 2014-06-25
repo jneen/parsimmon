@@ -1,3 +1,7 @@
+## version 0.5.1 (2014-06-25)
+
+  * Added .custom, .test, and .takeWhile for folks who don't like to use regexes.
+
 ## version 0.5.0 (2014-06-15)
 
 * Added `.desc()` for custom parse error messages
