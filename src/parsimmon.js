@@ -326,6 +326,26 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     return makeSuccess(i, null);
   });
 
+  var test = Parsimmon.test = function(predicate) {
+    return Parser(function(stream, i) {
+      var char = stream.charAt(i);
+      if (i < stream.length && predicate(char)) {
+        return makeSuccess(i+1, char);
+      }
+      else {
+        return makeFailure(i, 'a character matching '+predicate);
+      }
+    });
+  };
+
+  var takeWhile = Parsimmon.takeWhile = function(predicate) {
+    return Parser(function(stream, i) {
+      var j = i;
+      while (j < stream.length && predicate(stream.charAt(j))) j += 1;
+      return makeSuccess(j, stream.slice(i, j));
+    });
+  };
+
   var lazy = Parsimmon.lazy = function(desc, f) {
     if (arguments.length < 2) {
       f = desc;

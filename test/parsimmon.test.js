@@ -359,6 +359,21 @@ suite('parser', function() {
     assert.equal(parser.parse('x').value, 'default');
   });
 
+  test('test', function() {
+    var parser = Parsimmon.test(function(ch) { return ch !== '.' });
+    assert.equal(parser.parse('x').value, 'x');
+    assert.equal(parser.parse('.').status, false);
+  });
+
+  test('takeWhile', function() {
+    var parser = Parsimmon.takeWhile(function(ch) { return ch !== '.' })
+                    .skip(all);
+    assert.equal(parser.parse('abc').value, 'abc');
+    assert.equal(parser.parse('abc.').value, 'abc');
+    assert.equal(parser.parse('.').value, '');
+    assert.equal(parser.parse('').value, '');
+  });
+
   test('index', function() {
     var parser = regex(/^x*/).then(index);
     assert.equal(parser.parse('').value, 0);

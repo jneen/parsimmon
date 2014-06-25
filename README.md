@@ -96,6 +96,8 @@ error string.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
   - `Parsimmon.index` is a parser that yields the current index of the parse.
+  - `Parsimmon.test(pred)` yield a single characer if it passes the predicate.
+  - `Parsimmon.takeWhile(pred)` yield a string containing all the next characters that pass the predicate.
 
 ### Adding base parsers
 
