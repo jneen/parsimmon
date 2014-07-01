@@ -97,6 +97,15 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
     });
   };
 
+
+  var seqMap = Parsimmon.seqMap = function() {
+    var args = [].slice.call(arguments);
+    var mapper = args.pop();
+    return seq.apply(null, args).map(function(results) {
+      return mapper.apply(null, results);
+    });
+  };
+
   /**
    * Allows to add custom primitive parsers
    */
@@ -336,6 +345,14 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
         return makeFailure(i, 'a character matching '+predicate);
       }
     });
+  };
+
+  var oneOf = Parsimmon.oneOf = function(str) {
+    return test(function(ch) { return str.indexOf(ch) >= 0; });
+  };
+
+  var noneOf = Parsimmon.noneOf = function(str) {
+    return test(function(ch) { return str.indexOf(ch) < 0; });
   };
 
   var takeWhile = Parsimmon.takeWhile = function(predicate) {
