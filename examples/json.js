@@ -1,13 +1,54 @@
 var Parsimmon = require('./../index');
-var string = Parsimmon.string;
-var regex = Parsimmon.regex;
-var succeed = Parsimmon.succeed;
-var seq = Parsimmon.seq;
-var alt = Parsimmon.alt;
-var lazy = Parsimmon.lazy;
+
+function interpretEscapes(str) {
+  var escapes = {
+    b: '\b',
+    f: '\f',
+    n: '\n',
+    r: '\r',
+    t: '\t'
+  };
+
+  return str.replace(/\\(u[0-9a-fA-F]{4}|[^u])/, function(_, escape) {
+    var type = escape.charAt(0);
+    var hex = escape.slice(1);
+    if (type === 'u') return String.fromCharCode(parseInt(hex, 16));
+    if (escapes.hasOwnProperty(type)) return escapes[type];
+    return type;
+  });
+}
 
 var json = (function() {
-  var json = lazy(function() {
+  // local imports
+  var string = Parsimmon.string;
+  var regex = Parsimmon.regex;
+  var succeed = Parsimmon.succeed;
+  var seq = Parsimmon.seq;
+  var seqMap = Parsimmon.seqMap;
+  var alt = Parsimmon.alt;
+  var lazy = Parsimmon.lazy;
+
+  // whitespace, etc
+  var ignore = regex(/^\s*/m);
+  function lexeme(p) { return p.skip(ignore); }
+
+  // lexemes
+  var lbrace = lexeme(string('{'));
+  var rbrace = lexeme(string('}'));
+  var lbrack = lexeme(string('['));
+  var rbrack = lexeme(string(']'));
+  var quoted = lexeme(regex(/"(\\.|.)*?"/))
+                .map(function(s) { return s.slice(1, -1) })
+                .desc('a quoted string');
+  var comma = lexeme(string(','));
+  var number = lexeme(regex(/-?(0|[1-9]\d*)([.]\d+)?(e[+-]?\d+)?/i)).desc('a numeral');
+
+  var nullLiteral = lexeme(string('null')).result(null);
+  var trueLiteral = lexeme(string('true')).result(true);
+  var falseLiteral = lexeme(string('false')).result(false);
+
+  // forward-declared base parser
+  var json = lazy('a json element', function() {
     return alt(
       object,
       array,
@@ -19,39 +60,25 @@ var json = (function() {
     ).skip(regex(/^\s*/m));
   });
 
-  var escapes = {
-    b: '\b',
-    f: '\f',
-    n: '\n',
-    r: '\r',
-    t: '\t'
-  }
+  // domain parsers
+  var stringLiteral = quoted.map(interpretEscapes);
 
-  var stringLiteral = regex(/"(\\.|.)*?"/).map(function(str) {
-    return str.slice(1, -1).replace(/\\u(\d{4})/, function(_, hex) {
-      return String.fromCharCode(parseInt(hex, 16));
-    }).replace(/\\(.)/, function(_, ch) {
-      return escapes.hasOwnProperty(ch) ? escapes[ch] : ch
-    });
-  });
-
-  var numberLiteral = regex(/\d+(([.]|e[+-]?)\d+)?/i).map(parseFloat)
+  var numberLiteral = number.map(parseFloat)
 
   function commaSep(parser) {
-    var commaParser = regex(/^,\s*/m).then(parser).many()
-    return seq(parser, commaParser).map(function(results) {
-      return [results[0]].concat(results[1]);
+    var commaParser = comma.then(parser).many()
+    return seqMap(parser, commaParser, function(first, rest) {
+      return [first].concat(rest);
     }).or(succeed([]));
   }
 
-  var array = seq(regex(/\[\s*/m), commaSep(json), string(']')).map(function(results) {
-    return results[1];
+  var array = seqMap(lbrack, commaSep(json), rbrack, function(_, results, __) {
+    return results;
   });
 
-  var pair = seq(stringLiteral.skip(regex(/^\s*:\s*/m)), json);
+  var pair = seq(stringLiteral.skip(regex(/\s*:\s*/m)), json);
 
-  var object = seq(regex(/^[{]\s*/m), commaSep(pair), string('}')).map(function(results) {
-    var pairs = results[1];
+  var object = seqMap(lbrace, commaSep(pair), rbrace, function(_, pairs, __) {
     var out = {};
     for (var i = pairs.length-1; i >= 0; i -= 1) {
       out[pairs[i][0]] = pairs[i][1];
@@ -59,11 +86,8 @@ var json = (function() {
     return out;
   });
 
-  var nullLiteral = string('null').result(null);
-  var trueLiteral = string('true').result(true);
-  var falseLiteral = string('false').result(false);
-
-  return json;
+  // top-level parser, with whitespace at the beginning
+  return ignore.then(json);
 })();
 
 var source = process.argv[2] || __dirname+'/../package.json';
