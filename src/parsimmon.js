@@ -1,13 +1,20 @@
 var Parsimmon = {};
 
-Parsimmon.Parser = P(function(_, _super, Parser) {
+Parsimmon.Parser = (function() {
   "use strict";
+
   // The Parser object is a wrapper for a parser function.
   // Externally, you use one to parse a string by calling
   //   var result = SomeParser.parse('Me Me Me! Parse Me!');
   // You should never call the constructor, rather you should
   // construct your Parser from the base parsers and the
   // parser combinator methods.
+  function Parser(action) {
+    if (!(this instanceof Parser)) return new Parser(action);
+    this._ = action;
+  };
+
+  var _ = Parser.prototype;
 
   function makeSuccess(index, value) {
     return {
@@ -61,8 +68,6 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       prefix + stream.slice(i, i+12) + suffix
     );
   };
-
-  _.init = function(body) { this._ = body; };
 
   _.parse = function(stream) {
     var result = this.skip(eof)._(stream, 0);
@@ -402,4 +407,6 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
       return furthestBacktrackFor(nextParser._(stream, result.index), result);
     });
   };
-});
+
+  return Parser;
+})();

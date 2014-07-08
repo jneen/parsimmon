@@ -29,10 +29,6 @@ commonjs: $(COMMONJS)
 .PHONY: browser
 browser: $(BROWSER) $(UGLY)
 
-$(BROWSER): $(SRC_DIR)/browser/pre.js node_modules/pjs/src/p.js $(SRC) $(SRC_DIR)/browser/post.js
-	mkdir -p $(dir $@)
-	cat $^ > $@
-
 # -*- testing -*- #
 MOCHA ?= ./node_modules/.bin/mocha
 MOCHA_OPTS += -u tdd

@@ -1,1 +1,1 @@
-var P = require('pjs').P;
+// pass
