@@ -135,7 +135,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
 
   _.then = function(next) {
     if (typeof next === 'function') {
-      throw new Error('chaining features of .then are no longer supported');
+      throw new Error('chaining features of .then are no longer supported, use .chain instead');
     }
 
     assertParser(next);
