@@ -237,8 +237,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.atMost = function(n) { return this.times(0, n); };
   _.atLeast = function(n) {
     var self = this;
-    return seq(this.times(n), this.many()).map(function(results) {
-      return results[0].concat(results[1]);
+    return seqMap(this.times(n), this.many(), function(init, rest) {
+      return init.concat(rest);
     });
   };
 
@@ -256,8 +256,8 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   _.mark = function() {
-    return seq(index, this, index).map(function(results) {
-      return { start: results[0], value: results[1], end: results[2] };
+    return seqMap(index, this, index, function(start, value, end) {
+      return { start: start, value: value, end: end };
     });
   };
 
@@ -389,9 +389,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   _.of = Parser.of = Parsimmon.of = succeed
 
   _.ap = function(other) {
-    return seq(this, other).map(function(results) {
-      return results[0](results[1]);
-    });
+    return seqMap(this, other, function(f, x) { return f(x); })
   };
 
   //- Monad
