@@ -215,9 +215,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
           i = result.index;
           accum.push(result.value);
         }
-        else {
-          return prevResult;
-        }
+        else return prevResult;
       }
 
       for (; times < max; times += 1) {
@@ -227,9 +225,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
           i = result.index;
           accum.push(result.value);
         }
-        else {
-          break;
-        }
+        else break;
       }
 
       return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
