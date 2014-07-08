@@ -233,7 +233,7 @@ Parsimmon.Parser = P(function(_, _super, Parser) {
   };
 
   // -*- higher-level combinators -*- //
-  _.result = function(res) { return this.then(succeed(res)); };
+  _.result = function(res) { return this.map(function(_) { return res; }); };
   _.atMost = function(n) { return this.times(0, n); };
   _.atLeast = function(n) {
     var self = this;
