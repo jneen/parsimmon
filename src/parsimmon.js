@@ -287,19 +287,20 @@ Parsimmon.Parser = (function() {
     });
   };
 
-  var regex = Parsimmon.regex = function(re) {
+  var regex = Parsimmon.regex = function(re, group) {
     var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
+    if (group == null) group = 0;
 
     return Parser(function(stream, i) {
       var match = anchored.exec(stream.slice(i));
 
       if (match) {
-        var result = match[0];
-        return makeSuccess(i+result.length, result);
+        var fullMatch = match[0];
+        var groupMatch = match[group];
+        if (groupMatch != null) return makeSuccess(i+fullMatch.length, groupMatch);
       }
-      else {
-        return makeFailure(i, re);
-      }
+
+      return makeFailure(i, re);
     });
   };
 

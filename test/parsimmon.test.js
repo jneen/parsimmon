@@ -47,6 +47,15 @@ suite('parser', function() {
     });
   });
 
+  test('Parsimmon.regex with group', function() {
+    var parser0 = regex(/(\w)(\d)/, 0);
+    var parser1 = regex(/(\w)(\d)/, 1);
+    var parser2 = regex(/(\w)(\d)/, 2);
+    assert.equal(parser0.parse('a1').value, 'a1');
+    assert.equal(parser1.parse('a1').value, 'a');
+    assert.equal(parser2.parse('a1').value, '1');
+  });
+
   test('Parsimmon.seq', function() {
       var parser = seq(string('('), regex(/[^\)]/).many(), string(')'));
 

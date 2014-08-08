@@ -72,8 +72,9 @@ error string.
 ### Included parsers / parser generators:
   - `Parsimmon.string("my-string")` is a parser that expects to find
     `"my-string"`, and will yield the same.
-  - `Parsimmon.regex(/myregex/)` is a parser that expects the stream
-    to match the given regex.
+  - `Parsimmon.regex(/myregex/, group=0)` is a parser that expects the stream
+    to match the given regex, and yields the given match group, or the
+    entire match.
   - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
     the string, and yields `result`.
   - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
