@@ -37,10 +37,10 @@ var json = (function() {
   var rbrace = lexeme(string('}'));
   var lbrack = lexeme(string('['));
   var rbrack = lexeme(string(']'));
-  var quoted = lexeme(regex(/"(\\.|.)*?"/))
-                .map(function(s) { return s.slice(1, -1) })
+  var quoted = lexeme(regex(/"((?:\\.|.)*?)"/, 1))
                 .desc('a quoted string');
   var comma = lexeme(string(','));
+  var colon = lexeme(string(':'));
   var number = lexeme(regex(/-?(0|[1-9]\d*)([.]\d+)?(e[+-]?\d+)?/i)).desc('a numeral');
 
   var nullLiteral = lexeme(string('null')).result(null);
@@ -57,7 +57,7 @@ var json = (function() {
       nullLiteral,
       trueLiteral,
       falseLiteral
-    ).skip(regex(/^\s*/m));
+    );
   });
 
   // domain parsers
@@ -76,7 +76,7 @@ var json = (function() {
     return results;
   });
 
-  var pair = seq(stringLiteral.skip(regex(/\s*:\s*/m)), json);
+  var pair = seq(stringLiteral.skip(colon), json);
 
   var object = seqMap(lbrace, commaSep(pair), rbrace, function(_, pairs, __) {
     var out = {};
