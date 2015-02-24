@@ -38,12 +38,12 @@ suite('parser', function() {
     assert.deepEqual(parser.parse('x0'), {
       status: false,
       index: 0,
-      expected: /[0-9]/
+      expected: ['/[0-9]/']
     });
     assert.deepEqual(parser.parse('0x'), {
       status: false,
       index: 1,
-      expected: 'EOF'
+      expected: ['EOF']
     });
   });
 
@@ -63,12 +63,12 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('(string'), {
           status: false,
           index: 7,
-          expected: "')'"
+          expected: ["')'", "/[^\\)]/"]
       });
       assert.deepEqual(parser.parse('starts wrong (string between parens)'), {
           status: false,
           index: 0,
-          expected: "'('"
+          expected: ["'('"]
       });
   });
 
@@ -99,7 +99,7 @@ suite('parser', function() {
         });
       }
 
-      assert.deepEqual(failer().parse('a'), {status: false, index: 0, expected: 'nothing'})
+      assert.deepEqual(failer().parse('a'), {status: false, index: 0, expected: ['nothing']})
     });
 
     test('composes with existing parsers', function(){
@@ -152,12 +152,12 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('xy'), { status: true, value: 'y' });
       assert.deepEqual(parser.parse('y'), {
         status: false,
-        expected: "'x'",
+        expected: ["'x'"],
         index: 0
       })
       assert.deepEqual(parser.parse('xz'), {
         status: false,
-        expected: "'y'",
+        expected: ["'y'"],
         index: 1
       });
     });
@@ -325,7 +325,7 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('y'), {
         status: false,
         index: 1,
-        expected: 'a character besides y'
+        expected: ['a character besides y']
       });
       assert.equal(parser.parse('x').value, 'x');
     });
@@ -348,7 +348,7 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('x*y'), {
         status: false,
         index: 2,
-        expected: '+'
+        expected: ['+']
       });
 
       allowedOperator = '*';
@@ -356,7 +356,7 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('x+y'), {
         status: false,
         index: 2,
-        expected: '*'
+        expected: ['*']
       });
     });
   });
@@ -408,7 +408,7 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('abc'), {
           status: false,
           index: 3,
-          expected: "'def'"
+          expected: ["'def'"]
         });
       });
 
@@ -418,7 +418,7 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('abc'), {
           status: false,
           index: 3,
-          expected: "'d'"
+          expected: ["'d'", "'def'"]
         });
       });
 
@@ -429,7 +429,7 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('abcdef'), {
           status: false,
           index: 6,
-          expected: "'g'"
+          expected: ["'g'"]
         });
       });
     });
@@ -439,7 +439,7 @@ suite('parser', function() {
         var list = lazy(function() {
           return optWhitespace.then(atom.or(sexpr)).skip(optWhitespace).many();
         });
-        var atom = regex(/^[^()\s]+/);
+        var atom = regex(/[^()\s]+/).desc('an atom');
         var sexpr = string('(').then(list).skip(string(')'));
 
         assert.deepEqual(list.parse('(a b) (c ((() d)))').value,
@@ -448,13 +448,13 @@ suite('parser', function() {
         assert.deepEqual(list.parse('(a b ()) c)'), {
           status: false,
           index: 10,
-          expected: 'EOF'
+          expected: ['EOF', "'('", "an atom"]
         });
 
         assert.deepEqual(list.parse('(a (b)) (() c'), {
           status: false,
           index: 13,
-          expected: "')'"
+          expected: ["')'", "'('", "an atom"]
         });
       });
 
@@ -467,7 +467,7 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('aaabcde'), {
           status: false,
           index: 5,
-          expected: "'def'"
+          expected: ["'def'"]
         });
       });
     });
@@ -479,13 +479,13 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('aabcde'), {
           status: false,
           index: 4,
-          expected: "'def'"
+          expected: ["'def'"]
         });
 
         assert.deepEqual(parser.parse('aaaaabcde'), {
           status: false,
           index: 7,
-          expected: "'def'"
+          expected: ["'def'"]
         });
       });
     });
@@ -499,13 +499,13 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('a'), {
           status: false,
           index: 0,
-          expected: 'the letter x'
+          expected: ['the letter x']
         });
 
         assert.deepEqual(parser.parse('xa'), {
           status: false,
           index: 1,
-          expected: 'the letter y'
+          expected: ['the letter y']
         });
       });
 
@@ -517,13 +517,13 @@ suite('parser', function() {
         assert.deepEqual(parser.parse('a'), {
           status: false,
           index: 0,
-          expected: 'the letter x'
+          expected: ['the letter x']
         });
 
         assert.deepEqual(parser.parse('xa'), {
           status: false,
           index: 1,
-          expected: 'the letter y'
+          expected: ['the letter y']
         });
       });
     });
