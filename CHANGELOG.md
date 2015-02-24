@@ -1,3 +1,9 @@
+## version 0.6.0 (2015-02-24)
+
+  * add a second optional argument to `regex()` indicating group selection
+  * eliminates pjs dependency
+  * add seqMap, oneOf, and noneOf
+
 ## version 0.5.1 (2014-06-25)
 
   * Added .custom, .test, and .takeWhile for folks who don't like to use regexes.
