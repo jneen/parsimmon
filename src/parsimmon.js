@@ -60,7 +60,7 @@ Parsimmon.Parser = (function() {
   function formatExpected(expected) {
     if (expected.length === 1) return expected[0];
 
-    'one of ' + expected.join(', ')
+    return 'one of ' + expected.join(', ')
   }
 
   function formatGot(stream, error) {
