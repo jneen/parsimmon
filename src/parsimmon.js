@@ -22,7 +22,7 @@ Parsimmon.Parser = (function() {
       index: index,
       value: value,
       furthest: -1,
-      expected: ''
+      expected: []
     };
   }
 
@@ -32,20 +32,24 @@ Parsimmon.Parser = (function() {
       index: -1,
       value: null,
       furthest: index,
-      expected: expected
+      expected: [expected]
     };
   }
 
-  function furthestBacktrackFor(result, last) {
+  function mergeReplies(result, last) {
     if (!last) return result;
-    if (result.furthest >= last.furthest) return result;
+    if (result.furthest > last.furthest) return result;
+
+    var expected = (result.furthest === last.furthest)
+      ? result.expected.concat(last.expected)
+      : last.expected;
 
     return {
       status: result.status,
       index: result.index,
       value: result.value,
       furthest: last.furthest,
-      expected: last.expected
+      expected: expected
     }
   }
 
@@ -53,20 +57,26 @@ Parsimmon.Parser = (function() {
     if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
   }
 
-  var formatError = Parsimmon.formatError = function(stream, error) {
-    var expected = error.expected;
+  function formatExpected(expected) {
+    if (expected.length === 1) return expected[0];
+
+    return 'one of ' + expected.join(', ')
+  }
+
+  function formatGot(stream, error) {
     var i = error.index;
 
-    if (i === stream.length) {
-      return 'expected ' + expected + ', got the end of the string';
-    }
+    if (i === stream.length) return ', got the end of the stream'
+
 
     var prefix = (i > 0 ? "'..." : "'");
     var suffix = (stream.length - i > 12 ? "...'" : "'");
-    return (
-      'expected ' + expected + ' at character ' + i + ', got ' +
-      prefix + stream.slice(i, i+12) + suffix
-    );
+
+    return ' at character ' + i + ', got ' + prefix + stream.slice(i, i+12) + suffix
+  }
+
+  var formatError = Parsimmon.formatError = function(stream, error) {
+    return 'expected ' + formatExpected(error.expected) + formatGot(stream, error)
   };
 
   _.parse = function(stream) {
@@ -92,13 +102,13 @@ Parsimmon.Parser = (function() {
       var accum = new Array(numParsers);
 
       for (var j = 0; j < numParsers; j += 1) {
-        result = furthestBacktrackFor(parsers[j]._(stream, i), result);
+        result = mergeReplies(parsers[j]._(stream, i), result);
         if (!result.status) return result;
         accum[j] = result.value
         i = result.index;
       }
 
-      return furthestBacktrackFor(makeSuccess(i, accum), result);
+      return mergeReplies(makeSuccess(i, accum), result);
     });
   };
 
@@ -126,7 +136,7 @@ Parsimmon.Parser = (function() {
     return Parser(function(stream, i) {
       var result;
       for (var j = 0; j < parsers.length; j += 1) {
-        result = furthestBacktrackFor(parsers[j]._(stream, i), result);
+        result = mergeReplies(parsers[j]._(stream, i), result);
         if (result.status) return result;
       }
       return result;
@@ -170,14 +180,14 @@ Parsimmon.Parser = (function() {
       var prevResult;
 
       for (;;) {
-        result = furthestBacktrackFor(self._(stream, i), result);
+        result = mergeReplies(self._(stream, i), result);
 
         if (result.status) {
           i = result.index;
           accum.push(result.value);
         }
         else {
-          return furthestBacktrackFor(makeSuccess(i, accum), result);
+          return mergeReplies(makeSuccess(i, accum), result);
         }
       }
     });
@@ -215,7 +225,7 @@ Parsimmon.Parser = (function() {
 
       for (var times = 0; times < min; times += 1) {
         result = self._(stream, i);
-        prevResult = furthestBacktrackFor(result, prevResult);
+        prevResult = mergeReplies(result, prevResult);
         if (result.status) {
           i = result.index;
           accum.push(result.value);
@@ -225,7 +235,7 @@ Parsimmon.Parser = (function() {
 
       for (; times < max; times += 1) {
         result = self._(stream, i);
-        prevResult = furthestBacktrackFor(result, prevResult);
+        prevResult = mergeReplies(result, prevResult);
         if (result.status) {
           i = result.index;
           accum.push(result.value);
@@ -233,7 +243,7 @@ Parsimmon.Parser = (function() {
         else break;
       }
 
-      return furthestBacktrackFor(makeSuccess(i, accum), prevResult);
+      return mergeReplies(makeSuccess(i, accum), prevResult);
     });
   };
 
@@ -252,7 +262,7 @@ Parsimmon.Parser = (function() {
     return Parser(function(stream, i) {
       var result = self._(stream, i);
       if (!result.status) return result;
-      return furthestBacktrackFor(makeSuccess(result.index, fn(result.value)), result);
+      return mergeReplies(makeSuccess(result.index, fn(result.value)), result);
     });
   };
 
@@ -267,7 +277,12 @@ Parsimmon.Parser = (function() {
   };
 
   _.desc = function(expected) {
-    return this.or(fail(expected))
+    var self = this;
+    return Parser(function(stream, i) {
+      var reply = self._(stream, i);
+      if (!reply.status) reply.expected = [expected];
+      return reply;
+    });
   };
 
   // -*- primitive parsers -*- //
@@ -289,6 +304,7 @@ Parsimmon.Parser = (function() {
 
   var regex = Parsimmon.regex = function(re, group) {
     var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
+    var expected = '' + re;
     if (group == null) group = 0;
 
     return Parser(function(stream, i) {
@@ -300,7 +316,7 @@ Parsimmon.Parser = (function() {
         if (groupMatch != null) return makeSuccess(i+fullMatch.length, groupMatch);
       }
 
-      return makeFailure(i, re);
+      return makeFailure(i, expected);
     });
   };
 
@@ -405,7 +421,7 @@ Parsimmon.Parser = (function() {
       var result = self._(stream, i);
       if (!result.status) return result;
       var nextParser = f(result.value);
-      return furthestBacktrackFor(nextParser._(stream, result.index), result);
+      return mergeReplies(nextParser._(stream, result.index), result);
     });
   };
 
