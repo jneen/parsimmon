@@ -29,7 +29,7 @@ var json = (function() {
   var lazy = Parsimmon.lazy;
 
   // whitespace, etc
-  var ignore = regex(/^\s*/m);
+  var ignore = regex(/\s*/m);
   function lexeme(p) { return p.skip(ignore); }
 
   // lexemes
