@@ -166,7 +166,7 @@ parser.parse('accccc');
 
 ## Tips and patterns
 
-These apply to most parsers for traditional langauges - it's possible
+These apply to most parsers for traditional languages - it's possible
 you may need to do something different for yours!
 
 For most parsers, the following format is helpful:
