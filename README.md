@@ -81,6 +81,10 @@ error string.
     that it expects to find in order, yielding an array of the results.
   - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
     and yields the value of the first one that succeeds, backtracking in between.
+  - `Parsimmon.sepBy(content, separator)` accepts two parsers, and expects multiple 
+    `content`s, separated by `separator`s. Yields an array of `contents`.  
+  - `Parsimmon.sepBy1(content, separator)` same as `Parsimmon.sepBy`, but expects
+    `content` to succeed at least once.
   - `Parsimmon.lazy(f)` accepts a function that returns a parser, which
     is evaluated the first time the parser is used.  This is useful for
     referencing parsers that haven't yet been defined.
