@@ -143,6 +143,23 @@ Parsimmon.Parser = (function() {
     });
   };
 
+  var sepBy = Parsimmon.sepBy = function(parser, separator) {
+    return sepBy1(parser, separator).or(Parsimmon.of([]));
+  };
+
+  var sepBy1 = Parsimmon.sepBy1 = function(parser, separator) {
+    assertParser(parser);
+    assertParser(separator);
+
+    var pairs = separator.then(parser).many();
+
+    return parser.chain(function(r) {
+      return pairs.map(function(rs) {
+        return [r].concat(rs);
+      })
+    })
+  };
+
   // -*- primitive combinators -*- //
   _.or = function(alternative) {
     return alt(this, alternative);
