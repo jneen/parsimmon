@@ -80,6 +80,9 @@ Parsimmon.Parser = (function() {
   };
 
   _.parse = function(stream) {
+    if (typeof stream !== 'string') {
+      throw new Error('.parse must be called with a string as its argument');
+    }
     var result = this.skip(eof)._(stream, 0);
 
     return result.status ? {
