@@ -44,15 +44,21 @@ Parsimmon.Parser = (function() {
     if (!last) return result;
     if (result.furthest > last.furthest) return result;
 
-    var expected = last.expected;
-    var expectedSet = last.expectedSet;
+    var expected;
+    var expectedSet;
     if (result.furthest === last.furthest) {
-      result.expected.forEach(function(expectedValue) {
+      expected = result.expected;
+      expectedSet = result.expectedSet;
+      last.expected.forEach(function(expectedValue) {
         if (!expectedSet.hasOwnProperty(expectedValue)) {
           expected.push(expectedValue);
           expectedSet[expectedValue] = true;
         }
       });
+    }
+    else {
+      expected = last.expected;
+      expectedSet = last.expectedSet;
     }
 
     return {
