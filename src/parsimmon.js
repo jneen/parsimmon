@@ -22,17 +22,21 @@ Parsimmon.Parser = (function() {
       index: index,
       value: value,
       furthest: -1,
-      expected: []
+      expected: [],
+      expectedSet: {}
     };
   }
 
   function makeFailure(index, expected) {
+    var expectedSet = {};
+    expectedSet[expected] = true;
     return {
       status: false,
       index: -1,
       value: null,
       furthest: index,
-      expected: [expected]
+      expected: [expected],
+      expectedSet: expectedSet
     };
   }
 
@@ -40,16 +44,24 @@ Parsimmon.Parser = (function() {
     if (!last) return result;
     if (result.furthest > last.furthest) return result;
 
-    var expected = (result.furthest === last.furthest)
-      ? result.expected.concat(last.expected)
-      : last.expected;
+    var expected = last.expected;
+    var expectedSet = last.expectedSet;
+    if (result.furthest === last.furthest) {
+      result.expected.forEach(function(expectedValue) {
+        if (!expectedSet.hasOwnProperty(expectedValue)) {
+          expected.push(expectedValue);
+          expectedSet[expectedValue] = true;
+        }
+      });
+    }
 
     return {
       status: result.status,
       index: result.index,
       value: result.value,
       furthest: last.furthest,
-      expected: expected
+      expected: expected,
+      expectedSet: expectedSet
     }
   }
 
@@ -60,7 +72,7 @@ Parsimmon.Parser = (function() {
   function formatExpected(expected) {
     if (expected.length === 1) return expected[0];
 
-    return 'one of ' + expected.join(', ')
+    return 'one of ' + expected.join(', ');
   }
 
   function formatGot(stream, error) {
