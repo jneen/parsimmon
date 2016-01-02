@@ -11,6 +11,7 @@ suite('parser', function() {
   var alt = Parsimmon.alt;
   var all = Parsimmon.all;
   var index = Parsimmon.index;
+  var indexLineColumn = Parsimmon.indexLineColumn;
   var lazy = Parsimmon.lazy;
 
   test('Parsimmon.string', function() {
@@ -428,11 +429,59 @@ suite('parser', function() {
     assert.equal(parser.parse('xxxx').value, 4);
   });
 
+  test('indexLineColumn', function() {
+    var parser = regex(/^[x\n]*/).then(indexLineColumn);
+    assert.deepEqual(parser.parse('').value, {
+      offset: 0,
+      line: 0,
+      column: 0
+    });
+    assert.deepEqual(parser.parse('xx').value, {
+      offset: 2,
+      line: 0,
+      column: 2
+    });
+    assert.deepEqual(parser.parse('xx\nxx').value, {
+      offset: 5,
+      line: 1,
+      column: 2
+    });
+  });
+
   test('mark', function() {
     var ys = regex(/^y*/).mark()
     var parser = optWhitespace.then(ys).skip(optWhitespace);
     assert.deepEqual(parser.parse('').value, { start: 0, value: '', end: 0 });
     assert.deepEqual(parser.parse(' yy ').value, { start: 1, value: 'yy', end: 3 });
+  });
+
+  test('markLineColumn', function() {
+    var ys = regex(/^y*/).markLineColumn()
+    var parser = optWhitespace.then(ys).skip(optWhitespace);
+    assert.deepEqual(
+      parser.parse('').value,
+      {
+        value: '',
+        start: { offset: 0, line: 0, column: 0 },
+        end: { offset: 0, line: 0, column: 0 }
+      }
+      );
+    assert.deepEqual(
+      parser.parse(' yy ').value,
+      {
+        value: 'yy',
+        start: { offset: 1, line: 0, column: 1 },
+        end: { offset: 3, line: 0, column: 3 }
+      }
+      );
+    assert.deepEqual(
+      parser.parse('\nyy ').value,
+      {
+        value: 'yy',
+        start: { offset: 1, line: 1, column: 0 },
+        end: { offset: 3, line: 1, column: 2 }
+      }
+      );
   });
 
   suite('smart error messages', function() {

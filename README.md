@@ -101,6 +101,9 @@ error string.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
   - `Parsimmon.index` is a parser that yields the current index of the parse.
+  - `Parsimmon.indexLineColumn` is a parser that yields an object with a more
+    verbose index of the parse: it has 0-based `line` and `column` numbers as
+    well as the character `offset`.
   - `Parsimmon.test(pred)` yield a single character if it passes the predicate.
   - `Parsimmon.takeWhile(pred)` yield a string containing all the next characters that pass the predicate.
 
@@ -164,6 +167,11 @@ parser.parse('accccc');
   - `parser.mark()` yields an object with `start`, `value`, and `end` keys, where
     `value` is the original value yielded by the parser, and `start` and `end` are
     the indices in the stream that contain the parsed text.
+  - `parser.markLineColumn()` is a more verbose version of `mark`: it yields an
+    object with `start`, `value`, and `end` keys, where `value` is the original
+    value yielded by the parser, and `start` and `end` are objects with
+    `offset`, `line` and `column` properties that represent the position in the
+    stream that contained the parsed text.
   - `parser.desc(description)` returns a new parser whose failure message is the passed
     description.  For example, `string('x').desc('the letter x')` will indicate that
     'the letter x' was expected.
