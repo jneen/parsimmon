@@ -436,8 +436,9 @@ Parsimmon.Parser = (function() {
 
       var lines = stream.slice(0, i).split("\n");
 
-      var lineWeAreUpTo = lines.length - 1;
-      var columnWeAreUpTo = lines[lines.length - 1].length;
+      // Unlike the character offset, lines and columns are 1-based.
+      var lineWeAreUpTo = lines.length;
+      var columnWeAreUpTo = lines[lines.length - 1].length + 1;
 
       return makeSuccess(i, {
         offset: i,
