@@ -60,7 +60,7 @@ Parsimmon.Parser = (function() {
   function assertNumber(x) {
     if (typeof x !== 'number') throw new Error('not a number: '+x);
   }
-  function assertRegex(x) {
+  function assertRegexp(x) {
     if (!(x instanceof RegExp)) throw new Error('not a regex: '+x);
   }
   function assertFunction(x) {
@@ -350,7 +350,7 @@ Parsimmon.Parser = (function() {
 
   var regex = Parsimmon.regex = function(re, group) {
 
-    assertRegex(re);
+    assertRegexp(re);
     if (group) assertNumber(group);
 
     var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
