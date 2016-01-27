@@ -28,6 +28,8 @@ suite('parser', function() {
       "expected 'x' at character 0, got 'y'",
       Parsimmon.formatError('y', res)
     );
+
+    assert.throws(function() { string(34) });
   });
 
   test('Parsimmon.regex', function() {
@@ -45,6 +47,8 @@ suite('parser', function() {
       index: 1,
       expected: ['EOF']
     });
+    assert.throws(function() { regex(42) });
+    assert.throws(function() { regex(/a/, 'not a number') });
   });
 
   test('Parsimmon.regex with group', function() {
@@ -70,6 +74,7 @@ suite('parser', function() {
           index: 0,
           expected: ["'('"]
       });
+      assert.throws(function() { seq('not a parser') });
   });
 
   suite('Parsimmon.custom', function(){
@@ -144,6 +149,8 @@ suite('parser', function() {
          type: 'identifier',
          value: 'anIdentifier'
       });
+
+      assert.throws(function() { alt('not a parser') });
   });
 
   suite('Parsimmon.sepBy/sepBy1', function() {
@@ -160,6 +167,10 @@ suite('parser', function() {
 
       assert.deepEqual(csvSep.parse(input).value, output);
       assert.deepEqual(csvSep1.parse(input).value, output);
+      assert.throws(function() { Parsimmon.sepBy('not a parser') });
+      assert.throws(function() {
+        Parsimmon.sepBy(string('a'), 'not a parser')
+      });
     });
 
     test('sepBy succeeds with the empty list on empty input, sepBy1 fails', function() {
@@ -199,6 +210,11 @@ suite('parser', function() {
         index: 1
       });
     });
+    test('errors when argument is not a parser', function() {
+      assert.throws(function() {
+        string('x').then('not a parser')
+      });
+    });
   });
 
   suite('chain', function() {
@@ -234,6 +250,9 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('x'), { status: true, value: 'y' });
       assert.equal(piped, 'x');
     });
+    test('asserts that a function was given', function() {
+      assert.throws(function() { string('x').map('not a function') });
+    });
   });
 
   suite('result', function() {
@@ -249,6 +268,9 @@ suite('parser', function() {
 
       assert.deepEqual(parser.parse('xy'), { status: true, value: 'x' });
       assert.ok(!parser.parse('x').status);
+    });
+    test('asserts that a parser was given', function() {
+      assert.throws(function() { string('x').skip('not a parser') });
     });
   });
 
@@ -270,6 +292,9 @@ suite('parser', function() {
       assert.equal(parser.parse('\\y').value, 'y');
       assert.equal(parser.parse('z').value, 'z');
       assert.ok(!parser.parse('\\z').status);
+    });
+    test('asserts that a parser was given', function() {
+      assert.throws(function() { string('x').or('not a parser') });
     });
   });
 
@@ -349,6 +374,12 @@ suite('parser', function() {
       assert.deepEqual(atLeastTwo.parse('xyzw').value, ['x', 'y', 'z', 'w']);
       assert.ok(!atLeastTwo.parse('x').status);
     });
+    test('checks that argument types are correct', function() {
+      assert.throws(function() { string('x').times('not a number') });
+      assert.throws(function() { string('x').times(1, 'not a number') });
+      assert.throws(function() { string('x').atLeast('not a number') });
+      assert.throws(function() { string('x').atMost('not a number') });
+    });
   });
 
   suite('fail', function() {
@@ -410,6 +441,7 @@ suite('parser', function() {
     var parser = Parsimmon.test(function(ch) { return ch !== '.' });
     assert.equal(parser.parse('x').value, 'x');
     assert.equal(parser.parse('.').status, false);
+    assert.throws(function() { Parsimmon.test('not a function') });
   });
 
   test('takeWhile', function() {
@@ -419,6 +451,7 @@ suite('parser', function() {
     assert.equal(parser.parse('abc.').value, 'abc');
     assert.equal(parser.parse('.').value, '');
     assert.equal(parser.parse('').value, '');
+    assert.throws(function() { Parsimmon.takeWhile('not a function') });
   });
 
   test('index', function() {
