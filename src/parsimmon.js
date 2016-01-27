@@ -58,16 +58,16 @@ Parsimmon.Parser = (function() {
     if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
   }
   function assertNumber(x) {
-    if (!(typeof x === 'number')) throw new Error('not a number: '+x);
+    if (typeof x !== 'number') throw new Error('not a number: '+x);
   }
-  function assertRegex(x) {
+  function assertRegexp(x) {
     if (!(x instanceof RegExp)) throw new Error('not a regex: '+x);
   }
   function assertFunction(x) {
-    if (!(typeof x === 'function')) throw new Error('not a function: '+x);
+    if (typeof x !== 'function') throw new Error('not a function: '+x);
   }
   function assertString(x) {
-    if (!(typeof x === 'string')) throw new Error('not a string: '+x);
+    if (typeof x !== 'string') throw new Error('not a string: '+x)
   }
 
   function formatExpected(expected) {
@@ -113,7 +113,9 @@ Parsimmon.Parser = (function() {
     var parsers = [].slice.call(arguments);
     var numParsers = parsers.length;
 
-    parsers.forEach(assertParser);
+    for (var j = 0; j < numParsers; j += 1) {
+      assertParser(parsers[j]);
+    }
 
     return Parser(function(stream, i) {
       var result;
@@ -151,7 +153,9 @@ Parsimmon.Parser = (function() {
     var numParsers = parsers.length;
     if (numParsers === 0) return fail('zero alternates')
 
-    parsers.forEach(assertParser);
+    for (var j = 0; j < numParsers; j += 1) {
+      assertParser(parsers[j]);
+    }
 
     return Parser(function(stream, i) {
       var result;
@@ -350,7 +354,7 @@ Parsimmon.Parser = (function() {
 
   var regex = Parsimmon.regex = function(re, group) {
 
-    assertRegex(re);
+    assertRegexp(re);
     if (group) assertNumber(group);
 
     var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
