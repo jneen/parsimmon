@@ -58,16 +58,16 @@ Parsimmon.Parser = (function() {
     if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
   }
   function assertNumber(x) {
-    if (!(typeof x === 'number')) throw new Error('not a number: '+x);
+    if (typeof x !== 'number') throw new Error('not a number: '+x);
   }
   function assertRegex(x) {
     if (!(x instanceof RegExp)) throw new Error('not a regex: '+x);
   }
   function assertFunction(x) {
-    if (!(typeof x === 'function')) throw new Error('not a function: '+x);
+    if (typeof x !== 'function') throw new Error('not a function: '+x);
   }
   function assertString(x) {
-    if (!(typeof x === 'string')) throw new Error('not a string: '+x);
+    if (typeof x !== 'string') throw new Error('not a string: '+x)
   }
 
   function formatExpected(expected) {
