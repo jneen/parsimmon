@@ -113,7 +113,9 @@ Parsimmon.Parser = (function() {
     var parsers = [].slice.call(arguments);
     var numParsers = parsers.length;
 
-    parsers.forEach(assertParser);
+    for (var j = 0; j < numParsers; j += 1) {
+      assertParser(parsers[j]);
+    }
 
     return Parser(function(stream, i) {
       var result;
@@ -151,7 +153,9 @@ Parsimmon.Parser = (function() {
     var numParsers = parsers.length;
     if (numParsers === 0) return fail('zero alternates')
 
-    parsers.forEach(assertParser);
+    for (var j = 0; j < numParsers; j += 1) {
+      assertParser(parsers[j]);
+    }
 
     return Parser(function(stream, i) {
       var result;
