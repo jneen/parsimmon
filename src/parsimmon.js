@@ -53,8 +53,21 @@ Parsimmon.Parser = (function() {
     }
   }
 
+  // For ensuring we have the right argument types
   function assertParser(p) {
     if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
+  }
+  function assertNumber(x) {
+    if (!(typeof x === 'number')) throw new Error('not a number: '+x);
+  }
+  function assertRegex(x) {
+    if (!(x instanceof RegExp)) throw new Error('not a regex: '+x);
+  }
+  function assertFunction(x) {
+    if (!(typeof x === 'function')) throw new Error('not a function: '+x);
+  }
+  function assertString(x) {
+    if (!(typeof x === 'string')) throw new Error('not a string: '+x);
   }
 
   function formatExpected(expected) {
@@ -100,6 +113,8 @@ Parsimmon.Parser = (function() {
     var parsers = [].slice.call(arguments);
     var numParsers = parsers.length;
 
+    parsers.forEach(assertParser);
+
     return Parser(function(stream, i) {
       var result;
       var accum = new Array(numParsers);
@@ -136,6 +151,8 @@ Parsimmon.Parser = (function() {
     var numParsers = parsers.length;
     if (numParsers === 0) return fail('zero alternates')
 
+    parsers.forEach(assertParser);
+
     return Parser(function(stream, i) {
       var result;
       for (var j = 0; j < parsers.length; j += 1) {
@@ -147,6 +164,7 @@ Parsimmon.Parser = (function() {
   };
 
   var sepBy = Parsimmon.sepBy = function(parser, separator) {
+    // Argument asserted by sepBy1
     return sepBy1(parser, separator).or(Parsimmon.of([]));
   };
 
@@ -237,6 +255,9 @@ Parsimmon.Parser = (function() {
     if (arguments.length < 2) max = min;
     var self = this;
 
+    assertNumber(min);
+    assertNumber(max);
+
     return Parser(function(stream, i) {
       var accum = [];
       var start = i;
@@ -278,6 +299,9 @@ Parsimmon.Parser = (function() {
   };
 
   _.map = function(fn) {
+
+    assertFunction(fn);
+
     var self = this;
     return Parser(function(stream, i) {
       var result = self._(stream, i);
@@ -310,6 +334,8 @@ Parsimmon.Parser = (function() {
     var len = str.length;
     var expected = "'"+str+"'";
 
+    assertString(str);
+
     return Parser(function(stream, i) {
       var head = stream.slice(i, i+len);
 
@@ -323,6 +349,10 @@ Parsimmon.Parser = (function() {
   };
 
   var regex = Parsimmon.regex = function(re, group) {
+
+    assertRegex(re);
+    if (group) assertNumber(group);
+
     var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
     var expected = '' + re;
     if (group == null) group = 0;
@@ -374,6 +404,8 @@ Parsimmon.Parser = (function() {
   });
 
   var test = Parsimmon.test = function(predicate) {
+    assertFunction(predicate);
+
     return Parser(function(stream, i) {
       var char = stream.charAt(i);
       if (i < stream.length && predicate(char)) {
@@ -394,6 +426,8 @@ Parsimmon.Parser = (function() {
   };
 
   var takeWhile = Parsimmon.takeWhile = function(predicate) {
+    assertFunction(predicate);
+
     return Parser(function(stream, i) {
       var j = i;
       while (j < stream.length && predicate(stream.charAt(j))) j += 1;
