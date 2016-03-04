@@ -9,14 +9,12 @@
   "files": [
     "index.js", "src", "test", "Makefile", "package.json",
     "build/parsimmon.commonjs.js",
-    "build/parsimmon.browser.js",
-    "build/parsimmon.browser.min.js"
+    "build/parsimmon.browser.js"
   ],
   "main": "index.js",
   "devDependencies": {
     "mocha": "1.8.x",
-    "chai": "1.5.x",
-    "uglify-js": "2.x"
+    "chai": "1.5.x"
   },
   "dependencies": {},
   "scripts": {
