@@ -6,10 +6,7 @@
   "author": "Jeanine Adkisson <jneen at jneen dot net>",
   "repository": "git://github.com/jneen/parsimmon",
 
-  "files": [
-    "index.js", "src", "test", "Makefile", "package.json",
-    "build/parsimmon.commonjs.js"
-  ],
+  "files": [ "index.js" ],
   "main": "index.js",
   "devDependencies": {
     "mocha": "1.8.x",
