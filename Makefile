@@ -4,9 +4,9 @@ export PATH := $(shell npm bin):$(PATH)
 all:
 
 .PHONY: test
-test:
-	mocha -u tdd ./test/*.test.js
+test: test.js
+	mocha -u tdd test.js
 
 .PHONY: publish
-publish: clean test
+publish: test
 	npm publish

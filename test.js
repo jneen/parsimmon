@@ -1,5 +1,5 @@
 var assert = require('chai').assert;
-var Parsimmon = require('./../index');
+var Parsimmon = require('./index');
 
 suite('parser', function() {
   var string = Parsimmon.string;
