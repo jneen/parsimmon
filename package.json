@@ -8,8 +8,7 @@
 
   "files": [
     "index.js", "src", "test", "Makefile", "package.json",
-    "build/parsimmon.commonjs.js",
-    "build/parsimmon.browser.js"
+    "build/parsimmon.commonjs.js"
   ],
   "main": "index.js",
   "devDependencies": {

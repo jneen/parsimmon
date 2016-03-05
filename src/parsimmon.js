@@ -485,3 +485,4 @@ Parsimmon.Parser = (function() {
 
   return Parser;
 })();
+module.exports = Parsimmon;

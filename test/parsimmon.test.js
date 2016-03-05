@@ -1,3 +1,6 @@
+var assert = require('chai').assert;
+var Parsimmon = require('./../index');
+
 suite('parser', function() {
   var string = Parsimmon.string;
   var regex = Parsimmon.regex;

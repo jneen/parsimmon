@@ -1,5 +1,4 @@
 /*.tgz
-/build
 
 npm-*.log
 /node_modules

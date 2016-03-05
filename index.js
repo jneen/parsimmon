@@ -1,2 +1,1 @@
-module.exports = require('./build/parsimmon.commonjs');
-exports.version = require('./package.json').version;
+module.exports = require('./src/parsimmon.js');
