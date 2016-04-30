@@ -85,9 +85,10 @@ error string.
     `content`s, separated by `separator`s. Yields an array of `contents`.  
   - `Parsimmon.sepBy1(content, separator)` same as `Parsimmon.sepBy`, but expects
     `content` to succeed at least once.
-  - `Parsimmon.lazy(f)` accepts a function that returns a parser, which
-    is evaluated the first time the parser is used.  This is useful for
-    referencing parsers that haven't yet been defined.
+  - `Parsimmon.lazy(f)` accepts a function that returns a parser, which is
+    evaluated the first time the parser is used.  This is useful for
+    referencing parsers that haven't yet been defined, and for implementing
+    recursive parsers.
   - `Parsimmon.lazy(desc, f)` is the same as `Parsimmon.lazy` but also
     sets `desc` as the expected value (see `.desc()` below)
   - `Parsimmon.fail(message)`
@@ -192,13 +193,16 @@ For most parsers, the following format is helpful:
     var number = lexeme(regex(/[0-9]+/)).map(parseInt);
     ```
 
-1. Forward-declare one or more top-level expressions with `lazy`,
-   referring to parsers that have not yet been defined.  Generally, this
-   takes the form of a large `.alt()` call
+1. Forward-declare one or more top-level expressions with `lazy`, referring to
+   parsers that have not yet been defined.  Generally, this takes the form of a
+   large `.alt()` call
 
     ``` js
     var expr = lazy('an expression', function() { return Parsimmon.alt(p1, p2, ...); });
     ```
+
+    With `.lazy` you could also recursively refer to `expr` in its own
+    definition.
 
 1. Then build your parsers from the inside out - these should return
    AST nodes or other objects specific to your domain.
