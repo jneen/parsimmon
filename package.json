@@ -18,9 +18,7 @@
     "chai": "1.5.x",
     "uglify-js": "2.x"
   },
-  "dependencies": {
-    "pjs": "5.x"
-  },
+  "dependencies": {},
   "scripts": {
     "test": "make test"
   }
