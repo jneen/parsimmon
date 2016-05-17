@@ -20,6 +20,7 @@
   },
   "dependencies": {},
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "install": "make commonjs"
   }
 }
