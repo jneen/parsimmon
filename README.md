@@ -4,9 +4,12 @@
 
 [![Parsimmon](http://i.imgur.com/wyKOf.png)](http://github.com/jneen/parsimmon)
 
-(by @jneen and @laughinghan)
+Authors: @jneen and @laughinghan
+Maintainer: @wavebeem
 
 Parsimmon is a small library for writing big parsers made up of lots of little parsers.  The API is inspired by parsec and Promises/A.
+
+Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as a standard Node module through npm, or through `build/parsimmon.browser.js` directly in the browser through a script tag, where it exports a global variable called `Parsimmon`.
 
 ## Quick Example
 
