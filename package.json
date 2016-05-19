@@ -2,21 +2,21 @@
   "name": "parsimmon",
   "version": "0.6.0",
   "description": "A monadic LL(infinity) parser combinator library",
-  "keywords": ["parsing", "parse", "parser combinators"],
+  "keywords": [
+    "parsing",
+    "parse",
+    "parser combinators"
+  ],
   "author": "Jeanine Adkisson <jneen at jneen dot net>",
   "repository": "git://github.com/jneen/parsimmon",
-
   "files": [
-    "index.js", "src", "test", "Makefile", "package.json",
-    "build/parsimmon.commonjs.js",
-    "build/parsimmon.browser.js",
-    "build/parsimmon.browser.min.js"
+    "index.js"
   ],
   "main": "index.js",
   "devDependencies": {
-    "mocha": "1.8.x",
     "chai": "1.5.x",
-    "uglify-js": "2.x"
+    "mocha": "1.8.x",
+    "standard": "^6.0.7"
   },
   "dependencies": {},
   "scripts": {
