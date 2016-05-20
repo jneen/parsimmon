@@ -58,14 +58,13 @@ digits.map(function(x) { return parseInt(x) * 2; })
 will yield the number 24 when it encounters the string '12'.  The method
 `.result` can be used to set a constant result.
 
-Calling `.parse(str)` on a parser parses the string, and returns an
-object with a `status` flag, indicating whether the parse succeeded.
-If it succeeded, the `value` attribute will contain the yielded value.
-Otherwise, the `index` and `expected` attributes will contain the
-index of the parse error, and a message indicating what was expected.
+Calling `.parse(str)` on a parser parses the string, and returns an object with
+a `status` flag, indicating whether the parse succeeded.  If it succeeded, the
+`value` attribute will contain the yielded value.  Otherwise, the `index` and
+`expected` attributes will contain the index of the parse error (with `offset`,
+`line` and `column` properties), and a message indicating what was expected.
 The error object can be passed along with the original source to
-`Parsimmon.formatError(source, error)` to obtain a human-readable
-error string.
+`Parsimmon.formatError(source, error)` to obtain a human-readable error string.
 
 ## Full API
 
@@ -100,10 +99,9 @@ error string.
   - `Parsimmon.any` consumes and yields the next character of the stream.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
-  - `Parsimmon.index` is a parser that yields the current index of the parse.
-  - `Parsimmon.indexLineColumn` is a parser that yields an object with a more
-    verbose index of the parse: it has a 0-based character `offset` and 1-based
-    `line` and `column` numbers.
+  - `Parsimmon.index` is a parser that yields an object an object representing
+    the current offset into the parse: it has a 0-based character `offset`
+    property and 1-based `line` and `column` properties.
   - `Parsimmon.test(pred)` yield a single character if it passes the predicate.
   - `Parsimmon.takeWhile(pred)` yield a string containing all the next characters that pass the predicate.
 
@@ -164,14 +162,11 @@ parser.parse('accccc');
     expects `parser` at most `n` times.  Yields an array of the results.
   - `parser.atLeast(n)`:
     expects `parser` at least `n` times.  Yields an array of the results.
-  - `parser.mark()` yields an object with `start`, `value`, and `end` keys, where
-    `value` is the original value yielded by the parser, and `start` and `end` are
-    the indices in the stream that contain the parsed text.
-  - `parser.markLineColumn()` is a more verbose version of `mark`: it yields an
-    object with `start`, `value`, and `end` keys, where `value` is the original
-    value yielded by the parser, and `start` and `end` are objects with a
-    0-based `offset` and 1-based `line` and `column` properties that represent
-    the position in the stream that contained the parsed text.
+  - `parser.mark()` yields an object with `start`, `value`, and `end` keys,
+    where `value` is the original value yielded by the parser, and `start` and
+    `end` are are objects with a 0-based `offset` and 1-based `line` and
+    `column` properties that represent the position in the stream that
+    contained the parsed text.
   - `parser.desc(description)` returns a new parser whose failure message is the passed
     description.  For example, `string('x').desc('the letter x')` will indicate that
     'the letter x' was expected.
