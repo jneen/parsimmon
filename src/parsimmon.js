@@ -64,7 +64,7 @@ Parsimmon.Parser = (function() {
   }
 
   function formatGot(stream, error) {
-    var i = error.index;
+    var i = error.index.offset;
 
     if (i === stream.length) return ', got the end of the stream'
 
@@ -90,7 +90,7 @@ Parsimmon.Parser = (function() {
       value: result.value
     } : {
       status: false,
-      index: result.furthest,
+      index: makeLineColumnIndex(stream, result.furthest),
       expected: result.expected
     };
   };
@@ -417,20 +417,24 @@ Parsimmon.Parser = (function() {
     return parser;
   };
 
+  var makeLineColumnIndex = function(stream, i) {
+    var lines = stream.slice(0, i).split("\n");
+    // Note that unlike the character offset, the line and column offsets are
+    // 1-based.
+    var lineWeAreUpTo = lines.length;
+    var columnWeAreUpTo = lines[lines.length - 1].length + 1;
+
+    return {
+      offset: i,
+      line: lineWeAreUpTo,
+      column: columnWeAreUpTo
+    };
+  };
+
   var index
     = Parsimmon.index
     = Parser(function(stream, i) {
-      var lines = stream.slice(0, i).split("\n");
-      // Note that unlike the character offset, the line and column offsets are
-      // 1-based.
-      var lineWeAreUpTo = lines.length;
-      var columnWeAreUpTo = lines[lines.length - 1].length + 1;
-
-      return makeSuccess(i, {
-        offset: i,
-        line: lineWeAreUpTo,
-        column: columnWeAreUpTo
-      });
+      return makeSuccess(i, makeLineColumnIndex(stream, i));
     });
 
   //- fantasyland compat
