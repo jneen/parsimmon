@@ -11,7 +11,6 @@ suite('parser', function() {
   var alt = Parsimmon.alt;
   var all = Parsimmon.all;
   var index = Parsimmon.index;
-  var indexLineColumn = Parsimmon.indexLineColumn;
   var lazy = Parsimmon.lazy;
 
   test('Parsimmon.string', function() {
@@ -423,14 +422,7 @@ suite('parser', function() {
   });
 
   test('index', function() {
-    var parser = regex(/^x*/).then(index);
-    assert.equal(parser.parse('').value, 0);
-    assert.equal(parser.parse('xx').value, 2);
-    assert.equal(parser.parse('xxxx').value, 4);
-  });
-
-  test('indexLineColumn', function() {
-    var parser = regex(/^[x\n]*/).then(indexLineColumn);
+    var parser = regex(/^[x\n]*/).then(index);
     assert.deepEqual(parser.parse('').value, {
       offset: 0,
       line: 1,
@@ -450,13 +442,6 @@ suite('parser', function() {
 
   test('mark', function() {
     var ys = regex(/^y*/).mark()
-    var parser = optWhitespace.then(ys).skip(optWhitespace);
-    assert.deepEqual(parser.parse('').value, { start: 0, value: '', end: 0 });
-    assert.deepEqual(parser.parse(' yy ').value, { start: 1, value: 'yy', end: 3 });
-  });
-
-  test('markLineColumn', function() {
-    var ys = regex(/^y*/).markLineColumn()
     var parser = optWhitespace.then(ys).skip(optWhitespace);
     assert.deepEqual(
       parser.parse('').value,

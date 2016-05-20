@@ -296,13 +296,6 @@ Parsimmon.Parser = (function() {
     });
   };
 
-  _.markLineColumn = function() {
-    var indexLC = indexLineColumn;
-    return seqMap(indexLC, this, indexLC, function(start, value, end) {
-      return { start: start, value: value, end: end };
-    });
-  };
-
   _.desc = function(expected) {
     var self = this;
     return Parser(function(stream, i) {
@@ -424,19 +417,12 @@ Parsimmon.Parser = (function() {
     return parser;
   };
 
-  var index = Parsimmon.index = Parser(function(stream, i) {
-    return makeSuccess(i, i);
-  });
-
-  var indexLineColumn
-    = Parsimmon.indexLineColumn
+  var index
+    = Parsimmon.index
     = Parser(function(stream, i) {
-      // Like `index` above, but emitting an object that contains line and
-      // column indices in addition to the character-based one.
-
       var lines = stream.slice(0, i).split("\n");
-
-      // Unlike the character offset, lines and columns are 1-based.
+      // Note that unlike the character offset, the line and column offsets are
+      // 1-based.
       var lineWeAreUpTo = lines.length;
       var columnWeAreUpTo = lines[lines.length - 1].length + 1;
 
