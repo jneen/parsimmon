@@ -64,7 +64,8 @@ Parsimmon.Parser = (function() {
   }
 
   function formatGot(stream, error) {
-    var i = error.index.offset;
+    var index = error.index;
+    var i = index.offset;
 
     if (i === stream.length) return ', got the end of the stream'
 
@@ -72,7 +73,8 @@ Parsimmon.Parser = (function() {
     var prefix = (i > 0 ? "'..." : "'");
     var suffix = (stream.length - i > 12 ? "...'" : "'");
 
-    return ' at character ' + i + ', got ' + prefix + stream.slice(i, i+12) + suffix
+    return ' at line ' + index.line + ' column ' + index.column
+      +  ', got ' + prefix + stream.slice(i, i+12) + suffix
   }
 
   var formatError = Parsimmon.formatError = function(stream, error) {

@@ -31,7 +31,7 @@ suite('parser', function() {
     });
 
     assert.equal(
-      "expected 'x' at character 0, got 'y'",
+      "expected 'x' at line 1 column 1, got 'y'",
       Parsimmon.formatError('y', res)
     );
   });
