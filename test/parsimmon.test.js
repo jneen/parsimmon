@@ -19,13 +19,19 @@ suite('parser', function() {
     assert.ok(res.status);
     assert.equal(res.value, 'x');
 
-    res = parser.parse('y')
-    assert.ok(!res.status)
-    assert.equal("'x'", res.expected);
-    assert.equal(0, res.index);
+    res = parser.parse('y');
+    assert.deepEqual(res, {
+      status: false,
+      index: {
+        offset: 0,
+        line: 1,
+        column: 1
+      },
+      expected: ["'x'"]
+    });
 
     assert.equal(
-      "expected 'x' at character 0, got 'y'",
+      "expected 'x' at line 1 column 1, got 'y'",
       Parsimmon.formatError('y', res)
     );
 
@@ -39,12 +45,20 @@ suite('parser', function() {
     assert.equal(parser.parse('4').value, '4');
     assert.deepEqual(parser.parse('x0'), {
       status: false,
-      index: 0,
+      index: {
+        offset: 0,
+        line: 1,
+        column: 1
+      },
       expected: ['/[0-9]/']
     });
     assert.deepEqual(parser.parse('0x'), {
       status: false,
-      index: 1,
+      index: {
+        offset: 1,
+        line: 1,
+        column: 2
+      },
       expected: ['EOF']
     });
     assert.throws(function() { regex(42) });
@@ -66,12 +80,20 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('(string between parens)').value, ['(', 'string between parens', ')']);
       assert.deepEqual(parser.parse('(string'), {
           status: false,
-          index: 7,
+          index: {
+            offset: 7,
+            line: 1,
+            column: 8
+          },
           expected: ["')'", "/[^\\)]/"]
       });
       assert.deepEqual(parser.parse('starts wrong (string between parens)'), {
           status: false,
-          index: 0,
+          index: {
+            offset: 0,
+            line: 1,
+            column: 1
+          },
           expected: ["'('"]
       });
       assert.throws(function() { seq('not a parser') });
@@ -104,7 +126,15 @@ suite('parser', function() {
         });
       }
 
-      assert.deepEqual(failer().parse('a'), {status: false, index: 0, expected: ['nothing']})
+      assert.deepEqual(failer().parse('a'), {
+        status: false,
+        index: {
+          offset: 0,
+          line: 1,
+          column: 1
+        },
+        expected: ['nothing']}
+        )
     });
 
     test('composes with existing parsers', function(){
@@ -177,7 +207,11 @@ suite('parser', function() {
       assert.deepEqual(csvSep.parse('').value, []);
       assert.deepEqual(csvSep1.parse(''), {
         status: false,
-        index: 0,
+        index: {
+          offset: 0,
+          line: 1,
+          column: 1
+        },
         expected: ['/[a-zA-Z]+/']
       });
     });
@@ -186,7 +220,11 @@ suite('parser', function() {
       var input = 'Heres,a,csv,with,a,trailing,comma,';
       var output = {
         status: false,
-        index: 34,
+        index: {
+          offset: 34,
+          line: 1,
+          column: 35
+        },
         expected: ['/[a-zA-Z]+/']
       };
 
@@ -202,12 +240,20 @@ suite('parser', function() {
       assert.deepEqual(parser.parse('y'), {
         status: false,
         expected: ["'x'"],
-        index: 0
+        index: {
+          offset: 0,
+          line: 1,
+          column: 1
+        }
       })
       assert.deepEqual(parser.parse('xz'), {
         status: false,
         expected: ["'y'"],
-        index: 1
+        index: {
+          offset: 1,
+          line: 1,
+          column: 2
+        }
       });
     });
     test('errors when argument is not a parser', function() {
@@ -393,7 +439,11 @@ suite('parser', function() {
 
       assert.deepEqual(parser.parse('y'), {
         status: false,
-        index: 1,
+        index: {
+          offset: 1,
+          line: 1,
+          column: 2
+        },
         expected: ['a character besides y']
       });
       assert.equal(parser.parse('x').value, 'x');
@@ -416,7 +466,11 @@ suite('parser', function() {
       assert.equal(parser.parse('x+y').value, '+');
       assert.deepEqual(parser.parse('x*y'), {
         status: false,
-        index: 2,
+        index: {
+          offset: 2,
+          line: 1,
+          column: 3
+        },
         expected: ['+']
       });
 
@@ -424,7 +478,11 @@ suite('parser', function() {
       assert.equal(parser.parse('x*y').value, '*');
       assert.deepEqual(parser.parse('x+y'), {
         status: false,
-        index: 2,
+        index: {
+          offset: 2,
+          line: 1,
+          column: 3
+        },
         expected: ['*']
       });
     });
@@ -455,17 +513,51 @@ suite('parser', function() {
   });
 
   test('index', function() {
-    var parser = regex(/^x*/).then(index);
-    assert.equal(parser.parse('').value, 0);
-    assert.equal(parser.parse('xx').value, 2);
-    assert.equal(parser.parse('xxxx').value, 4);
+    var parser = regex(/^[x\n]*/).then(index);
+    assert.deepEqual(parser.parse('').value, {
+      offset: 0,
+      line: 1,
+      column: 1
+    });
+    assert.deepEqual(parser.parse('xx').value, {
+      offset: 2,
+      line: 1,
+      column: 3
+    });
+    assert.deepEqual(parser.parse('xx\nxx').value, {
+      offset: 5,
+      line: 2,
+      column: 3
+    });
   });
 
   test('mark', function() {
     var ys = regex(/^y*/).mark()
     var parser = optWhitespace.then(ys).skip(optWhitespace);
-    assert.deepEqual(parser.parse('').value, { start: 0, value: '', end: 0 });
-    assert.deepEqual(parser.parse(' yy ').value, { start: 1, value: 'yy', end: 3 });
+    assert.deepEqual(
+      parser.parse('').value,
+      {
+        value: '',
+        start: { offset: 0, line: 1, column: 1 },
+        end: { offset: 0, line: 1, column: 1 }
+      }
+      );
+    assert.deepEqual(
+      parser.parse(' yy ').value,
+      {
+        value: 'yy',
+        start: { offset: 1, line: 1, column: 2 },
+        end: { offset: 3, line: 1, column: 4 }
+      }
+      );
+    assert.deepEqual(
+      parser.parse('\nyy ').value,
+      {
+        value: 'yy',
+        start: { offset: 1, line: 2, column: 1 },
+        end: { offset: 3, line: 2, column: 3 }
+      }
+      );
   });
 
   suite('smart error messages', function() {
@@ -478,7 +570,11 @@ suite('parser', function() {
 
         assert.deepEqual(parser.parse('abc'), {
           status: false,
-          index: 3,
+          index: {
+            offset: 3,
+            line: 1,
+            column: 4
+          },
           expected: ["'def'"]
         });
       });
@@ -488,7 +584,11 @@ suite('parser', function() {
 
         assert.deepEqual(parser.parse('abc'), {
           status: false,
-          index: 3,
+          index: {
+            offset: 3,
+            line: 1,
+            column: 4
+          },
           expected: ["'d'", "'def'"]
         });
       });
@@ -499,7 +599,11 @@ suite('parser', function() {
 
         assert.deepEqual(parser.parse('abcdef'), {
           status: false,
-          index: 6,
+          index: {
+            offset: 6,
+            line: 1,
+            column: 7
+          },
           expected: ["'g'"]
         });
       });
@@ -518,13 +622,21 @@ suite('parser', function() {
 
         assert.deepEqual(list.parse('(a b ()) c)'), {
           status: false,
-          index: 10,
+          index: {
+            offset: 10,
+            line: 1,
+            column: 11
+          },
           expected: ['EOF', "'('", "an atom"]
         });
 
         assert.deepEqual(list.parse('(a (b)) (() c'), {
           status: false,
-          index: 13,
+          index: {
+            offset: 13,
+            line: 1,
+            column: 14
+          },
           expected: ["')'", "'('", "an atom"]
         });
       });
@@ -537,7 +649,11 @@ suite('parser', function() {
 
         assert.deepEqual(parser.parse('aaabcde'), {
           status: false,
-          index: 5,
+          index: {
+            offset: 5,
+            line: 1,
+            column: 6
+          },
           expected: ["'def'"]
         });
       });
@@ -549,13 +665,21 @@ suite('parser', function() {
 
         assert.deepEqual(parser.parse('aabcde'), {
           status: false,
-          index: 4,
+          index: {
+            offset: 4,
+            line: 1,
+            column: 5
+          },
           expected: ["'def'"]
         });
 
         assert.deepEqual(parser.parse('aaaaabcde'), {
           status: false,
-          index: 7,
+          index: {
+            offset: 7,
+            line: 1,
+            column: 8
+          },
           expected: ["'def'"]
         });
       });
@@ -569,13 +693,21 @@ suite('parser', function() {
 
         assert.deepEqual(parser.parse('a'), {
           status: false,
-          index: 0,
+          index: {
+            offset: 0,
+            line: 1,
+            column: 1
+          },
           expected: ['the letter x']
         });
 
         assert.deepEqual(parser.parse('xa'), {
           status: false,
-          index: 1,
+          index: {
+            offset: 1,
+            line: 1,
+            column: 2
+          },
           expected: ['the letter y']
         });
       });
@@ -587,13 +719,21 @@ suite('parser', function() {
 
         assert.deepEqual(parser.parse('a'), {
           status: false,
-          index: 0,
+          index: {
+            offset: 0,
+            line: 1,
+            column: 1
+          },
           expected: ['the letter x']
         });
 
         assert.deepEqual(parser.parse('xa'), {
           status: false,
-          index: 1,
+          index: {
+            offset: 1,
+            line: 1,
+            column: 2
+          },
           expected: ['the letter y']
         });
       });
