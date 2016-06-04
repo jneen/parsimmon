@@ -87,6 +87,10 @@ The error object can be passed along with the original source to
     the string, and yields `result`.
   - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
     that it expects to find in order, yielding an array of the results.
+  - `Parsimmon.seqMap(parser1, parser2, ..., function(result1, result2, ...) { return anotherResult; })`:
+    matches all parsers sequentially, passing their results to the callback
+    at the end, returning its value. Works like `seq` and `map` combined but
+    without any arrays.
   - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
     and yields the value of the first one that succeeds, backtracking in between.
   - `Parsimmon.sepBy(content, separator)` accepts two parsers, and expects multiple 
@@ -156,10 +160,6 @@ parser.parse('accccc');
     of `anotherParser`.  NB: the result of `parser` here is ignored.
   - `parser.map(function(result) { return anotherResult; })`:
     transforms the output of `parser` with the given function.
-  - `parser.seqMap(parser1, parser2, ..., function(result1, result2, ...) { return anotherResult; })`:
-    matches all parsers sequentially, passing their results to the callback
-    at the end, returning its value. Works like `seq` and `map` combined but
-    without any arrays.
   - `parser.skip(otherParser)`
     expects `otherParser` after `parser`, but preserves the yield value
     of `parser`.
