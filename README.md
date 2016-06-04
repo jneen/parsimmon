@@ -14,7 +14,7 @@ Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as
 
 ## Quick Example
 
-``` js
+```javascript
 var regex = Parsimmon.regex;
 var string = Parsimmon.string;
 var optWhitespace = Parsimmon.optWhitespace;
@@ -49,13 +49,13 @@ and otherwise fails.
 The combinator method `.map` is used to transform the yielded value.
 For example,
 
-``` js
+```javascript
 string('foo').map(function(x) { return x + 'bar'; })
 ```
 
 will yield `'foobar'` if the stream starts with `'foo'`.  The parser
 
-``` js
+```javascript
 digits.map(function(x) { return parseInt(x) * 2; })
 ```
 
@@ -75,6 +75,11 @@ The error object can be passed along with the original source to
 ### Included parsers / parser generators:
   - `Parsimmon.string("my-string")` is a parser that expects to find
     `"my-string"`, and will yield the same.
+  - `Parsimmon.oneOf("abc")` is a parser that expects to find
+    one of the characters `"a"`, `"b"`, or `"c"`, and will yield the same.
+  - `Parsimmon.noneOf("abc")` is a parser that expects to find
+    any character except one of the characters `"a"`, `"b"`, or `"c"`,
+    and will yield the same.
   - `Parsimmon.regex(/myregex/, group=0)` is a parser that expects the stream
     to match the given regex, and yields the given match group, or the
     entire match.
@@ -82,10 +87,14 @@ The error object can be passed along with the original source to
     the string, and yields `result`.
   - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
     that it expects to find in order, yielding an array of the results.
+  - `Parsimmon.seqMap(parser1, parser2, ..., function(result1, result2, ...) { return anotherResult; })`:
+    matches all parsers sequentially, passing their results to the callback
+    at the end, returning its value. Works like `seq` and `map` combined but
+    without any arrays.
   - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
     and yields the value of the first one that succeeds, backtracking in between.
   - `Parsimmon.sepBy(content, separator)` accepts two parsers, and expects multiple 
-    `content`s, separated by `separator`s. Yields an array of `contents`.  
+    `content`s, separated by `separator`s. Yields an array of `contents`.
   - `Parsimmon.sepBy1(content, separator)` same as `Parsimmon.sepBy`, but expects
     `content` to succeed at least once.
   - `Parsimmon.lazy(f)` accepts a function that returns a parser, which is
@@ -187,14 +196,14 @@ For most parsers, the following format is helpful:
    about (whitespace, comments, etc).  You may need multiple types of lexemes.
    For example,
 
-    ``` js
+    ```javascript
     var ignore = whitespace.or(comment.many());
     function lexeme(p) { return p.skip(ignore); }
     ```
 
 1. Define all your lexemes first.  These should yield native javascript values.
 
-    ``` js
+    ```javascript
     var lparen = lexeme(string('('));
     var rparen = lexeme(string(')'));
     var number = lexeme(regex(/[0-9]+/)).map(parseInt);
@@ -204,7 +213,7 @@ For most parsers, the following format is helpful:
    parsers that have not yet been defined.  Generally, this takes the form of a
    large `.alt()` call
 
-    ``` js
+    ```javascript
     var expr = lazy('an expression', function() { return Parsimmon.alt(p1, p2, ...); });
     ```
 
@@ -214,7 +223,7 @@ For most parsers, the following format is helpful:
 1. Then build your parsers from the inside out - these should return
    AST nodes or other objects specific to your domain.
 
-    ``` js
+    ```javascript
     var p1 = ...
     var p2 = ...
     ```
@@ -222,7 +231,7 @@ For most parsers, the following format is helpful:
 1. Finally, export your top-level parser.  Remember to skip ignored
    stuff at the beginning.
 
-    ``` js
+    ```javascript
     return ignore.then(expr.many());
     ```
 
