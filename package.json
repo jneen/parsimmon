@@ -1,6 +1,6 @@
 {
   "name": "parsimmon",
-  "version": "0.6.0",
+  "version": "0.7.1",
   "description": "A monadic LL(infinity) parser combinator library",
   "keywords": ["parsing", "parse", "parser combinators"],
   "author": "Jeanine Adkisson <jneen at jneen dot net>",
