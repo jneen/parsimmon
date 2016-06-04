@@ -103,7 +103,7 @@ The error object can be passed along with the original source to
     recursive parsers.
   - `Parsimmon.lazy(desc, f)` is the same as `Parsimmon.lazy` but also
     sets `desc` as the expected value (see `.desc()` below)
-  - `Parsimmon.fail(message)`
+  - `Parsimmon.fail(message)` returns a failing parser with the given message.
   - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/[a-z]/i)`
   - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/[a-z]*/i)`
   - `Parsimmon.digit` is equivalent to `Parsimmon.regex(/[0-9]/)`
