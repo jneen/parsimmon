@@ -129,12 +129,26 @@ function notChar(char) {
 }
 ```
 
+```js
+function notChar(char) {
+  return Parsimmon.custom(function(success, failure) {
+    return function(stream, i) {
+      if (stream.charAt(i) !== char && i <= stream.length) {
+        return success(i + 1, stream.charAt(i));
+      }
+      return failure(i, 'anything different than "' + char + '"');
+    };
+  });
+}
+```
+
 This parser can then be used and composed the same way all the existing ones are
 used and composed, for example:
 
 ```js
-var parser = seq(string('a'), notChar('b').times(5));
-parser.parse('accccc');
+var parser = Parsimmon.seq(Parsimmon.string('a'), notChar('b').times(5));
+console.log(parser.parse('accccc'));
+//=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
 ```
 
 ### Parser methods
