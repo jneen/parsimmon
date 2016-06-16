@@ -129,19 +129,6 @@ any character except the one provided:
 function notChar(char) {
   return Parsimmon.custom(function(success, failure) {
     return function(stream, i) {
-      if (stream.charAt(i) !== char && stream.length <= i) {
-        return success(i+1, stream.charAt(i));
-      }
-      return failure(i, 'anything different than "' + char + '"');
-    }
-  });
-}
-```
-
-```js
-function notChar(char) {
-  return Parsimmon.custom(function(success, failure) {
-    return function(stream, i) {
       if (stream.charAt(i) !== char && i <= stream.length) {
         return success(i + 1, stream.charAt(i));
       }
