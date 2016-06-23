@@ -1,9 +1,12 @@
 {
   "name": "parsimmon",
-  "version": "0.6.0",
+  "version": "0.7.1",
   "description": "A monadic LL(infinity) parser combinator library",
   "keywords": ["parsing", "parse", "parser combinators"],
   "author": "Jeanine Adkisson <jneen at jneen dot net>",
+  "contributors": [
+    "Brian Mock <brian@mockbrian.com>"
+  ],
   "repository": "git://github.com/jneen/parsimmon",
 
   "files": [
@@ -18,6 +21,7 @@
     "chai": "1.5.x",
     "uglify-js": "2.x"
   },
+  "license": "MIT",
   "dependencies": {},
   "scripts": {
     "test": "make test",

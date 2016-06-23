@@ -4,13 +4,17 @@
 
 [![Parsimmon](http://i.imgur.com/wyKOf.png)](http://github.com/jneen/parsimmon)
 
-(by @jneen and @laughinghan)
+**Authors:** [@jneen](https://github.com/jneen) and [@laughinghan](https://github.com/laughinghan)
+
+**Maintainer:** [@wavebeem](https://github.com/wavebeem)
 
 Parsimmon is a small library for writing big parsers made up of lots of little parsers.  The API is inspired by parsec and Promises/A.
 
+Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as a standard Node module through npm, or through `build/parsimmon.browser.js` directly in the browser through a script tag, where it exports a global variable called `Parsimmon`.
+
 ## Quick Example
 
-``` js
+```javascript
 var regex = Parsimmon.regex;
 var string = Parsimmon.string;
 var optWhitespace = Parsimmon.optWhitespace;
@@ -45,33 +49,37 @@ and otherwise fails.
 The combinator method `.map` is used to transform the yielded value.
 For example,
 
-``` js
+```javascript
 string('foo').map(function(x) { return x + 'bar'; })
 ```
 
 will yield `'foobar'` if the stream starts with `'foo'`.  The parser
 
-``` js
+```javascript
 digits.map(function(x) { return parseInt(x) * 2; })
 ```
 
 will yield the number 24 when it encounters the string '12'.  The method
 `.result` can be used to set a constant result.
 
-Calling `.parse(str)` on a parser parses the string, and returns an
-object with a `status` flag, indicating whether the parse succeeded.
-If it succeeded, the `value` attribute will contain the yielded value.
-Otherwise, the `index` and `expected` attributes will contain the
-index of the parse error, and a message indicating what was expected.
+Calling `.parse(str)` on a parser parses the string, and returns an object with
+a `status` flag, indicating whether the parse succeeded.  If it succeeded, the
+`value` attribute will contain the yielded value.  Otherwise, the `index` and
+`expected` attributes will contain the index of the parse error (with `offset`,
+`line` and `column` properties), and a message indicating what was expected.
 The error object can be passed along with the original source to
-`Parsimmon.formatError(source, error)` to obtain a human-readable
-error string.
+`Parsimmon.formatError(source, error)` to obtain a human-readable error string.
 
 ## Full API
 
 ### Included parsers / parser generators:
   - `Parsimmon.string("my-string")` is a parser that expects to find
     `"my-string"`, and will yield the same.
+  - `Parsimmon.oneOf("abc")` is a parser that expects to find
+    one of the characters `"a"`, `"b"`, or `"c"`, and will yield the same.
+  - `Parsimmon.noneOf("abc")` is a parser that expects to find
+    any character except one of the characters `"a"`, `"b"`, or `"c"`,
+    and will yield the same.
   - `Parsimmon.regex(/myregex/, group=0)` is a parser that expects the stream
     to match the given regex, and yields the given match group, or the
     entire match.
@@ -79,10 +87,14 @@ error string.
     the string, and yields `result`.
   - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
     that it expects to find in order, yielding an array of the results.
+  - `Parsimmon.seqMap(parser1, parser2, ..., function(result1, result2, ...) { return anotherResult; })`:
+    matches all parsers sequentially, passing their results to the callback
+    at the end, returning its value. Works like `seq` and `map` combined but
+    without any arrays.
   - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
     and yields the value of the first one that succeeds, backtracking in between.
   - `Parsimmon.sepBy(content, separator)` accepts two parsers, and expects multiple 
-    `content`s, separated by `separator`s. Yields an array of `contents`.  
+    `content`s, separated by `separator`s. Yields an array of `contents`.
   - `Parsimmon.sepBy1(content, separator)` same as `Parsimmon.sepBy`, but expects
     `content` to succeed at least once.
   - `Parsimmon.lazy(f)` accepts a function that returns a parser, which is
@@ -91,7 +103,7 @@ error string.
     recursive parsers.
   - `Parsimmon.lazy(desc, f)` is the same as `Parsimmon.lazy` but also
     sets `desc` as the expected value (see `.desc()` below)
-  - `Parsimmon.fail(message)`
+  - `Parsimmon.fail(message)` returns a failing parser with the given message.
   - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/[a-z]/i)`
   - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/[a-z]*/i)`
   - `Parsimmon.digit` is equivalent to `Parsimmon.regex(/[0-9]/)`
@@ -101,7 +113,9 @@ error string.
   - `Parsimmon.any` consumes and yields the next character of the stream.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
-  - `Parsimmon.index` is a parser that yields the current index of the parse.
+  - `Parsimmon.index` is a parser that yields an object an object representing
+    the current offset into the parse: it has a 0-based character `offset`
+    property and 1-based `line` and `column` properties.
   - `Parsimmon.test(pred)` yield a single character if it passes the predicate.
   - `Parsimmon.takeWhile(pred)` yield a string containing all the next characters that pass the predicate.
 
@@ -115,11 +129,11 @@ any character except the one provided:
 function notChar(char) {
   return Parsimmon.custom(function(success, failure) {
     return function(stream, i) {
-      if (stream.charAt(i) !== char && stream.length <= i) {
-        return success(i+1, stream.charAt(i));
+      if (stream.charAt(i) !== char && i <= stream.length) {
+        return success(i + 1, stream.charAt(i));
       }
       return failure(i, 'anything different than "' + char + '"');
-    }
+    };
   });
 }
 ```
@@ -128,8 +142,9 @@ This parser can then be used and composed the same way all the existing ones are
 used and composed, for example:
 
 ```js
-var parser = seq(string('a'), notChar('b').times(5));
-parser.parse('accccc');
+var parser = Parsimmon.seq(Parsimmon.string('a'), notChar('b').times(5));
+console.log(parser.parse('accccc'));
+//=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
 ```
 
 ### Parser methods
@@ -162,9 +177,11 @@ parser.parse('accccc');
     expects `parser` at most `n` times.  Yields an array of the results.
   - `parser.atLeast(n)`:
     expects `parser` at least `n` times.  Yields an array of the results.
-  - `parser.mark()` yields an object with `start`, `value`, and `end` keys, where
-    `value` is the original value yielded by the parser, and `start` and `end` are
-    the indices in the stream that contain the parsed text.
+  - `parser.mark()` yields an object with `start`, `value`, and `end` keys,
+    where `value` is the original value yielded by the parser, and `start` and
+    `end` are are objects with a 0-based `offset` and 1-based `line` and
+    `column` properties that represent the position in the stream that
+    contained the parsed text.
   - `parser.desc(description)` returns a new parser whose failure message is the passed
     description.  For example, `string('x').desc('the letter x')` will indicate that
     'the letter x' was expected.
@@ -180,14 +197,14 @@ For most parsers, the following format is helpful:
    about (whitespace, comments, etc).  You may need multiple types of lexemes.
    For example,
 
-    ``` js
+    ```javascript
     var ignore = whitespace.or(comment.many());
     function lexeme(p) { return p.skip(ignore); }
     ```
 
 1. Define all your lexemes first.  These should yield native javascript values.
 
-    ``` js
+    ```javascript
     var lparen = lexeme(string('('));
     var rparen = lexeme(string(')'));
     var number = lexeme(regex(/[0-9]+/)).map(parseInt);
@@ -197,7 +214,7 @@ For most parsers, the following format is helpful:
    parsers that have not yet been defined.  Generally, this takes the form of a
    large `.alt()` call
 
-    ``` js
+    ```javascript
     var expr = lazy('an expression', function() { return Parsimmon.alt(p1, p2, ...); });
     ```
 
@@ -207,7 +224,7 @@ For most parsers, the following format is helpful:
 1. Then build your parsers from the inside out - these should return
    AST nodes or other objects specific to your domain.
 
-    ``` js
+    ```javascript
     var p1 = ...
     var p2 = ...
     ```
@@ -215,7 +232,7 @@ For most parsers, the following format is helpful:
 1. Finally, export your top-level parser.  Remember to skip ignored
    stuff at the beginning.
 
-    ``` js
+    ```javascript
     return ignore.then(expr.many());
     ```
 
