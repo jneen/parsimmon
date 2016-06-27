@@ -1,12 +1,28 @@
+## version 0.7.2 (2016-06-??)
+
+* No API changes
+* Switches to npm-based task running
+* Switches to UMD-based code
+
+## version 0.7.1 (2016-06-04)
+
+* Documentation updates
+* Adds line/column information to `P.index` and `.mark()`
+* Adds additional type assertions
+
+## version 0.7.0 (???)
+
+This release may have been unpublished or something, I'm not exactly sure.
+
 ## version 0.6.0 (2015-02-24)
 
-  * add a second optional argument to `regex()` indicating group selection
-  * eliminates pjs dependency
-  * add seqMap, oneOf, and noneOf
+* add a second optional argument to `regex()` indicating group selection
+* eliminates pjs dependency
+* add seqMap, oneOf, and noneOf
 
 ## version 0.5.1 (2014-06-25)
 
-  * Added .custom, .test, and .takeWhile for folks who don't like to use regexes.
+* Added .custom, .test, and .takeWhile for folks who don't like to use regexes.
 
 ## version 0.5.0 (2014-06-15)
 

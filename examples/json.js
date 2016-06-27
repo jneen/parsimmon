@@ -1,4 +1,4 @@
-var Parsimmon = require('./../index');
+var Parsimmon = require('../src/parsimmon');
 
 function interpretEscapes(str) {
   var escapes = {
