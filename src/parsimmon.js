@@ -40,17 +40,21 @@
       index: index,
       value: value,
       furthest: -1,
-      expected: []
+      expected: [],
+      expectedSet: {}
     };
   }
 
   function makeFailure(index, expected) {
+    var expectedSet = {};
+    expectedSet[expected] = true;
     return {
       status: false,
       index: -1,
       value: null,
       furthest: index,
-      expected: [expected]
+      expected: [expected],
+      expectedSet: expectedSet
     };
   }
 
@@ -58,16 +62,30 @@
     if (!last) return result;
     if (result.furthest > last.furthest) return result;
 
-    var expected = (result.furthest === last.furthest)
-      ? result.expected.concat(last.expected)
-      : last.expected;
+    var expected;
+    var expectedSet;
+    if (result.furthest === last.furthest) {
+      expected = result.expected;
+      expectedSet = result.expectedSet;
+      last.expected.forEach(function(expectedValue) {
+        if (!expectedSet.hasOwnProperty(expectedValue)) {
+          expected.push(expectedValue);
+          expectedSet[expectedValue] = true;
+        }
+      });
+    }
+    else {
+      expected = last.expected;
+      expectedSet = last.expectedSet;
+    }
 
     return {
       status: result.status,
       index: result.index,
       value: result.value,
       furthest: last.furthest,
-      expected: expected
+      expected: expected,
+      expectedSet: expectedSet
     }
   }
 
@@ -91,7 +109,7 @@
   function formatExpected(expected) {
     if (expected.length === 1) return expected[0];
 
-    return 'one of ' + expected.join(', ')
+    return 'one of ' + expected.sort().join(', ');
   }
 
   function formatGot(stream, error) {
