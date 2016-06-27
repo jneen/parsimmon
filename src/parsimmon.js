@@ -1,7 +1,23 @@
-var Parsimmon = {};
+// This unsightly UMD-module header is here to make this code work without
+// modification with CommonJS, AMD, and browser globals.
 
-Parsimmon.Parser = (function() {
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define([], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory();
+  } else {
+    // Browser globals (root is window).
+    root.Parsimmon = factory();
+  }
+}(this, function() {
   "use strict";
+
+  var Parsimmon = {};
 
   // The Parser object is a wrapper for a parser function.
   // Externally, you use one to parse a string by calling
@@ -13,6 +29,8 @@ Parsimmon.Parser = (function() {
     if (!(this instanceof Parser)) return new Parser(action);
     this._ = action;
   };
+
+  Parsimmon.Parser = Parser;
 
   var _ = Parser.prototype;
 
@@ -501,5 +519,5 @@ Parsimmon.Parser = (function() {
     });
   };
 
-  return Parser;
-})();
+  return Parsimmon;
+}));

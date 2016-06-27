@@ -1,29 +1,36 @@
 {
   "name": "parsimmon",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "A monadic LL(infinity) parser combinator library",
-  "keywords": ["parsing", "parse", "parser combinators"],
+  "keywords": [
+    "parsing",
+    "parse",
+    "parser combinators"
+  ],
   "author": "Jeanine Adkisson <jneen at jneen dot net>",
   "contributors": [
     "Brian Mock <brian@mockbrian.com>"
   ],
   "repository": "git://github.com/jneen/parsimmon",
-
   "files": [
-    "index.js", "src", "test", "Makefile", "package.json",
-    "build/parsimmon.commonjs.js",
-    "build/parsimmon.browser.js",
-    "build/parsimmon.browser.min.js"
+    "src",
+    "build"
   ],
-  "main": "index.js",
+  "main": "src/parsimmon.js",
   "devDependencies": {
-    "mocha": "1.8.x",
     "chai": "1.5.x",
+    "mocha": "1.8.x",
+    "ncp": "^2.0.0",
+    "rimraf": "^2.5.2",
     "uglify-js": "2.x"
   },
   "license": "MIT",
   "dependencies": {},
   "scripts": {
-    "test": "make test"
+    "clean": "rimraf build/*.js",
+    "build:browser": "ncp src/parsimmon.js build/parsimmon.browser.js",
+    "build:browser.min": "uglifyjs --mangle < src/parsimmon.js > build/parsimmon.browser.min.js",
+    "prepublish": "npm run test && npm run clean && npm run build:browser && npm run build:browser.min",
+    "test": "mocha -u tdd test/intro.js test/*.test.js"
   }
 }
