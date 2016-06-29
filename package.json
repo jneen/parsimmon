@@ -1,6 +1,6 @@
 {
   "name": "parsimmon",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "A monadic LL(infinity) parser combinator library",
   "keywords": [
     "parsing",
@@ -18,8 +18,8 @@
   ],
   "main": "src/parsimmon.js",
   "devDependencies": {
-    "chai": "1.5.x",
-    "mocha": "1.8.x",
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3",
     "ncp": "^2.0.0",
     "rimraf": "^2.5.2",
     "uglify-js": "2.x"
@@ -31,6 +31,6 @@
     "build:browser": "ncp src/parsimmon.js build/parsimmon.browser.js",
     "build:browser.min": "uglifyjs --mangle < src/parsimmon.js > build/parsimmon.browser.min.js",
     "prepublish": "npm run test && npm run clean && npm run build:browser && npm run build:browser.min",
-    "test": "mocha -u tdd test/intro.js test/*.test.js"
+    "test": "mocha --ui tdd --reporter dot test/intro.js test/*.test.js"
   }
 }
