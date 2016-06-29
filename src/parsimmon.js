@@ -59,7 +59,7 @@
     if (result.furthest > last.furthest) return result;
 
     var expected = (result.furthest === last.furthest)
-      ? result.expected.concat(last.expected)
+      ? union(result.expected, last.expected)
       : last.expected;
 
     return {
@@ -69,6 +69,36 @@
       furthest: last.furthest,
       expected: expected
     }
+  }
+
+  // Returns the sorted set union of two arrays of strings
+  function union(xs, ys) {
+    // Exit early if either array is empty (common case)
+    var xn = xs.length;
+    var yn = ys.length;
+    if (xn === 0 && yn === 0) {
+      return [];
+    } else if (xn === 0) {
+      return ys.slice().sort();
+    } else if (yn === 0) {
+      return xs.slice().sort();
+    }
+    // Two non-empty arrays: do the full algorithm
+    var obj = {};
+    for (var i = 0; i < xn; i++) {
+      obj[xs[i]] = true;
+    }
+    for (var i = 0; i < yn; i++) {
+      obj[ys[i]] = true;
+    }
+    var keys = [];
+    for (var k in obj) {
+      if (obj.hasOwnProperty(k)) {
+        keys.push(k);
+      }
+    }
+    keys.sort();
+    return keys;
   }
 
   // For ensuring we have the right argument types

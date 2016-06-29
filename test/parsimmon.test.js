@@ -12,6 +12,7 @@ suite('parser', function() {
   var all = Parsimmon.all;
   var index = Parsimmon.index;
   var lazy = Parsimmon.lazy;
+  var fail = Parsimmon.fail;
 
   test('Parsimmon.string', function() {
     var parser = string('x');
@@ -75,10 +76,23 @@ suite('parser', function() {
   });
 
   test('Parsimmon.seq', function() {
-      var parser = seq(string('('), regex(/[^\)]/).many(), string(')'));
+      var parser =
+        seq(
+          string('('),
+          regex(/[^\)]/).many().map(function(xs) {
+            return xs.join('');
+          }),
+          string(')')
+        );
 
-      assert.deepEqual(parser.parse('(string between parens)').value, ['(', 'string between parens', ')']);
-      assert.deepEqual(parser.parse('(string'), {
+      assert.deepEqual(
+        parser.parse('(string between parens)').value,
+        ['(', 'string between parens', ')']
+      );
+
+      assert.deepEqual(
+        parser.parse('(string'),
+        {
           status: false,
           index: {
             offset: 7,
@@ -86,8 +100,12 @@ suite('parser', function() {
             column: 8
           },
           expected: ["')'", "/[^\\)]/"]
-      });
-      assert.deepEqual(parser.parse('starts wrong (string between parens)'), {
+        }
+      );
+
+      assert.deepEqual(
+        parser.parse('starts wrong (string between parens)'),
+        {
           status: false,
           index: {
             offset: 0,
@@ -95,8 +113,12 @@ suite('parser', function() {
             column: 1
           },
           expected: ["'('"]
+        }
+      );
+
+      assert.throws(function() {
+        seq('not a parser');
       });
-      assert.throws(function() { seq('not a parser') });
   });
 
   suite('Parsimmon.custom', function(){
@@ -159,6 +181,20 @@ suite('parser', function() {
     });
   });
 
+  test('Unique and sorted .expected array', function() {
+    var parser =
+      alt(
+        fail('c'),
+        fail('a'),
+        fail('a'),
+        fail('b'),
+        fail('b'),
+        fail('b'),
+        fail('a')
+      );
+    var result = parser.parse('');
+    assert.deepEqual(result.expected, ['a', 'b', 'c']);
+  })
 
   test('Parsimmon.alt', function(){
       var toNode = function(nodeType){
@@ -617,8 +653,10 @@ suite('parser', function() {
         var atom = regex(/[^()\s]+/).desc('an atom');
         var sexpr = string('(').then(list).skip(string(')'));
 
-        assert.deepEqual(list.parse('(a b) (c ((() d)))').value,
-                         [['a', 'b'], ['c', [[[], 'd']]]]);
+        assert.deepEqual(
+          list.parse('(a b) (c ((() d)))').value,
+          [['a', 'b'], ['c', [[[], 'd']]]]
+        );
 
         assert.deepEqual(list.parse('(a b ()) c)'), {
           status: false,
@@ -627,7 +665,7 @@ suite('parser', function() {
             line: 1,
             column: 11
           },
-          expected: ['EOF', "'('", "an atom"]
+          expected: ["'('", 'EOF', "an atom"]
         });
 
         assert.deepEqual(list.parse('(a (b)) (() c'), {
@@ -637,7 +675,7 @@ suite('parser', function() {
             line: 1,
             column: 14
           },
-          expected: ["')'", "'('", "an atom"]
+          expected: ["'('", "')'", "an atom"]
         });
       });
 

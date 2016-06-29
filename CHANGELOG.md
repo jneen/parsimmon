@@ -1,4 +1,10 @@
-## version 0.7.2 (2016-06-??)
+## version 0.8.0 (2016-06-28)
+
+* The `.expected` array on parse results is now unique and sorted
+* Updated Mocha and Chai versions
+* Updated README a bit (mostly line wrapping stuff)
+
+## version 0.7.2 (2016-06-26)
 
 * No API changes
 * Switches to npm-based task running
