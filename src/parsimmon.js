@@ -409,7 +409,8 @@
     assertRegexp(re);
     if (group) assertNumber(group);
 
-    var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
+    var anchored = re.flags === 'g' ? RegExp('^('+re.source+')+')
+                                    : RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
     var expected = '' + re;
     if (group == null) group = 0;
 
