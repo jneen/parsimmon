@@ -59,7 +59,7 @@
     if (result.furthest > last.furthest) return result;
 
     var expected = (result.furthest === last.furthest)
-      ? union(result.expected, last.expected)
+      ? unsafeUnion(result.expected, last.expected)
       : last.expected;
 
     return {
@@ -71,17 +71,19 @@
     }
   }
 
-  // Returns the sorted set union of two arrays of strings
-  function union(xs, ys) {
+  // Returns the sorted set union of two arrays of strings. Note that if both
+  // arrays are empty, it simply returns the first array, and if exactly one
+  // array is empty, it returns the other one unsorted. This is safe because
+  // expectation arrays always start as [] or [x], so as long as we merge with
+  // this function, we know they stay in sorted order.
+  function unsafeUnion(xs, ys) {
     // Exit early if either array is empty (common case)
     var xn = xs.length;
     var yn = ys.length;
-    if (xn === 0 && yn === 0) {
-      return [];
-    } else if (xn === 0) {
-      return ys.slice().sort();
+    if (xn === 0) {
+      return ys;
     } else if (yn === 0) {
-      return xs.slice().sort();
+      return xs;
     }
     // Two non-empty arrays: do the full algorithm
     var obj = {};

@@ -1,3 +1,7 @@
+## version 0.8.1 (2016-06-30)
+
+* Optimizes internal set union function, which should result in slightly faster parsing
+
 ## version 0.8.0 (2016-06-28)
 
 * The `.expected` array on parse results is now unique and sorted
