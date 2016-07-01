@@ -80,9 +80,7 @@
     // Exit early if either array is empty (common case)
     var xn = xs.length;
     var yn = ys.length;
-    if (xn === 0 && yn === 0) {
-      return xs;
-    } else if (xn === 0) {
+    if (xn === 0) {
       return ys;
     } else if (yn === 0) {
       return xs;
