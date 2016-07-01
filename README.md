@@ -10,7 +10,7 @@
 
 Parsimmon is a small library for writing big parsers made up of lots of little parsers. The API is inspired by parsec and Promises/A.
 
-Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as a standard Node module through npm, or through `build/parsimmon.browser.js` directly in the browser through a script tag, where it exports a global variable called `Parsimmon`.
+Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as a standard Node module through npm, or through `build/parsimmon.browser.min.js` directly in the browser through a script tag, where it exports a global variable called `Parsimmon` (you can also use the `build/parsimmon.browser.js` for local development).
 
 ## Quick Example
 
