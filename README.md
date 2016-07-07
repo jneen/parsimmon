@@ -87,6 +87,8 @@ The error object can be passed along with the original source to `Parsimmon.form
     without any arrays.
   - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
     and yields the value of the first one that succeeds, backtracking in between.
+    This means that the order of parsers matters -- if two parsers match the
+    same prefix, the "longer" of the two must come first.
   - `Parsimmon.sepBy(content, separator)` accepts two parsers, and expects multiple `content`s, separated by `separator`s. Yields an array of `contents`.
   - `Parsimmon.sepBy1(content, separator)` same as `Parsimmon.sepBy`, but expects
     `content` to succeed at least once.
