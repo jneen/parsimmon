@@ -105,19 +105,43 @@
 
   // For ensuring we have the right argument types
   function assertParser(p) {
-    if (!(p instanceof Parser)) throw new Error('not a parser: '+p);
+    if (!(p instanceof Parser)) {
+      throw new Error('not a parser: ' + p);
+    }
   }
+
   function assertNumber(x) {
-    if (typeof x !== 'number') throw new Error('not a number: '+x);
+    if (typeof x !== 'number') {
+      throw new Error('not a number: ' + x);
+    }
   }
+
   function assertRegexp(x) {
-    if (!(x instanceof RegExp)) throw new Error('not a regex: '+x);
+    if (!(x instanceof RegExp)) {
+      throw new Error('not a regex: '+x);
+    }
+    var f = flags(x);
+    for (var i = 0; i < f.length; i++) {
+      var c = f.charAt(i);
+      // Only allow regexp flags [imu] for now, since [g] and [y] specifically
+      // mess up Parsimmon. If more non-stateful regexp flags are added in the
+      // future, this will need to be revisited.
+      if (c != 'i' && c != 'm' && c != 'u') {
+        throw new Error('unsupported regexp flag "' + c + '": ' + x);
+      }
+    }
   }
+
   function assertFunction(x) {
-    if (typeof x !== 'function') throw new Error('not a function: '+x);
+    if (typeof x !== 'function') {
+      throw new Error('not a function: ' + x);
+    }
   }
+
   function assertString(x) {
-    if (typeof x !== 'string') throw new Error('not a string: '+x)
+    if (typeof x !== 'string') {
+      throw new Error('not a string: ' + x);
+    }
   }
 
   function formatExpected(expected) {
@@ -404,14 +428,21 @@
     });
   };
 
+  var flags = function(re) {
+    var s = '' + re;
+    return s.slice(s.lastIndexOf('/') + 1);
+  };
+
   var regex = Parsimmon.regex = function(re, group) {
-
     assertRegexp(re);
-    if (group) assertNumber(group);
+    if (arguments.length >= 2) {
+      assertNumber(group);
+    } else {
+      group = 0;
+    }
 
-    var anchored = RegExp('^(?:'+re.source+')', (''+re).slice((''+re).lastIndexOf('/')+1));
+    var anchored = RegExp('^(?:' + re.source + ')', flags(re));
     var expected = '' + re;
-    if (group == null) group = 0;
 
     return Parser(function(stream, i) {
       var match = anchored.exec(stream.slice(i));
@@ -419,7 +450,9 @@
       if (match) {
         var fullMatch = match[0];
         var groupMatch = match[group];
-        if (groupMatch != null) return makeSuccess(i+fullMatch.length, groupMatch);
+        if (groupMatch != null) {
+          return makeSuccess(i + fullMatch.length, groupMatch);
+        }
       }
 
       return makeFailure(i, expected);

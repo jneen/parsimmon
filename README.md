@@ -76,7 +76,7 @@ The error object can be passed along with the original source to `Parsimmon.form
     and will yield the same.
   - `Parsimmon.regex(/myregex/, group=0)` is a parser that expects the stream
     to match the given regex, and yields the given match group, or the
-    entire match.
+    entire match. The regex may only use the following flags: `imu`. `Parsimmon.regex` will throw an error for any other flag. The regex is also wrapped in `^(?: ... )` because it doesn't make sense to match something further away than the next character.
   - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
     the string, and yields `result`.
   - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
