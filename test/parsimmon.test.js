@@ -66,6 +66,12 @@ suite('parser', function() {
     assert.throws(function() { regex(/a/, 'not a number') });
   });
 
+  test('Parsimmon.regex rejects /g flag', function() {
+    assert.throws(function() {
+      regex(/a/g);
+    });
+  });
+
   test('Parsimmon.regex with group', function() {
     var parser0 = regex(/(\w)(\d)/, 0);
     var parser1 = regex(/(\w)(\d)/, 1);
