@@ -1,6 +1,6 @@
 ## version 0.9.0 (2016-07-07)
 
-* `P.regexp` throws on regexps with flags other than `imu` now.
+* `P.regex` throws on regexps with flags other than `imu` now.
 
 ## version 0.8.1 (2016-06-30)
 
