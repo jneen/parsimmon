@@ -1,5 +1,9 @@
-var Parsimmon = require('../src/parsimmon');
+var fs = require('fs');
+var path = require('path');
+var util = require('util');
+var P = require('../src/parsimmon');
 
+// Turn escaped characters into real ones (e.g. "\\n" becoems "\n").
 function interpretEscapes(str) {
   var escapes = {
     b: '\b',
@@ -8,7 +12,6 @@ function interpretEscapes(str) {
     r: '\r',
     t: '\t'
   };
-
   return str.replace(/\\(u[0-9a-fA-F]{4}|[^u])/, function(_, escape) {
     var type = escape.charAt(0);
     var hex = escape.slice(1);
@@ -18,38 +21,48 @@ function interpretEscapes(str) {
   });
 }
 
-var json = (function() {
-  // local imports
-  var string = Parsimmon.string;
-  var regex = Parsimmon.regex;
-  var succeed = Parsimmon.succeed;
-  var seq = Parsimmon.seq;
-  var seqMap = Parsimmon.seqMap;
-  var alt = Parsimmon.alt;
-  var lazy = Parsimmon.lazy;
+// This gets reused for both array and object parsing.
+function commaSep(parser) {
+  return P.sepBy(parser, token(P.string(',')))
+}
 
-  // whitespace, etc
-  var ignore = regex(/\s*/m);
-  function lexeme(p) { return p.skip(ignore); }
+// Use the JSON standard's definition of whitespace rather than Parsimmon's.
+var whitespace = P.regexp(/\s*/m);
 
-  // lexemes
-  var lbrace = lexeme(string('{'));
-  var rbrace = lexeme(string('}'));
-  var lbrack = lexeme(string('['));
-  var rbrack = lexeme(string(']'));
-  var quoted = lexeme(regex(/"((?:\\.|.)*?)"/, 1))
-                .desc('a quoted string');
-  var comma = lexeme(string(','));
-  var colon = lexeme(string(':'));
-  var number = lexeme(regex(/-?(0|[1-9]\d*)([.]\d+)?(e[+-]?\d+)?/i)).desc('a numeral');
+// JSON is pretty relaxed about whitespace, so let's make it easy to ignore
+// after most text.
+function token(p) {
+  return p.skip(whitespace);
+}
 
-  var nullLiteral = lexeme(string('null')).result(null);
-  var trueLiteral = lexeme(string('true')).result(true);
-  var falseLiteral = lexeme(string('false')).result(false);
+// The basic tokens in JSON, with optional whitespace afterward.
+var lbrace = token(P.string('{'));
+var rbrace = token(P.string('}'));
+var lbracket = token(P.string('['));
+var rbracket = token(P.string(']'));
+var comma = token(P.string(','));
+var colon = token(P.string(':'));
 
-  // forward-declared base parser
-  var json = lazy('a json element', function() {
-    return alt(
+// `.result` is like `.map` but it takes a value instead of a function, and
+// `.always returns the same value.
+var nullLiteral = token(P.string('null')).result(null);
+var trueLiteral = token(P.string('true')).result(true);
+var falseLiteral = token(P.string('false')).result(false);
+
+// Regexp based parsers should generally be named for better error reporting.
+var stringLiteral =
+  token(P.regexp(/"((?:\\.|.)*?)"/, 1))
+    .map(interpretEscapes)
+    .desc('string');
+
+var numberLiteral =
+  token(P.regexp(/-?(0|[1-9][0-9]*)([.][0-9]+)?([eE][+-]?[0-9]+)?/))
+    .map(Number)
+    .desc('number');
+
+// This is the main entry point of the parser: a full JSON document.
+var json = P.lazy(function() {
+  return whitespace.then(P.alt(
       object,
       array,
       stringLiteral,
@@ -57,28 +70,21 @@ var json = (function() {
       nullLiteral,
       trueLiteral,
       falseLiteral
-    );
-  });
+    ));
+});
 
-  // domain parsers
-  var stringLiteral = quoted.map(interpretEscapes);
+// Array parsing is just ignoring brackets and commas and parsing as many nested
+// JSON documents as possible. Notice that we're using the parser `json` we just
+// defined above. Arrays and objects in the JSON grammar are recursive because
+// they can contain any other JSON document within them.
+var array = lbracket.then(commaSep(json)).skip(rbracket);
 
-  var numberLiteral = number.map(parseFloat)
-
-  function commaSep(parser) {
-    var commaParser = comma.then(parser).many()
-    return seqMap(parser, commaParser, function(first, rest) {
-      return [first].concat(rest);
-    }).or(succeed([]));
-  }
-
-  var array = seqMap(lbrack, commaSep(json), rbrack, function(_, results, __) {
-    return results;
-  });
-
-  var pair = seq(stringLiteral.skip(colon), json);
-
-  var object = seqMap(lbrace, commaSep(pair), rbrace, function(_, pairs, __) {
+// Object parsing is a little trickier because we have to collect all the key-
+// value pairs in order as length-2 arrays, then manually copy them into an
+// object.
+var pair = P.seq(stringLiteral.skip(colon), json);
+var object =
+  lbrace.then(commaSep(pair)).skip(rbrace).map(function(pairs) {
     var out = {};
     for (var i = pairs.length-1; i >= 0; i -= 1) {
       out[pairs[i][0]] = pairs[i][1];
@@ -86,11 +92,18 @@ var json = (function() {
     return out;
   });
 
-  // top-level parser, with whitespace at the beginning
-  return ignore.then(json);
-})();
+var source = process.argv[2] || path.resolve(__dirname, '..', 'package.json');
+var result = json.parse(fs.readFileSync(source, 'utf-8'));
 
-var source = process.argv[2] || __dirname+'/../package.json';
-var result = json.parse(require('fs').readFileSync(source, 'utf-8'));
+function prettyPrint(x) {
+  console.log(util.inspect(x, {depth: null, colors: 'auto'}))
+}
 
-console.log(result);
+if (result.status) {
+  prettyPrint(result.value);
+} else {
+  console.log('Parse failure');
+  console.log('=============');
+  console.log();
+  prettyPrint(result);
+}

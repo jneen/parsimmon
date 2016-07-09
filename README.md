@@ -12,35 +12,9 @@ Parsimmon is a small library for writing big parsers made up of lots of little p
 
 Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as a standard Node module through npm, or through `build/parsimmon.browser.min.js` directly in the browser through a script tag, where it exports a global variable called `Parsimmon` (you can also use the `build/parsimmon.browser.js` for local development).
 
-## Quick Example
+## Examples
 
-```javascript
-var regexp = Parsimmon.regexp;
-var string = Parsimmon.string;
-var optWhitespace = Parsimmon.optWhitespace;
-var lazy = Parsimmon.lazy;
-
-function lexeme(p) {
-  return p.skip(optWhitespace);
-}
-
-var lparen = lexeme(string('('));
-var rparen = lexeme(string(')'));
-
-var expr = lazy('an s-expression', function() { return form.or(atom); });
-
-var number = lexeme(regexp(/[0-9]+/).map(Number));
-var id = lexeme(regexp(/[a-zA-Z_]\w*/));
-
-var atom = number.or(id);
-var form = lparen.then(expr.many()).skip(rparen);
-
-expr.parse('3').value;
-// => 3
-
-expr.parse('(add (mul 10 (add 3 4)) (add 7 8))').value;
-// => ['add', ['mul', 10, ['add', 3, 4]], ['add', 7, 8]]
-```
+See the [`examples`](https://github.com/jneen/parsimmon/tree/master/examples) directory for annotated examples of parsing JSON and Lisp.
 
 ## Explanation
 
