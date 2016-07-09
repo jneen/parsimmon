@@ -211,7 +211,11 @@
 
   var seqMap = Parsimmon.seqMap = function() {
     var args = [].slice.call(arguments);
+    if (args.length === 0) {
+      throw new Error('seqMap needs at least one argument');
+    }
     var mapper = args.pop();
+    assertFunction(mapper);
     return seq.apply(null, args).map(function(results) {
       return mapper.apply(null, results);
     });
