@@ -1,4 +1,4 @@
-## version 0.9.1 (????-??-??)
+## version 0.9.1 (2016-07-08)
 
 * `P.regex` is now an alias for `P.regexp`.
 * `P.seqMap` now throws when passed zero arguments, or when the final argument is not a function.
