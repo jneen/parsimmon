@@ -15,7 +15,7 @@ Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as
 ## Quick Example
 
 ```javascript
-var regex = Parsimmon.regex;
+var regexp = Parsimmon.regexp;
 var string = Parsimmon.string;
 var optWhitespace = Parsimmon.optWhitespace;
 var lazy = Parsimmon.lazy;
@@ -29,8 +29,8 @@ var rparen = lexeme(string(')'));
 
 var expr = lazy('an s-expression', function() { return form.or(atom); });
 
-var number = lexeme(regex(/[0-9]+/).map(Number));
-var id = lexeme(regex(/[a-zA-Z_]\w*/));
+var number = lexeme(regexp(/[0-9]+/).map(Number));
+var id = lexeme(regexp(/[a-zA-Z_]\w*/));
 
 var atom = number.or(id);
 var form = lparen.then(expr.many()).skip(rparen);
@@ -74,9 +74,10 @@ The error object can be passed along with the original source to `Parsimmon.form
   - `Parsimmon.noneOf("abc")` is a parser that expects to find
     any character except one of the characters `"a"`, `"b"`, or `"c"`,
     and will yield the same.
-  - `Parsimmon.regex(/myregex/, group=0)` is a parser that expects the stream
+  - `Parsimmon.regexp(/regexp/, group=0)` is a parser that expects the stream
     to match the given regexp, and yields the given match group, or the
-    entire match. The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. `Parsimmon.regex` will throw an error for any other flag.
+    entire match. The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. `Parsimmon.regexp` will throw an error for any other flag.
+  - `Parsimmon.regex` is an alias for `Parsimmon.regexp`.
   - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
     the string, and yields `result`.
   - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
@@ -99,12 +100,12 @@ The error object can be passed along with the original source to `Parsimmon.form
   - `Parsimmon.lazy(desc, f)` is the same as `Parsimmon.lazy` but also
     sets `desc` as the expected value (see `.desc()` below)
   - `Parsimmon.fail(message)` returns a failing parser with the given message.
-  - `Parsimmon.letter` is equivalent to `Parsimmon.regex(/[a-z]/i)`
-  - `Parsimmon.letters` is equivalent to `Parsimmon.regex(/[a-z]*/i)`
-  - `Parsimmon.digit` is equivalent to `Parsimmon.regex(/[0-9]/)`
-  - `Parsimmon.digits` is equivalent to `Parsimmon.regex(/[0-9]*/)`
-  - `Parsimmon.whitespace` is equivalent to `Parsimmon.regex(/\s+/)`
-  - `Parsimmon.optWhitespace` is equivalent to `Parsimmon.regex(/\s*/)`
+  - `Parsimmon.letter` is equivalent to `Parsimmon.regexp(/[a-z]/i)`
+  - `Parsimmon.letters` is equivalent to `Parsimmon.regexp(/[a-z]*/i)`
+  - `Parsimmon.digit` is equivalent to `Parsimmon.regexp(/[0-9]/)`
+  - `Parsimmon.digits` is equivalent to `Parsimmon.regexp(/[0-9]*/)`
+  - `Parsimmon.whitespace` is equivalent to `Parsimmon.regexp(/\s+/)`
+  - `Parsimmon.optWhitespace` is equivalent to `Parsimmon.regexp(/\s*/)`
   - `Parsimmon.any` consumes and yields the next character of the stream.
   - `Parsimmon.all` consumes and yields the entire remainder of the stream.
   - `Parsimmon.eof` expects the end of the stream.
@@ -198,7 +199,7 @@ For most parsers, the following format is helpful:
     ```javascript
     var lparen = lexeme(string('('));
     var rparen = lexeme(string(')'));
-    var number = lexeme(regex(/[0-9]+/)).map(parseInt);
+    var number = lexeme(regexp(/[0-9]+/)).map(parseInt);
     ```
 
 1. Forward-declare one or more top-level expressions with `lazy`, referring to

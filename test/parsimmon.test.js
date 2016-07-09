@@ -72,6 +72,10 @@ suite('parser', function() {
     });
   });
 
+  test('Parsimmon.regex is an alias for Parsimmon.regexp', function() {
+    assert.equal(Parsimmon.regex, Parsimmon.regexp);
+  });
+
   test('Parsimmon.regex with group', function() {
     var parser0 = regex(/(\w)(\d)/, 0);
     var parser1 = regex(/(\w)(\d)/, 1);

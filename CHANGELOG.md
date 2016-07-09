@@ -1,3 +1,7 @@
+## version 0.9.1 (2016-07-08)
+
+* `P.regex` is now an alias for `P.regexp`.
+
 ## version 0.9.0 (2016-07-07)
 
 * `P.regex` throws on regexps with flags other than `imu` now.

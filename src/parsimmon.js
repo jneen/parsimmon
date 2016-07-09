@@ -118,7 +118,7 @@
 
   function assertRegexp(x) {
     if (!(x instanceof RegExp)) {
-      throw new Error('not a regex: '+x);
+      throw new Error('not a regexp: '+x);
     }
     var f = flags(x);
     for (var i = 0; i < f.length; i++) {
@@ -433,7 +433,7 @@
     return s.slice(s.lastIndexOf('/') + 1);
   };
 
-  var regex = Parsimmon.regex = function(re, group) {
+  var regexp = Parsimmon.regexp = function(re, group) {
     assertRegexp(re);
     if (arguments.length >= 2) {
       assertNumber(group);
@@ -458,6 +458,7 @@
       return makeFailure(i, expected);
     });
   };
+  Parsimmon.regex = regexp;
 
   var succeed = Parsimmon.succeed = function(value) {
     return Parser(function(stream, i) {
@@ -469,12 +470,12 @@
     return Parser(function(stream, i) { return makeFailure(i, expected); });
   };
 
-  var letter = Parsimmon.letter = regex(/[a-z]/i).desc('a letter')
-  var letters = Parsimmon.letters = regex(/[a-z]*/i)
-  var digit = Parsimmon.digit = regex(/[0-9]/).desc('a digit');
-  var digits = Parsimmon.digits = regex(/[0-9]*/)
-  var whitespace = Parsimmon.whitespace = regex(/\s+/).desc('whitespace');
-  var optWhitespace = Parsimmon.optWhitespace = regex(/\s*/);
+  var letter = Parsimmon.letter = regexp(/[a-z]/i).desc('a letter')
+  var letters = Parsimmon.letters = regexp(/[a-z]*/i)
+  var digit = Parsimmon.digit = regexp(/[0-9]/).desc('a digit');
+  var digits = Parsimmon.digits = regexp(/[0-9]*/)
+  var whitespace = Parsimmon.whitespace = regexp(/\s+/).desc('whitespace');
+  var optWhitespace = Parsimmon.optWhitespace = regexp(/\s*/);
 
   var any = Parsimmon.any = Parser(function(stream, i) {
     if (i >= stream.length) return makeFailure(i, 'any character');
