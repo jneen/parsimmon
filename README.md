@@ -14,7 +14,7 @@ Parsimmon supports IE7 and newer browsers, along with Node.js. It can be used as
 
 ## Examples
 
-See the [`examples`](https://github.com/jneen/parsimmon/tree/master/examples) directory for annotated examples of parsing JSON and Lisp.
+See the [examples](https://github.com/jneen/parsimmon/tree/master/examples) directory for annotated examples of parsing JSON and Lisp.
 
 ## Explanation
 
@@ -44,19 +44,19 @@ The error object can be passed along with the original source to `Parsimmon.form
 
 ### Base parsers and parser generators:
 
-#### `Parsimmon.string("my-string")`
+#### `Parsimmon.string(string)`
 
-Returns a parser that looks for `"my-string"` and yields that exact value.
+Returns a parser that looks for `string` and yields that exact value.
 
-#### `Parsimmon.oneOf("abc")`
+#### `Parsimmon.oneOf(string)`
 
-Returns a parser that looks for exactly one character from the string passed in, and yields that character.
+Returns a parser that looks for exactly one character from `string`, and yields that character.
 
-#### `Parsimmon.noneOf("abc")`
+#### `Parsimmon.noneOf(string)`
 
-Returns a parser that looks for exactly one character *NOT* from the string passed in, and yields that character.
+Returns a parser that looks for exactly one character *NOT* from `string`, and yields that character.
 
-#### `Parsimmon.regexp(/regexp/, group=0)`
+#### `Parsimmon.regexp(regexp, group=0)`
 
 Returns a parser that looks for a match to the regexp and yields the given match group (defaulting to the entire match). The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. Any other flag will result in an error being thrown.
 
@@ -399,7 +399,7 @@ Returns a new parser whose failure message is `description`. For example, `strin
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon.custom`. This is an example of how to create a parser that matches any character except the one provided:
 
-```js
+```javascript
 function notChar(char) {
   return Parsimmon.custom(function(success, failure) {
     return function(stream, i) {
@@ -414,7 +414,7 @@ function notChar(char) {
 
 This parser can then be used and composed the same way all the existing ones are used and composed, for example:
 
-```js
+```javascript
 var parser = Parsimmon.seq(Parsimmon.string('a'), notChar('b').times(5));
 console.log(parser.parse('accccc'));
 //=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
