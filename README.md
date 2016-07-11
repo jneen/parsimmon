@@ -18,76 +18,382 @@ See the [`examples`](https://github.com/jneen/parsimmon/tree/master/examples) di
 
 ## Explanation
 
-A Parsimmon parser is an object that represents an action on a stream of text, and the promise of either an object yielded by that action on success or a message in case of failure. For example, `string('foo')` yields the string `'foo'` if the beginning of the stream is `'foo'`, and otherwise fails.
+A Parsimmon parser is an object that represents an action on a stream of text, and the promise of either an object yielded by that action on success or a message in case of failure. For example, `Parsimmon.string('foo')` yields the string `'foo'` if the beginning of the stream is `'foo'`, and otherwise fails.
 
-The combinator method `.map` is used to transform the yielded value. For example,
+The method `.map` is used to transform the yielded value. For example,
 
 ```javascript
-string('foo').map(function(x) { return x + 'bar'; })
+Parsimmon.string('foo')
+  .map(function(x) { return x + 'bar'; })
 ```
 
 will yield `'foobar'` if the stream starts with `'foo'`. The parser
 
 ```javascript
-digits.map(function(x) { return parseInt(x) * 2; })
+Parsimmon.regexp(/[0-9]+/)
+  .map(function(x) { return Number(x) * 2; })
 ```
 
-will yield the number 24 when it encounters the string '12'. The method `.result` can be used to set a constant result.
+will yield the number `24` when it encounters the string `'12'`.
 
-Calling `.parse(str)` on a parser parses the string, and returns an object with a `status` flag, indicating whether the parse succeeded. If it succeeded, the `value` attribute will contain the yielded value. Otherwise, the `index` and `expected` attributes will contain the index of the parse error (with `offset`, `line` and `column` properties), and a sorted, unique array of messages indicating what was expected.
+Calling `.parse(string)` on a parser parses the string and returns an object with a boolean `status` flag, indicating whether the parse succeeded. If it succeeded, the `value` attribute will contain the yielded value. Otherwise, the `index` and `expected` attributes will contain the index of the parse error (with `offset`, `line` and `column` properties), and a sorted, unique array of messages indicating what was expected.
 
 The error object can be passed along with the original source to `Parsimmon.formatError(source, error)` to obtain a human-readable error string.
 
 ## Full API
 
-### Included parsers / parser generators:
-  - `Parsimmon.string("my-string")` is a parser that expects to find
-    `"my-string"`, and will yield the same.
-  - `Parsimmon.oneOf("abc")` is a parser that expects to find
-    one of the characters `"a"`, `"b"`, or `"c"`, and will yield the same.
-  - `Parsimmon.noneOf("abc")` is a parser that expects to find
-    any character except one of the characters `"a"`, `"b"`, or `"c"`,
-    and will yield the same.
-  - `Parsimmon.regexp(/regexp/, group=0)` is a parser that expects the stream
-    to match the given regexp, and yields the given match group, or the
-    entire match. The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. `Parsimmon.regexp` will throw an error for any other flag.
-  - `Parsimmon.regex` is an alias for `Parsimmon.regexp`.
-  - `Parsimmon.succeed(result)` is a parser that doesn't consume any of
-    the string, and yields `result`.
-  - `Parsimmon.seq(p1, p2, ... pn)` accepts a variable number of parsers
-    that it expects to find in order, yielding an array of the results.
-  - `Parsimmon.seqMap(parser1, parser2, ..., function(result1, result2, ...) { return anotherResult; })`:
-    matches all parsers sequentially, passing their results to the callback
-    at the end, returning its value. Works like `seq` and `map` combined but
-    without any arrays.
-  - `Parsimmon.alt(p1, p2, ... pn)` accepts a variable number of parsers,
-    and yields the value of the first one that succeeds, backtracking in between.
-    This means that the order of parsers matters. If two parsers match the
-    same prefix, the **longer** of the two must come first (e.g. `Parsimmon.alt(Parsimmon.string('ab'), Parsimmin.string('a'))`).
-  - `Parsimmon.sepBy(content, separator)` accepts two parsers, and expects multiple `content`s, separated by `separator`s. Yields an array of `contents`.
-  - `Parsimmon.sepBy1(content, separator)` same as `Parsimmon.sepBy`, but expects
-    `content` to succeed at least once.
-  - `Parsimmon.lazy(f)` accepts a function that returns a parser, which is
-    evaluated the first time the parser is used. This is useful for
-    referencing parsers that haven't yet been defined, and for implementing
-    recursive parsers.
-  - `Parsimmon.lazy(desc, f)` is the same as `Parsimmon.lazy` but also
-    sets `desc` as the expected value (see `.desc()` below)
-  - `Parsimmon.fail(message)` returns a failing parser with the given message.
-  - `Parsimmon.letter` is equivalent to `Parsimmon.regexp(/[a-z]/i)`
-  - `Parsimmon.letters` is equivalent to `Parsimmon.regexp(/[a-z]*/i)`
-  - `Parsimmon.digit` is equivalent to `Parsimmon.regexp(/[0-9]/)`
-  - `Parsimmon.digits` is equivalent to `Parsimmon.regexp(/[0-9]*/)`
-  - `Parsimmon.whitespace` is equivalent to `Parsimmon.regexp(/\s+/)`
-  - `Parsimmon.optWhitespace` is equivalent to `Parsimmon.regexp(/\s*/)`
-  - `Parsimmon.any` consumes and yields the next character of the stream.
-  - `Parsimmon.all` consumes and yields the entire remainder of the stream.
-  - `Parsimmon.eof` expects the end of the stream.
-  - `Parsimmon.index` is a parser that yields an object an object representing
-    the current offset into the parse: it has a 0-based character `offset`
-    property and 1-based `line` and `column` properties.
-  - `Parsimmon.test(pred)` yield a single character if it passes the predicate.
-  - `Parsimmon.takeWhile(pred)` yield a string containing all the next characters that pass the predicate.
+### Base parsers and parser generators:
+
+#### `Parsimmon.string("my-string")`
+
+Returns a parser that looks for `"my-string"` and yields that exact value.
+
+#### `Parsimmon.oneOf("abc")`
+
+Returns a parser that looks for exactly one character from the string passed in, and yields that character.
+
+#### `Parsimmon.noneOf("abc")`
+
+Returns a parser that looks for exactly one character *NOT* from the string passed in, and yields that character.
+
+#### `Parsimmon.regexp(/regexp/, group=0)`
+
+Returns a parser that looks for a match to the regexp and yields the given match group (defaulting to the entire match). The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. Any other flag will result in an error being thrown.
+
+#### `Parsimmon.regex`
+
+This was the original name for `Parsimmon.regexp`, but now it is just an alias.
+
+#### `Parsimmon.succeed(result)`
+
+Returns a parser that doesn't consume any of the string, and yields `result`.
+
+#### `Parsimmon.of(result)`
+
+This is an alias for `Parsimmon.succeed(result)`.
+
+#### `Parsimmon.seq(p1, p2, ...pn)`
+
+Accepts any number of parsers and returns a new parser that expects them to match in order, yielding an array of all their results.
+
+#### `Parsimmon.seqMap(p1, p2, ...pn, function(r1, r2, ...rn))`
+
+Matches all parsers sequentially, and passes their results as the arguments to a function. Similar to calling `Parsimmon.seq` and then `.map`, but the values are not put in an array. Example:
+
+```javascript
+Parsimmon.seqMap(
+  Parsimmon.oneOf('abc'),
+  Parsimmon.oneOf('+-*'),
+  Parsimmon.oneOf('xyz'),
+  function(first, operator, second) {
+    console.log(first);    // => 'a'
+    console.log(operator); // => '+'
+    console.log(second);   // => 'x'
+  }
+).parse('a+x')
+```
+
+#### `Parsimmon.alt(p1, p2, ...pn)`
+
+Accepts any number of parsers, yielding the value of the first one that succeeds, backtracking in between.
+
+This means that the order of parsers matters. If two parsers match the
+same prefix, the **longer** of the two must come first. Example:
+
+```javascript
+Parsimmon.alt(
+  Parsimmon.string('ab'),
+  Parsimmon.string('a')
+).parse('ab');
+// => {status: true, value: 'ab'}
+
+Parsimmon.alt(
+  Parsimmon.string('a'),
+  Parsimmon.string('ab')
+).parse('ab');
+// => {status: false, ...}
+```
+
+In the second case, `Parsimmon.alt` matches on the first parser, then there are extra characters left over (`'b'`), so Parsimmon returns a failure.
+
+#### `Parsimmon.sepBy(content, separator)`
+
+Accepts two parsers, and expects zero or more matches for `content`, separated by `separator`, yielding an array. Example:
+
+```javascript
+Parsimmon.sepBy(
+  Parsimmon.oneOf('abc'),
+  Parsimmon.string('|')
+).parse('a|b|c|c|c|a');
+// => {status: true, value: ['a', 'b', 'c', 'c', 'c', 'a']}
+
+Parsimmon.sepBy(
+  Parsimmon.oneOf('XYZ'),
+  Parsimmon.string('-')
+).parse('');
+// => {status: true, value: []}
+```
+
+#### `Parsimmon.sepBy1(content, separator)`
+
+This  is the same as `Parsimmon.sepBy`, but matches the `content` parser **at least once**.
+
+#### `Parsimmon.lazy(f)`
+
+Accepts a function that returns a parser, which is evaluated the first time the parser is used. This is useful for referencing parsers that haven't yet been defined, and for implementing recursive parsers. Example:
+
+```javascript
+var Value = Parsimmon.lazy(function() {
+  return Parsimmon.alt(
+    Parsimmon.string('x'),
+    Parsimmon.string('(')
+      .then(Value)
+      .skip(Parsimmon.string(')'))
+  );
+});
+
+Value.parse('X');     // => {status: true, value: 'X'}
+Value.parse('(X)');   // => {status: true, value: 'X'}
+Value.parse('((X))'); // => {status: true, value: 'X'}
+```
+
+#### `Parsimmon.lazy(description, f)`
+
+Equivalent to `Parsimmon.lazy(f).desc(description)`.
+
+#### `Parsimmon.fail(message)`
+
+Returns a failing parser with the given message.
+
+#### `Parsimmon.letter`
+
+Equivalent to `Parsimmon.regexp(/[a-z]/i)`.
+
+#### `Parsimmon.letters`
+
+Equivalent to `Parsimmon.regexp(/[a-z]*/i)`.
+
+#### `Parsimmon.digit`
+
+Equivalent to `Parsimmon.regexp(/[0-9]/)`.
+
+#### `Parsimmon.digits`
+
+Equivalent to `Parsimmon.regexp(/[0-9]*/)`.
+
+#### `Parsimmon.whitespace`
+
+Equivalent to `Parsimmon.regexp(/\s+/)`.
+
+#### `Parsimmon.optWhitespace`
+
+Equivalent to `Parsimmon.regexp(/\s*/)`.
+
+#### `Parsimmon.any`
+
+A parser that consumes and yields the next character of the stream.
+
+#### `Parsimmon.all`
+
+A parser that consumes and yields the entire remainder of the stream.
+
+#### `Parsimmon.eof`
+
+A parser that expects to be at the end of the stream (zero characters left).
+
+#### `Parsimmon.index`
+
+A parser that consumes no text and yields an object an object representing the current offset into the parse: it has a 0-based character `offset` property and 1-based `line` and `column` properties. Example:
+
+```javascript
+Parsimmon.seqMap(
+  Parsimmon.oneOf('Q\n').many(),
+  Parsimmon.string('B'),
+  Parsimmon.index,
+  function(_prefix, B, index) {
+    console.log(index.offset); // => 8
+    console.log(index.line);   // => 3
+    console.log(index.column); // => 5
+    return B;
+  }
+).parse('QQ\n\nQQQB');
+```
+
+#### `Parsimmon.test(predicate)`
+
+Returns a parser that yield a single character if it passes the `predicate` function. Example:
+
+```javascript
+var SameUpperLower = Parsimmon.test(function(c) {
+  return c.toUpperCase() === c.toLowerCase();
+});
+
+SameUpperLower.parse('a'); // => {status: false, ...}
+SameUpperLower.parse('-'); // => {status: true, ...}
+SameUpperLower.parse(':'); // => {status: true, ...}
+```
+
+#### `Parsimmon.takeWhile(predicate)`
+
+Returns a parser yield a string containing all the next characters that pass the `predicate`. Example:
+
+```javascript
+var CustomString =
+  Parsimmon.string('%')
+    .then(Parsimmon.any)
+    .chain(function(start) {
+      var end = {
+        '[': ']',
+        '(': ')',
+        '{': '}',
+        '<': '>'
+      }[start] || start;
+
+      return Parsimmon.takeWhile(function(c) {
+        return c !== end;
+      }).skip(Parsimmon.string(end));
+    });
+
+CustomString.parse('%:a string:'); // => {status: true, value: 'a string'}
+CustomString.parse('%[a string]'); // => {status: true, value: 'a string'}
+CustomString.parse('%{a string}'); // => {status: true, value: 'a string'}
+CustomString.parse('%(a string)'); // => {status: true, value: 'a string'}
+CustomString.parse('%<a string>'); // => {status: true, value: 'a string'}
+```
+
+### Parser methods
+
+#### `parser.or(otherParser)`
+
+Returns a new parser which tries `parser`, and if it fails uses `otherParser`. Example:
+
+```javascript
+var numberPrefix =
+  Parsimmon.string('+')
+    .or(Parsimmin.of('-'))
+    .or(Parsimmin.of(''));
+
+maybePlus.parse('+'); // => {status: true, value: '+'}
+maybePlus.parse('-'); // => {status: true, value: '-'}
+maybePlus.parse('');  // => {status: true, value: ''}
+```
+
+#### `parser.chain(newParserFunc)`
+
+Returns a new parser which tries `parser`, and on success calls the function `newParserFunc` with the result of the parse, which is expected to return another parser, which will be tried next. This allows you to dynamically decide how to continue the parse, which is impossible with the other combinators. Example:
+
+```javascript
+var CustomString =
+  Parsimmon.string('%')
+    .then(Parsimmon.any)
+    .chain(function(start) {
+      var end = {
+        '[': ']',
+        '(': ')',
+        '{': '}',
+        '<': '>'
+      }[start] || start;
+
+      return Parsimmon.takeWhile(function(c) {
+        return c !== end;
+      }).skip(Parsimmon.string(end));
+    });
+
+CustomString.parse('%:a string:'); // => {status: true, value: 'a string'}
+CustomString.parse('%[a string]'); // => {status: true, value: 'a string'}
+CustomString.parse('%{a string}'); // => {status: true, value: 'a string'}
+CustomString.parse('%(a string)'); // => {status: true, value: 'a string'}
+CustomString.parse('%<a string>'); // => {status: true, value: 'a string'}
+```
+
+#### `parser.then(anotherParser)`
+
+Expects `anotherParser` to follow `parser`, and yields the result
+of `anotherParser`.
+
+```javascript
+var parserA = p1.then(p2); // is equivalent to...
+var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x2; });
+```
+
+#### `parser.map(function(result) { return anotherResult; })`
+
+Transforms the output of `parser` with the given function. Example:
+
+```javascript
+var pNum = Parsimmon.regexp(/[0-9]+/).map(Number);
+
+pNum.parse('9');   // => {status: true, value: 9}
+pNum.parse('123'); // => {status: true, value: 123}
+pNum.parse('3.1'); // => {status: true, value: 3.1}
+```
+
+#### `parser.result(value)`
+
+Returns a new parser with the same behavior, but which yields `value`. Equivalent to `parser.map(function(x) { return x; }.bind(value))`.
+
+#### `parser.skip(otherParser)`
+
+Expects `otherParser` after `parser`, but yields the value of `parser`.
+
+
+```javascript
+var parserA = p1.skip(p2); // is equivalent to...
+var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x1; });
+```
+
+#### `parser.many()`
+
+Expects `parser` zero or more times, and yields an array of the results.
+
+#### `parser.times(n)`
+
+Expects `parser` exactly `n` times, and yields an array of the results.
+
+#### `parser.times(min, max)`
+
+Expects `parser` between `min` and `max` times, and yields an array
+of the results.
+
+#### `parser.atMost(n)`
+
+Expects `parser` at most `n` times. Yields an array of the results.
+
+#### `parser.atLeast(n)`
+
+Expects `parser` at least `n` times. Yields an array of the results.
+
+#### `parser.mark()`
+
+Yields an object with `start`, `value`, and `end` keys,
+where `value` is the original value yielded by the parser, and `start` and
+`end` are are objects with a 0-based `offset` and 1-based `line` and
+`column` properties that represent the position in the stream that
+contained the parsed text. Works like this function:
+
+
+```javascript
+function mark(parser) {
+  return Parsimmon.seqMap(
+    Parsimmon.index,
+    parser,
+    Parsimmon.index,
+    function(start, value, end) {
+      return {
+        start: start,
+        value: value,
+        end: end
+      };
+    }
+  );
+}
+```
+
+#### `parser.desc(description)`
+
+Returns a new parser whose failure message is `description`. For example, `string('x').desc('the letter x')` will indicate that
+`'the letter x'` was expected.
+
 
 ### Adding base parsers
 
@@ -114,95 +420,7 @@ console.log(parser.parse('accccc'));
 //=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
 ```
 
-### Parser methods
-  - `parser.or(otherParser)`:
-    returns a new parser which tries `parser`, and if it fails uses `otherParser`.
-  - `parser.chain(function(result) { return anotherParser; })`:
-    returns a new parser which tries `parser`, and on success calls the
-    given function with the result of the parse, which is expected to
-    return another parser, which will be tried next. This allows you
-    to dynamically decide how to continue the parse, which is impossible
-    with the other combinators.
-  - `parser.then(anotherParser)`:
-    expects `anotherParser` to follow `parser`, and yields the result
-    of `anotherParser`. NB: the result of `parser` here is ignored.
-  - `parser.map(function(result) { return anotherResult; })`:
-    transforms the output of `parser` with the given function.
-  - `parser.skip(otherParser)`
-    expects `otherParser` after `parser`, but preserves the yield value
-    of `parser`.
-  - `parser.result(aResult)`:
-    returns a new parser with the same behavior, but which yields `aResult`.
-  - `parser.many()`:
-    expects `parser` zero or more times, and yields an array of the results.
-  - `parser.times(n)`:
-    expects `parser` exactly `n` times, and yields an array of the results.
-  - `parser.times(min, max)`:
-    expects `parser` between `min` and `max` times, and yields an array
-    of the results.
-  - `parser.atMost(n)`:
-    expects `parser` at most `n` times. Yields an array of the results.
-  - `parser.atLeast(n)`:
-    expects `parser` at least `n` times. Yields an array of the results.
-  - `parser.mark()` yields an object with `start`, `value`, and `end` keys,
-    where `value` is the original value yielded by the parser, and `start` and
-    `end` are are objects with a 0-based `offset` and 1-based `line` and
-    `column` properties that represent the position in the stream that
-    contained the parsed text.
-  - `parser.desc(description)` returns a new parser whose failure message is the passed
-    description. For example, `string('x').desc('the letter x')` will indicate that
-    'the letter x' was expected.
-
-## Tips and patterns
-
-These apply to most parsers for traditional languages - it's possible you may need to do something different for yours!
-
-For most parsers, the following format is helpful:
-
-1. define a `lexeme` function to skip all the stuff you don't care
-   about (whitespace, comments, etc). You may need multiple types of lexemes.
-   For example,
-
-    ```javascript
-    var ignore = whitespace.or(comment.many());
-    function lexeme(p) { return p.skip(ignore); }
-    ```
-
-1. Define all your lexemes first. These should yield native javascript values.
-
-    ```javascript
-    var lparen = lexeme(string('('));
-    var rparen = lexeme(string(')'));
-    var number = lexeme(regexp(/[0-9]+/)).map(parseInt);
-    ```
-
-1. Forward-declare one or more top-level expressions with `lazy`, referring to
-   parsers that have not yet been defined. Generally, this takes the form of a
-   large `.alt()` call
-
-    ```javascript
-    var expr = lazy('an expression', function() { return Parsimmon.alt(p1, p2, ...); });
-    ```
-
-    With `.lazy` you could also recursively refer to `expr` in its own
-    definition.
-
-1. Then build your parsers from the inside out - these should return
-   AST nodes or other objects specific to your domain.
-
-    ```javascript
-    var p1 = ...
-    var p2 = ...
-    ```
-
-1. Finally, export your top-level parser. Remember to skip ignored
-   stuff at the beginning.
-
-    ```javascript
-    return ignore.then(expr.many());
-    ```
-
-### Fantasyland
+## Fantasyland
 
 [fantasyland]: https://github.com/fantasyland/fantasy-land "Fantasyland"
 [fantasyland-logo]: https://github.com/fantasyland/fantasy-land/raw/master/logo.png
