@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/jneen/parsimmon.png)](http://travis-ci.org/jneen/parsimmon)
+<a href="http://travis-ci.org/jneen/parsimmon"><img alt="Build Status" src="https://api.travis-ci.org/jneen/parsimmon.svg"></a>
 
 <a href="http://github.com/jneen/parsimmon"><img align="right" src="http://i.imgur.com/wyKOf.png" alt="Parsimmon"></a>
 
