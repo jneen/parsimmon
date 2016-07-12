@@ -1,8 +1,8 @@
 [![Build Status](https://secure.travis-ci.org/jneen/parsimmon.png)](http://travis-ci.org/jneen/parsimmon)
 
-# Parsimmon
-
 <a href="http://github.com/jneen/parsimmon"><img align="right" src="http://i.imgur.com/wyKOf.png" alt="Parsimmon"></a>
+
+# Parsimmon
 
 **Authors:** [@jneen][] and [@laughinghan][]
 
