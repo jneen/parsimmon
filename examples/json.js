@@ -3,6 +3,8 @@ var path = require('path');
 var util = require('util');
 var P = require('../src/parsimmon');
 
+///////////////////////////////////////////////////////////////////////
+
 // Turn escaped characters into real ones (e.g. "\\n" becoems "\n").
 function interpretEscapes(str) {
   var escapes = {
@@ -91,6 +93,8 @@ var object =
     }
     return out;
   });
+
+///////////////////////////////////////////////////////////////////////
 
 var source = process.argv[2] || path.resolve(__dirname, '..', 'package.json');
 var result = json.parse(fs.readFileSync(source, 'utf-8'));
