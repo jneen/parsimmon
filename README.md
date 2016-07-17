@@ -18,7 +18,7 @@ Parsimmon supports IE7 and newer browsers, along with [Node.js][]. It can be use
 
 ## Examples
 
-See the [examples][] directory for annotated examples of parsing JSON and Lisp.
+See the [examples][] directory for annotated examples of parsing JSON, Lisp, and math.
 
 ## Basics
 
