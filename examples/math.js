@@ -3,8 +3,8 @@ var path = require('path');
 var util = require('util');
 var P = require('../src/parsimmon');
 
-// This parser supports basic math with + - * / ^, unary negation, and
-// parentheses. It does not evaluate the math, just turn it into a series of
+// This parser supports basic math with + - * / ^, unary negation, factorial,
+// and parentheses. It does not evaluate the math, just turn it into a series of
 // nested lists that are easy to evaluate.
 
 // You might think that parsing math would be easy since people learn it early
