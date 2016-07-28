@@ -40,7 +40,7 @@ var Lisp = spaced(LExpression);
 ///////////////////////////////////////////////////////////////////////
 
 var source = process.argv[2];
-var result = json.parse(fs.readFileSync(source, 'utf-8'));
+var result = Lisp.parse(fs.readFileSync(source, 'utf-8'));
 
 function prettyPrint(x) {
   console.log(util.inspect(x, {depth: null, colors: 'auto'}))
