@@ -46,10 +46,15 @@ The error object can be passed along with the original source to `Parsimmon.form
 
 <a href="https://github.com/fantasyland/fantasy-land"><img align="right" alt="Fantasy Land" src="https://github.com/fantasyland/fantasy-land/raw/master/logo.png"></a>
 
+## Performance
+
+Thanks to [@bd82][] we have a good [benchmark comparing Parsimmon CPU performance to several other parser libraries][perf] with a simple JSON parser example.
+
 ## Fantasyland
 
 Parsimmon is also compatible with [fantasyland][]. It is a Semigroup, an Applicative Functor, and a Monad.
 
+[@bd82]: https://github.com/bd82
 [@laughinghan]: https://github.com/laughinghan
 [@jneen]: https://github.com/jneen
 [@wavebeem]: https://github.com/wavebeem
@@ -62,3 +67,4 @@ Parsimmon is also compatible with [fantasyland][]. It is a Semigroup, an Applica
 [promises-aplus]: https://promisesaplus.com/
 [parsec]: https://hackage.haskell.org/package/parsec
 [fantasyland]: https://github.com/fantasyland/fantasy-land
+[perf]: https://sap.github.io/chevrotain/performance/
