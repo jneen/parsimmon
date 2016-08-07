@@ -20,18 +20,20 @@
   "browser": "build/parsimmon.browser.min.js",
   "devDependencies": {
     "chai": "^3.5.0",
+    "mkdirp": "^0.5.1",
     "mocha": "^2.5.3",
     "ncp": "^2.0.0",
-    "rimraf": "^2.5.2",
+    "rimraf": "^2.5.4",
     "uglify-js": "2.x"
   },
   "license": "MIT",
   "dependencies": {},
   "scripts": {
-    "clean": "rimraf build/*.js",
+    "prebuild": "rimraf build && mkdirp build",
+    "build": "npm run build:browser && npm run build:browser.min",
     "build:browser": "ncp src/parsimmon.js build/parsimmon.browser.js",
     "build:browser.min": "uglifyjs --mangle < src/parsimmon.js > build/parsimmon.browser.min.js",
-    "prepublish": "npm run test && npm run clean && npm run build:browser && npm run build:browser.min",
+    "prepublish": "npm run test && npm run build",
     "test": "mocha --ui tdd --reporter dot test/intro.js test/*.test.js"
   }
 }
