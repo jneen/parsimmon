@@ -1,3 +1,10 @@
+## version 0.9.2 (2016-08-07)
+
+* Adds `browser` field to `package.json` so npmcdn serves the correct file.
+* Documentation overhaul in `README.md`.
+* Examples overhaul.
+
+
 ## version 0.9.1 (2016-07-08)
 
 * `P.regex` is now an alias for `P.regexp`.

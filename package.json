@@ -1,6 +1,6 @@
 {
   "name": "parsimmon",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "A monadic LL(infinity) parser combinator library",
   "keywords": [
     "parsing",
@@ -17,6 +17,7 @@
     "build"
   ],
   "main": "src/parsimmon.js",
+  "browser": "build/parsimmon.browser.min.js",
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^2.5.3",
