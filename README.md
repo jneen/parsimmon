@@ -10,7 +10,7 @@
 
 Parsimmon is a small library for writing big parsers made up of lots of little parsers. The API is inspired by [parsec][] and [Promises/A+][promises-aplus].
 
-Parsimmon supports IE7 and newer browsers, along with [Node.js][]. It can be used as a standard Node module through [npm][] (named `parsimmon`), or directly in the browser through a script tag, where it exports a global variable called `Parsimmon`. To download the latest browser build, use the [npmcdn version][]. For more information on how to use npmcdn, see the [npmcdn homepage][].
+Parsimmon supports IE7 and newer browsers, along with [Node.js][]. It can be used as a standard Node module through [npm][] (named `parsimmon`), or directly in the browser through a script tag, where it exports a global variable called `Parsimmon`. To download the latest browser build, use the [unpkg version][]. For more information on how to use unpkg, see the [unpkg homepage][].
 
 ## API Documentation
 
@@ -62,8 +62,8 @@ Parsimmon is also compatible with [fantasyland][]. It is a Semigroup, an Applica
 [api]: https://github.com/jneen/parsimmon/blob/master/API.md
 [examples]: https://github.com/jneen/parsimmon/tree/master/examples
 
-[npmcdn homepage]: https://npmcdn.com/#/
-[npmcdn version]: https://npmcdn.com/parsimmon
+[unpkg homepage]: https://unpkg.com/#/
+[unpkg version]: https://unpkg.com/parsimmon
 [npm]: https://www.npmjs.com/
 [node.js]: https://nodejs.org/en/
 [promises-aplus]: https://promisesaplus.com/

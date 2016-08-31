@@ -1,6 +1,6 @@
 ## version 0.9.2 (2016-08-07)
 
-* Adds `browser` field to `package.json` so npmcdn serves the correct file.
+* Adds `browser` field to `package.json` so unpkg serves the correct file.
 * Documentation overhaul in `README.md`.
 * Examples overhaul.
 
