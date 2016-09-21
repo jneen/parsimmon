@@ -30,8 +30,10 @@
     this._ = action;
   };
 
-  Parsimmon.Parser = Parser;
-
+  Parsimmon.isParser = function (obj) {
+    return obj instanceof Parser;
+  }
+  
   var _ = Parser.prototype;
 
   function makeSuccess(index, value) {
