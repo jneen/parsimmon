@@ -30,7 +30,7 @@
     this._ = action;
   };
 
-  Parsimmon.isParser = function (obj) {
+  var isParser = Parsimmon.isParser = function (obj) {
     return obj instanceof Parser;
   }
   
@@ -107,7 +107,7 @@
 
   // For ensuring we have the right argument types
   function assertParser(p) {
-    if (!(p instanceof Parser)) {
+    if (!isParser(p)) {
       throw new Error('not a parser: ' + p);
     }
   }
