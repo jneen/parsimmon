@@ -33,7 +33,9 @@
   var isParser = Parsimmon.isParser = function (obj) {
     return obj instanceof Parser;
   }
-  
+
+  Parsimmon.Parser = Parser;
+
   var _ = Parser.prototype;
 
   function makeSuccess(index, value) {

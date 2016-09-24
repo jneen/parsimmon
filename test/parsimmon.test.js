@@ -14,10 +14,6 @@ suite('parser', function() {
   var lazy = Parsimmon.lazy;
   var fail = Parsimmon.fail;
   
-  test('Parsimmon.Parser is not exported', function() {
-   assert.isUndefined(Parsimmon.Parser);
-  });
-
   test('Parsimmon.isParser', function() {
    assert.isFalse(Parsimmon.isParser(undefined));
    assert.isFalse(Parsimmon.isParser({}));
@@ -25,7 +21,7 @@ suite('parser', function() {
    assert.isTrue(Parsimmon.isParser(string('x')));
    assert.isTrue(Parsimmon.isParser(regex(/[0-9]/)));
   });
-  
+
   test('Parsimmon.string', function() {
     var parser = string('x');
     var res = parser.parse('x');
