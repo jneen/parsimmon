@@ -1,4 +1,4 @@
-## version 0.10.0 (2016-09-25)
+## version ? (?)
 
 * **BREAKING:** `parser.empty` is now a function (`parser.empty()`)
 * `Parsimmon.Parser.empty()` is a copy of `parser.empty()`
