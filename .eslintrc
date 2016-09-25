@@ -1,0 +1,29 @@
+{
+  "extends": ["eslint:recommended"],
+  "rules": {
+    "brace-style": ["warn", "1tbs", {"allowSingleLine": true}],
+    "comma-style": ["warn", "last"],
+    "dot-notation": "warn",
+    "eol-last": "error",
+    "indent": ["warn", 2],
+    "key-spacing": "warn",
+    "keyword-spacing": "warn",
+    "linebreak-style": ["error", "unix"],
+    "no-alert": "error",
+    "no-caller": "error",
+    "no-eval": "error",
+    "no-multiple-empty-lines": "warn",
+    "no-unused-vars": ["error", {"caughtErrorsIgnorePattern": "^_"}],
+    "no-useless-concat": "warn",
+    "no-useless-escape": "warn",
+    "no-with": "error",
+    "object-curly-spacing": ["warn", "never"],
+    "one-var": ["warn", "never"],
+    "quote-props": ["warn", "as-needed"],
+    "quotes": ["warn", "single"],
+    "semi-spacing": "warn",
+    "semi": "warn",
+    "space-before-function-paren": ["warn", "never"],
+    "space-in-parens": "warn"
+  }
+}
