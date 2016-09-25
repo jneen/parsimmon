@@ -34,6 +34,10 @@ This is an alias for `Parsimmon.succeed(result)`.
 
 Accepts any number of parsers and returns a new parser that expects them to match in order, yielding an array of all their results.
 
+## Parsimmon.formatError(string, error)
+
+Takes the `string` passed to `parser.parse(string)` and the `error` returned from `parser.parse(string)` and turns it into a human readable error message string. Note that there are certainly better ways to format errors, so feel free to write your own.
+
 ## Parsimmon.seqMap(p1, p2, ...pn, function(r1, r2, ...rn))
 
 Matches all parsers sequentially, and passes their results as the arguments to a function. Similar to calling `Parsimmon.seq` and then `.map`, but the values are not put in an array. Example:
@@ -384,3 +388,15 @@ function mark(parser) {
 
 Returns a new parser whose failure message is `description`. For example, `string('x').desc('the letter x')` will indicate that
 `'the letter x'` was expected.
+
+# FantasyLand support
+
+The following methods are provided for FantasyLand compatibility.
+
+## Parsimmon.empty()
+
+Returns `Parsimmon.fail("empty")`.
+
+## parser.empty()
+
+Returns `Parsimmon.fail("empty")`.

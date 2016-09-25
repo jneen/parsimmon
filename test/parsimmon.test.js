@@ -272,6 +272,16 @@ suite('parser', function() {
       assert.throws(function() { alt('not a parser') });
   });
 
+  test('.empty()', function() {
+    var emptyParse = {
+      status: false,
+      expected: ['fantasy-land/empty'],
+      index: {offset: 0, line: 1, column: 1}
+    };
+    assert.deepEqual(Parsimmon.digit.empty, Parsimmon.Parser.empty);
+    assert.deepEqual(Parsimmon.Parser.empty().parse(''), emptyParse);
+  });
+
   suite('Parsimmon.sepBy/sepBy1', function() {
     var chars   = regex(/[a-zA-Z]+/);
     var comma   = string(',');

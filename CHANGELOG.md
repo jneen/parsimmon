@@ -1,9 +1,14 @@
+## version 0.10.0 (2016-09-25)
+
+* **BREAKING:** `parser.empty` is now a function (`parser.empty()`)
+* `Parsimmon.Parser.empty()` is a copy of `parser.empty()`
+* Documentation for `Parsimmon.formatError`
+
 ## version 0.9.2 (2016-08-07)
 
 * Adds `browser` field to `package.json` so unpkg serves the correct file.
 * Documentation overhaul in `README.md`.
 * Examples overhaul.
-
 
 ## version 0.9.1 (2016-07-08)
 

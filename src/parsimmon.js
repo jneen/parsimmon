@@ -565,11 +565,16 @@
       return makeSuccess(i, makeLineColumnIndex(stream, i));
     });
 
+  function empty() {
+    return fail("fantasy-land/empty");
+  }
+
   //- fantasyland compat
 
   //- Monoid (Alternative, really)
   _.concat = _.or;
-  _.empty = fail('empty')
+  _.empty = empty;
+  Parser.empty = empty;
 
   //- Applicative
   _.of = Parser.of = Parsimmon.of = succeed
