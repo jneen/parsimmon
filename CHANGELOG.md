@@ -2,6 +2,7 @@
 
 * **BREAKING:** `parser.empty` is now a function (`parser.empty()`)
 * `Parsimmon.Parser.empty()` is a copy of `parser.empty()`
+* Adds `Parsimmon.isParser`
 * Documentation for `Parsimmon.formatError`
 
 ## version 0.9.2 (2016-08-07)

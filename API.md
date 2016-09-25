@@ -2,6 +2,10 @@
 
 These are either parsers or functions that return new parsers. These are the building blocks of parsers. They are all contained in the `Parsimmon` object.
 
+## Parsimmon.isParser(obj)
+
+Returns `true` if `obj` is a Parsimmon parser, otherwise `false`.
+
 ## Parsimmon.string(string)
 
 Returns a parser that looks for `string` and yields that exact value.
