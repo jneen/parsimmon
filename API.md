@@ -395,8 +395,8 @@ The following methods are provided for FantasyLand compatibility.
 
 ## Parsimmon.empty()
 
-Returns `Parsimmon.fail("empty")`.
+Returns `Parsimmon.fail("fantasy-land/empty")`.
 
 ## parser.empty()
 
-Returns `Parsimmon.fail("empty")`.
+Returns `Parsimmon.fail("fantasy-land/empty")`.
