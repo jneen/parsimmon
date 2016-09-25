@@ -13,6 +13,14 @@ suite('parser', function() {
   var index = Parsimmon.index;
   var lazy = Parsimmon.lazy;
   var fail = Parsimmon.fail;
+  
+  test('Parsimmon.isParser', function() {
+   assert.isFalse(Parsimmon.isParser(undefined));
+   assert.isFalse(Parsimmon.isParser({}));
+   assert.isFalse(Parsimmon.isParser(null));
+   assert.isTrue(Parsimmon.isParser(string('x')));
+   assert.isTrue(Parsimmon.isParser(regex(/[0-9]/)));
+  });
 
   test('Parsimmon.string', function() {
     var parser = string('x');
