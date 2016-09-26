@@ -25,7 +25,7 @@ function interpretEscapes(str) {
 
 // This gets reused for both array and object parsing.
 function commaSep(parser) {
-  return P.sepBy(parser, token(P.string(',')))
+  return P.sepBy(parser, token(comma));
 }
 
 // Use the JSON standard's definition of whitespace rather than Parsimmon's.
@@ -100,7 +100,7 @@ var source = process.argv[2] || path.resolve(__dirname, '..', 'package.json');
 var result = json.parse(fs.readFileSync(source, 'utf-8'));
 
 function prettyPrint(x) {
-  console.log(util.inspect(x, {depth: null, colors: 'auto'}))
+  console.log(util.inspect(x, {depth: null, colors: 'auto'}));
 }
 
 if (result.status) {

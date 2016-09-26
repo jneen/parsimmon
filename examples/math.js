@@ -1,5 +1,4 @@
 var fs = require('fs');
-var path = require('path');
 var util = require('util');
 var P = require('../src/parsimmon');
 
@@ -141,7 +140,7 @@ var table = [
   {type: BINARY_LEFT, ops: operators({Multiply: '*', Divide: '/'})},
   {type: BINARY_LEFT, ops: operators({Add: '+', Subtract: '-'})},
   {type: PREFIX, ops: operators({Negate: '-'})},
-  {type: POSTFIX, ops: operators({Factorial: '!'})},
+  {type: POSTFIX, ops: operators({Factorial: '!'})}
 ];
 
 // Start off with Num as the base parser for numbers and thread that through the
@@ -171,7 +170,7 @@ var source = process.argv[2];
 var result = MyMath.parse(fs.readFileSync(source, 'utf-8'));
 
 function prettyPrint(x) {
-  console.log(util.inspect(x, {depth: null, colors: 'auto'}))
+  console.log(util.inspect(x, {depth: null, colors: 'auto'}));
 }
 
 if (result.status) {
