@@ -262,6 +262,26 @@ parser.parse('accccc');
 
 These methods are all called off of existing parsers, not from the `Parsimmon` object itself. They all return new parsers, so you can chain as many of them together as you like.
 
+## parser.parse(stream)
+
+Apply the `parser` on the provided string `stream`, yielding an object that contains status and parsed result.
+
+If the parser succeeds, `status` is set to *true*, and the value will be available in the `value` property.
+
+If the parser fails, `status` will be *false*. Further information on the error can be found at `index` and `expected`. `index` represents the furthest reached offset; it has a 0-based character `offset` and 1-based `line` and `column` properties. `expected` lists all tried parsers that were available at the offset, but the stream couldn't continue with any of these.
+
+```javascript
+var parser =
+  Parsimmon.alt(
+    // Use `parser.desc(string)` in order to have meaningful failure messages
+    Parsimmon.string('a').desc("'a' character"),
+    Parsimmon.string('b').desc("'b' character")
+  );
+
+parser.parse('a');    //=> {status:true, value:'a'}
+parser.parse('ccc');  //=> {status:false, index:{...}, expected:["'a' character", "'b' character"]}
+```
+
 ## parser.or(otherParser)
 
 Returns a new parser which tries `parser`, and if it fails uses `otherParser`. Example:
