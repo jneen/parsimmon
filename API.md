@@ -264,7 +264,7 @@ These methods are all called off of existing parsers, not from the `Parsimmon` o
 
 ## parser.parse(stream)
 
-Apply the `parser` on the provided string `stream`, yielding an object that contains status and parsed result.
+Apply `parser` on the provided string `stream`, yielding an object that contains the status and parsed result.
 
 If the parser succeeds, `status` is set to *true*, and the value will be available in the `value` property.
 
