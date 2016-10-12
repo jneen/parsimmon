@@ -269,12 +269,12 @@ Returns a new parser which tries `parser`, and if it fails uses `otherParser`. E
 ```javascript
 var numberPrefix =
   Parsimmon.string('+')
-    .or(Parsimmin.of('-'))
-    .or(Parsimmin.of(''));
+    .or(Parsimmon.string('-'))
+    .or(Parsimmon.of(''));
 
-maybePlus.parse('+'); // => {status: true, value: '+'}
-maybePlus.parse('-'); // => {status: true, value: '-'}
-maybePlus.parse('');  // => {status: true, value: ''}
+numberPrefix.parse('+'); // => {status: true, value: '+'}
+numberPrefix.parse('-'); // => {status: true, value: '-'}
+numberPrefix.parse('');  // => {status: true, value: ''}
 ```
 
 ## parser.chain(newParserFunc)
