@@ -267,10 +267,10 @@ These methods are all called off of existing parsers, not from the `Parsimmon` o
 Returns a new parser which tries `parser`, and if it fails uses `otherParser`. Example:
 
 ```javascript
-var numberPrefix =
+var maybePlus =
   Parsimmon.string('+')
-    .or(Parsimmin.of('-'))
-    .or(Parsimmin.of(''));
+    .or(Parsimmon.string('-'))
+    .or(Parsimmon.of(''));
 
 maybePlus.parse('+'); // => {status: true, value: '+'}
 maybePlus.parse('-'); // => {status: true, value: '-'}
