@@ -270,7 +270,7 @@ Returns a new parser which tries `parser`, and if it fails uses `otherParser`. E
 var numberPrefix =
   Parsimmon.string('+')
     .or(Parsimmon.string('-'))
-    .else('');
+    .fallback('');
 
 numberPrefix.parse('+'); // => {status: true, value: '+'}
 numberPrefix.parse('-'); // => {status: true, value: '-'}
@@ -331,12 +331,12 @@ pNum.parse('3.1'); // => {status: true, value: 3.1}
 
 Returns a new parser with the same behavior, but which yields `value`. Equivalent to `parser.map(function(x) { return x; }.bind(value))`.
 
-## parser.else(value)
+## parser.fallback(value)
 
-Returns a new parser which tries `parser` and, if it fails, yields `value` without consuming any character of the stream. Available also as `parser.else_(value)` to provide ES3 compatibility. Equivalent to `parser.or(Parsimmon.of(value))`.
+Returns a new parser which tries `parser` and, if it fails, yields `value` without consuming any character of the stream. Equivalent to `parser.or(Parsimmon.of(value))`.
 
 ```js
-var digitOrZero = Parsimmon.digit.else('0');
+var digitOrZero = Parsimmon.digit.fallback('0');
 
 digitOrZero.parse('4'); // => {status: true, value: '4'}
 digitOrZero.parse('');  // => {status: true, value: '0'}
