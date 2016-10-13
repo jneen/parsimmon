@@ -420,6 +420,10 @@
     });
   };
 
+  _.fallback = function(result) {
+    return this.or(succeed(result));
+  };
+
   // -*- primitive parsers -*- //
   function string(str) {
     assertString(str);
