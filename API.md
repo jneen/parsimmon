@@ -333,7 +333,7 @@ Returns a new parser with the same behavior, but which yields `value`. Equivalen
 
 ## parser.else(value)
 
-Returns a new parser which tries `parser` and, if it fails, yields `value` without consuming any character of the stream. Available also as `parser.else_(value)` to provide ES3 compatibility.
+Returns a new parser which tries `parser` and, if it fails, yields `value` without consuming any character of the stream. Available also as `parser.else_(value)` to provide ES3 compatibility. Equivalent to `parser.or(Parsimmon.of(value))`.
 
 ```js
 var digitOrZero = Parsimmon.digit.else('0');
