@@ -420,6 +420,13 @@
     });
   };
 
+  _.else = function(result) {
+    return this.or(succeed(result));
+  };
+
+  //- ES3 compatibility
+  _.else_ = _.else;
+
   // -*- primitive parsers -*- //
   function string(str) {
     assertString(str);
