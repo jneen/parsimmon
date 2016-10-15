@@ -1,6 +1,6 @@
-<a href="http://travis-ci.org/jneen/parsimmon"><img alt="Build Status" src="https://api.travis-ci.org/jneen/parsimmon.svg"></a>
+<a href="https://travis-ci.org/jneen/parsimmon"><img alt="Build Status" src="https://api.travis-ci.org/jneen/parsimmon.svg"></a>
 
-<a href="http://github.com/jneen/parsimmon"><img align="right" src="http://i.imgur.com/wyKOf.png" alt="Parsimmon"></a>
+<a href="https://github.com/jneen/parsimmon"><img align="right" src="https://i.imgur.com/wyKOf.png" alt="Parsimmon"></a>
 
 # Parsimmon
 
