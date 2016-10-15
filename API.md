@@ -401,7 +401,6 @@ where `value` is the original value yielded by the parser, and `start` and
 `column` properties that represent the position in the stream that
 contained the parsed text. Works like this function:
 
-
 ```javascript
 function mark(parser) {
   return Parsimmon.seqMap(
@@ -426,7 +425,7 @@ Returns a new parser whose failure message is `description`. For example, `strin
 
 # FantasyLand support
 
-The following methods are provided for FantasyLand compatibility.
+Parsimmon parsers are Semigroups, Applicative Functors, and Monads.
 
 ## Parsimmon.empty()
 
@@ -435,3 +434,26 @@ Returns `Parsimmon.fail("fantasy-land/empty")`.
 ## parser.empty()
 
 Returns `Parsimmon.fail("fantasy-land/empty")`.
+
+## parser.concat(otherParser)
+
+Alias of `parser.or(otherParser)`.
+
+## parser.ap(otherParser)
+
+Takes `parser` which returns a function and applies it to the parsed value of `otherParser`.
+
+```javascript
+Parsimmon.of(function(x) { return x + 1; })
+  .ap(Parsimmon.digit)
+  .parse('4')
+// => {status: true, value: 5}
+```
+
+## parser.chain(newParserFunc)
+
+Description mentioned earlier.
+
+## parser.of(result)
+
+Equivalent to `Parsimmon.of(result)`.
