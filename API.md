@@ -423,6 +423,51 @@ function mark(parser) {
 Returns a new parser whose failure message is `description`. For example, `string('x').desc('the letter x')` will indicate that
 `'the letter x'` was expected.
 
+It is important to only add descriptions to "low-level" parsers; things like numbers and strings. If you add a description to *every* parser you write then generated error messages will not be very helpful when simple syntax errors occur.
+
+```javascript
+var P = require('parsimmon');
+
+var pNumber =
+  P.regexp(/[0-9]+/).map(Number).desc('a number');
+
+var pPairNorm =
+  P.seq(
+    P.string('(').then(pNumber).skip(P.string(',')),
+    pNumber.skip(P.string(')'))
+  );
+
+var pPairDesc =
+  pPairNorm.desc('a pair');
+
+var badInputs = [
+  '(1,2',
+  '1,2)',
+  '(1|2)',
+];
+
+function report(name, parser, x) {
+  var expectations = parser.parse(x).expected.join(', ');
+  console.log(name + ' | Expected', expectations);
+}
+
+badInputs.forEach(function(x) {
+  report('pPairNorm', pPairNorm, x);
+  report('pPairDesc', pPairDesc, x);
+});
+```
+
+`pPairNorm` will output much more useful information than `pPairDesc`, as seen below:
+
+```
+pPairNorm | Expected ')'
+pPairDesc | Expected a pair
+pPairNorm | Expected '('
+pPairDesc | Expected a pair
+pPairNorm | Expected ','
+pPairDesc | Expected a pair
+```
+
 # FantasyLand support
 
 Parsimmon parsers are Semigroups, Applicative Functors, and Monads.
