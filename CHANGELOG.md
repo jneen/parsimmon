@@ -1,6 +1,7 @@
 ## version ? (?)
 
 * **BREAKING:** `parser.empty` is now a function (`parser.empty()`)
+* Adds `.desc` descriptions for `digits`, `letters`, `optWhitespace`.
 * `Parsimmon.Parser.empty()` is a copy of `parser.empty()`
 * Adds `Parsimmon.isParser`
 * Adds `parser.fallback`

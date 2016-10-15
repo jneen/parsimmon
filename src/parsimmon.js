@@ -591,11 +591,20 @@
     var self = this;
     return Parser(function(stream, i) {
       var result = self._(stream, i);
-      if (!result.status) return result;
+      if (!result.status) {
+        return result;
+      }
       var nextParser = f(result.value);
       return mergeReplies(nextParser._(stream, result.index), result);
     });
   };
+
+  var digit = regexp(/[0-9]/).desc('a digit');
+  var digits = regexp(/[0-9]*/).desc('optional digits');
+  var letter = regexp(/[a-z]/i).desc('a letter');
+  var letters = regexp(/[a-z]*/i).desc('optional letters');
+  var optWhitespace = regexp(/\s*/).desc('optional whitespace');
+  var whitespace = regexp(/\s+/).desc('whitespace');
 
   Parser.empty = empty;
   Parser.of = succeed;
@@ -604,20 +613,20 @@
   Parsimmon.alt = alt;
   Parsimmon.any = any;
   Parsimmon.custom = custom;
-  Parsimmon.digit = regexp(/[0-9]/).desc('a digit');
-  Parsimmon.digits = regexp(/[0-9]*/);
+  Parsimmon.digit = digit;
+  Parsimmon.digits = digits;
   Parsimmon.eof = eof;
   Parsimmon.fail = fail;
   Parsimmon.formatError = formatError;
   Parsimmon.index = index;
   Parsimmon.isParser = isParser;
   Parsimmon.lazy = lazy;
-  Parsimmon.letter = regexp(/[a-z]/i).desc('a letter');
-  Parsimmon.letters = regexp(/[a-z]*/i);
+  Parsimmon.letter = letter;
+  Parsimmon.letters = letters;
   Parsimmon.noneOf = noneOf;
   Parsimmon.of = succeed;
   Parsimmon.oneOf = oneOf;
-  Parsimmon.optWhitespace = regexp(/\s*/);
+  Parsimmon.optWhitespace = optWhitespace;
   Parsimmon.Parser = Parser;
   Parsimmon.regex = regexp;
   Parsimmon.regexp = regexp;
@@ -629,7 +638,7 @@
   Parsimmon.succeed = succeed;
   Parsimmon.takeWhile = takeWhile;
   Parsimmon.test = test;
-  Parsimmon.whitespace = regexp(/\s+/).desc('whitespace');
+  Parsimmon.whitespace = whitespace;
 
   return Parsimmon;
 }));
