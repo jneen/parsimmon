@@ -6,7 +6,7 @@
 * Adds `Parsimmon.isParser`.
 * Adds `parser.fallback(value)`.
 * Exposes `Parsimmon.makeSuccess` and `Parsimmon.makeFailure`.
-* Documentation for `Parsimmon.formatError`, `Parsimmon.parse`.
+* Documentation for `Parsimmon.formatError`, `Parsimmon.parse`, `Parsimmon.Parser`, `Parsimmon.makeSuccess`, `Parsimmon.makeFailure`, `Parsimmon.isParser`, `parser.fallback`.
 
 ## version 0.9.2 (2016-08-07)
 
