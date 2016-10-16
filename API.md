@@ -2,13 +2,15 @@
 
 These are either parsers or functions that return new parsers. These are the building blocks of parsers. They are all contained in the `Parsimmon` object.
 
-## Parsimmon.Parser(fn)
+## Parsimmon(fn)
 
-You can add a primitive parser (similar to the included ones) by using `Parsimmon.Parser(fn)`. This is an example of how to create a parser that matches any character except the one provided:
+**NOTE:** You probably will never need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`.
+
+You can add a primitive parser (similar to the included ones) by using `Parsimmon(fn)`. This is an example of how to create a parser that matches any character except the one provided:
 
 ```javascript
 function notChar(char) {
-  return Parsimmon.Parser(function(str, i) {
+  return Parsimmon(function(str, i) {
     if (stream.charAt(i) !== char) {
       return Parsimmon.makeSuccess(i + 1, str.charAt(i));
     }
@@ -29,13 +31,17 @@ parser.parse('accccc');
 //=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
 ```
 
+## Parsimmon.Parser(fn)
+
+Alias of `Parsimmon(fn)` for backwards compatibility.
+
 ## Parsimmon.makeSuccess(index, value)
 
-To be used inside of `Parsimmon.Parser`. Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for `Parsimmon.Parser`.
+To be used inside of `Parsimmon(fn)`. Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for `Parsimmon(fn)`.
 
 ## Parsimmon.makeFailure(furthest, expectation)
 
-To be used inside of `Parsimmon.Parser`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). See documentation for `Parsimmon.Parser`.
+To be used inside of `Parsimmon(fn)`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). See documentation for `Parsimmon(fn)`.
 
 ## Parsimmon.isParser(obj)
 
@@ -264,7 +270,7 @@ CustomString.parse('%<a string>'); // => {status: true, value: 'a string'}
 
 ## Parsimmon.custom(fn)
 
-**Deprecated:** Please use `Parsimmon.Parser(fn)` going forward. It's simpler
+**Deprecated:** Please use `Parsimmon(fn)` going forward.
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon.custom`. This is an example of how to create a parser that matches any character except the one provided:
 

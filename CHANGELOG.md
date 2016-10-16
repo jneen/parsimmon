@@ -5,6 +5,7 @@
 * Adds `.desc` descriptions for `digits`, `letters`, `optWhitespace`.
 * Adds `Parsimmon.isParser`.
 * Adds `parser.fallback(value)`.
+* Parsimmon now only has one namespace. `Parsimmon.Parser` is equal to `Parsimmon` itself for backwards compatibility purposes.
 * Exposes `Parsimmon.makeSuccess` and `Parsimmon.makeFailure`.
 * Documentation for `Parsimmon.formatError`, `Parsimmon.parse`, `Parsimmon.Parser`, `Parsimmon.makeSuccess`, `Parsimmon.makeFailure`, `Parsimmon.isParser`, `parser.fallback`.
 

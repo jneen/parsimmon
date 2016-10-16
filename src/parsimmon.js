@@ -19,26 +19,24 @@
 }(this, function() {
   'use strict';
 
-  var Parsimmon = {};
-
   // The Parser object is a wrapper for a parser function.
   // Externally, you use one to parse a string by calling
   //   var result = SomeParser.parse('Me Me Me! Parse Me!');
   // You should never call the constructor, rather you should
   // construct your Parser from the base parsers and the
   // parser combinator methods.
-  function Parser(action) {
-    if (!(this instanceof Parser)) {
-      return new Parser(action);
+  function Parsimmon(action) {
+    if (!(this instanceof Parsimmon)) {
+      return new Parsimmon(action);
     }
     this._ = action;
   }
 
   function isParser(obj) {
-    return obj instanceof Parser;
+    return obj instanceof Parsimmon;
   }
 
-  var _ = Parser.prototype;
+  var _ = Parsimmon.prototype;
 
   function makeSuccess(index, value) {
     return {
@@ -193,14 +191,14 @@
     };
   };
 
-  // [Parser a] -> Parser [a]
+  // [Parsimmon a] -> Parsimmon [a]
   function seq() {
     var parsers = [].slice.call(arguments);
     var numParsers = parsers.length;
     for (var j = 0; j < numParsers; j += 1) {
       assertParser(parsers[j]);
     }
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var result;
       var accum = new Array(numParsers);
       for (var j = 0; j < numParsers; j += 1) {
@@ -231,7 +229,7 @@
    * Allows to add custom primitive parsers
    */
   function custom(parsingFunction) {
-    return Parser(parsingFunction(makeSuccess, makeFailure));
+    return Parsimmon(parsingFunction(makeSuccess, makeFailure));
   }
 
   function alt() {
@@ -243,7 +241,7 @@
     for (var j = 0; j < numParsers; j += 1) {
       assertParser(parsers[j]);
     }
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var result;
       for (var j = 0; j < parsers.length; j += 1) {
         result = mergeReplies(parsers[j]._(stream, i), result);
@@ -299,7 +297,7 @@
   _.many = function() {
     var self = this;
 
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var accum = [];
       var result = undefined;
 
@@ -342,7 +340,7 @@
     }
     assertNumber(min);
     assertNumber(max);
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var accum = [];
       var result = undefined;
       var prevResult = undefined;
@@ -390,7 +388,7 @@
   _.map = function(fn) {
     assertFunction(fn);
     var self = this;
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var result = self._(stream, i);
       if (!result.status) {
         return result;
@@ -415,7 +413,7 @@
 
   _.desc = function(expected) {
     var self = this;
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var reply = self._(stream, i);
       if (!reply.status) {
         reply.expected = [expected];
@@ -432,7 +430,7 @@
   function string(str) {
     assertString(str);
     var expected = '\'' + str + '\'';
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var j = i + str.length;
       var head = stream.slice(i, j);
       if (head === str) {
@@ -457,7 +455,7 @@
     }
     var anchored = RegExp('^(?:' + re.source + ')', flags(re));
     var expected = '' + re;
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var match = anchored.exec(stream.slice(i));
       if (match) {
         var fullMatch = match[0];
@@ -471,29 +469,29 @@
   }
 
   function succeed(value) {
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       return makeSuccess(i, value);
     });
   }
 
   function fail(expected) {
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       return makeFailure(i, expected);
     });
   }
 
-  var any = Parser(function(stream, i) {
+  var any = Parsimmon(function(stream, i) {
     if (i >= stream.length) {
       return makeFailure(i, 'any character');
     }
     return makeSuccess(i+1, stream.charAt(i));
   });
 
-  var all = Parser(function(stream, i) {
+  var all = Parsimmon(function(stream, i) {
     return makeSuccess(stream.length, stream.slice(i));
   });
 
-  var eof = Parser(function(stream, i) {
+  var eof = Parsimmon(function(stream, i) {
     if (i < stream.length) {
       return makeFailure(i, 'EOF');
     }
@@ -502,7 +500,7 @@
 
   function test(predicate) {
     assertFunction(predicate);
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var char = stream.charAt(i);
       if (i < stream.length && predicate(char)) {
         return makeSuccess(i + 1, char);
@@ -527,7 +525,7 @@
   function takeWhile(predicate) {
     assertFunction(predicate);
 
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var j = i;
       while (j < stream.length && predicate(stream.charAt(j))) {
         j++;
@@ -542,7 +540,7 @@
       desc = undefined;
     }
 
-    var parser = Parser(function(stream, i) {
+    var parser = Parsimmon(function(stream, i) {
       parser._ = f()._;
       return parser._(stream, i);
     });
@@ -567,7 +565,7 @@
     };
   }
 
-  var index = Parser(function(stream, i) {
+  var index = Parsimmon(function(stream, i) {
     return makeSuccess(i, makeLineColumnIndex(stream, i));
   });
 
@@ -593,7 +591,7 @@
   //- Monad
   _.chain = function(f) {
     var self = this;
-    return Parser(function(stream, i) {
+    return Parsimmon(function(stream, i) {
       var result = self._(stream, i);
       if (!result.status) {
         return result;
@@ -610,9 +608,7 @@
   var optWhitespace = regexp(/\s*/).desc('optional whitespace');
   var whitespace = regexp(/\s+/).desc('whitespace');
 
-  Parser.empty = empty;
-  Parser.of = succeed;
-
+  Parsimmon.empty = empty;
   Parsimmon.makeSuccess = makeSuccess;
   Parsimmon.makeFailure = makeFailure;
   Parsimmon.all = all;
@@ -633,7 +629,7 @@
   Parsimmon.of = succeed;
   Parsimmon.oneOf = oneOf;
   Parsimmon.optWhitespace = optWhitespace;
-  Parsimmon.Parser = Parser;
+  Parsimmon.Parser = Parsimmon;
   Parsimmon.regex = regexp;
   Parsimmon.regexp = regexp;
   Parsimmon.sepBy = sepBy;
