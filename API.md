@@ -29,6 +29,14 @@ parser.parse('accccc');
 //=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
 ```
 
+## Parsimmon.makeSuccess(index, value)
+
+To be used inside of `Parsimmon.Parser`. Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for `Parsimmon.Parser`.
+
+## Parsimmon.makeFailure(furthest, expectation)
+
+To be used inside of `Parsimmon.Parser`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). See documentation for `Parsimmon.Parser`.
+
 ## Parsimmon.isParser(obj)
 
 Returns `true` if `obj` is a Parsimmon parser, otherwise `false`.
