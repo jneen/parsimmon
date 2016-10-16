@@ -52,7 +52,7 @@ suite('parser', function() {
   test('Parsimmon()', function() {
     var good = 'just a Q';
     var bad = 'all I wanted was a Q';
-    var justQ = Parsimmon.Parser(function(str, i) {
+    var justQ = Parsimmon(function(str, i) {
       if (str.charAt(i) === 'Q') {
         return Parsimmon.makeSuccess(i + 1, good);
       } else {
@@ -353,8 +353,8 @@ suite('parser', function() {
       expected: ['fantasy-land/empty'],
       index: {offset: 0, line: 1, column: 1}
     };
-    assert.deepEqual(Parsimmon.digit.empty, Parsimmon.Parser.empty);
-    assert.deepEqual(Parsimmon.Parser.empty().parse(''), emptyParse);
+    assert.deepEqual(Parsimmon.digit.empty, Parsimmon.empty);
+    assert.deepEqual(Parsimmon.empty().parse(''), emptyParse);
   });
 
   suite('Parsimmon.sepBy/sepBy1', function() {
