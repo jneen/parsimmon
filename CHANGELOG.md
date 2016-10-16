@@ -1,11 +1,12 @@
 ## version ? (?)
 
-* **BREAKING:** `parser.empty` is now a function (`parser.empty()`)
+* **BREAKING:** `parser.empty` is now a function (`parser.empty()`).
+* `Parsimmon.Parser.empty()` is a copy of `parser.empty()`.
 * Adds `.desc` descriptions for `digits`, `letters`, `optWhitespace`.
-* `Parsimmon.Parser.empty()` is a copy of `parser.empty()`
-* Adds `Parsimmon.isParser`
-* Adds `parser.fallback`
-* Documentation for `Parsimmon.formatError`, `Parsimmon.parse`
+* Adds `Parsimmon.isParser`.
+* Adds `parser.fallback(value)`.
+* Exposes `Parsimmon.makeSuccess` and `Parsimmon.makeFailure`.
+* Documentation for `Parsimmon.formatError`, `Parsimmon.parse`, `Parsimmon.Parser`, `Parsimmon.makeSuccess`, `Parsimmon.makeFailure`, `Parsimmon.isParser`, `parser.fallback`.
 
 ## version 0.9.2 (2016-08-07)
 
@@ -64,8 +65,8 @@ This release may have been unpublished or something, I'm not exactly sure.
 
 ## version 0.4.0 (2014-04-18)
 
-* breaking: deprecated use of `.then(function(result) { ... })`.  Use `chain` instead.
-* breaking: errors are no longer thrown on invalid parses.  Instead, `.parse(str)` returns
+* **BREAKING:** deprecated use of `.then(function(result) { ... })`.  Use `chain` instead.
+* **BREAKING:** errors are no longer thrown on invalid parses.  Instead, `.parse(str)` returns
   an object with a `status` tag, indicating whether the parse was successful.
 
 ## version 0.3.2 (2014-04-18)
@@ -80,7 +81,7 @@ This release may have been unpublished or something, I'm not exactly sure.
 ## version 0.3.0 (2014-03-12)
 
 * started updating the changelog again :x
-* breaking from 0.2.x: `seq` and `alt` now take varargs instead of a single list argument.
+* **BREAKING:** `seq` and `alt` now take varargs instead of a single list argument.
 
 ## version 0.1.0 (2014-01-09)
 

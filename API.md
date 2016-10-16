@@ -2,6 +2,41 @@
 
 These are either parsers or functions that return new parsers. These are the building blocks of parsers. They are all contained in the `Parsimmon` object.
 
+## Parsimmon.Parser(fn)
+
+You can add a primitive parser (similar to the included ones) by using `Parsimmon.Parser(fn)`. This is an example of how to create a parser that matches any character except the one provided:
+
+```javascript
+function notChar(char) {
+  return Parsimmon.Parser(function(str, i) {
+    if (stream.charAt(i) !== char) {
+      return Parsimmon.makeSuccess(i + 1, str.charAt(i));
+    }
+    return Parsimmon.makeFailure(i, 'anything different than "' + char + '"');
+  });
+}
+```
+
+This parser can then be used and composed the same way all the existing ones are used and composed, for example:
+
+```javascript
+var parser =
+  Parsimmon.seq(
+    Parsimmon.string('a'),
+    notChar('b').times(5)
+  );
+parser.parse('accccc');
+//=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
+```
+
+## Parsimmon.makeSuccess(index, value)
+
+To be used inside of `Parsimmon.Parser`. Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for `Parsimmon.Parser`.
+
+## Parsimmon.makeFailure(furthest, expectation)
+
+To be used inside of `Parsimmon.Parser`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). See documentation for `Parsimmon.Parser`.
+
 ## Parsimmon.isParser(obj)
 
 Returns `true` if `obj` is a Parsimmon parser, otherwise `false`.
@@ -229,13 +264,15 @@ CustomString.parse('%<a string>'); // => {status: true, value: 'a string'}
 
 ## Parsimmon.custom(fn)
 
+**Deprecated:** Please use `Parsimmon.Parser(fn)` going forward. It's simpler
+
 You can add a primitive parser (similar to the included ones) by using `Parsimmon.custom`. This is an example of how to create a parser that matches any character except the one provided:
 
 ```javascript
 function notChar(char) {
   return Parsimmon.custom(function(success, failure) {
     return function(stream, i) {
-      if (stream.charAt(i) !== char && i <= stream.length) {
+      if (stream.charAt(i) !== char) {
         return success(i + 1, stream.charAt(i));
       }
       return failure(i, 'anything different than "' + char + '"');
