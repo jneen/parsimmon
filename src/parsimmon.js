@@ -28,7 +28,9 @@
   // construct your Parser from the base parsers and the
   // parser combinator methods.
   function Parser(action) {
-    if (!(this instanceof Parser)) return new Parser(action);
+    if (!(this instanceof Parser)) {
+      return new Parser(action);
+    }
     this._ = action;
   }
 
@@ -166,7 +168,7 @@
     var prefix = (i > 0 ? '\'...' : '\'');
     var suffix = (stream.length - i > 12 ? '...\'' : '\'');
     return ' at line ' + index.line + ' column ' + index.column
-      +  ', got ' + prefix + stream.slice(i, i  +12) + suffix;
+      +  ', got ' + prefix + stream.slice(i, i + 12) + suffix;
   }
 
   function formatError(stream, error) {
@@ -203,7 +205,9 @@
       var accum = new Array(numParsers);
       for (var j = 0; j < numParsers; j += 1) {
         result = mergeReplies(parsers[j]._(stream, i), result);
-        if (!result.status) return result;
+        if (!result.status) {
+          return result;
+        }
         accum[j] = result.value;
         i = result.index;
       }
