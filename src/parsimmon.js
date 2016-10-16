@@ -613,6 +613,8 @@
   Parser.empty = empty;
   Parser.of = succeed;
 
+  Parsimmon.makeSuccess = makeSuccess;
+  Parsimmon.makeFailure = makeFailure;
   Parsimmon.all = all;
   Parsimmon.alt = alt;
   Parsimmon.any = any;

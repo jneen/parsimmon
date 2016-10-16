@@ -23,6 +23,59 @@ suite('parser', function() {
     assert.isTrue(Parsimmon.isParser(regex(/[0-9]/)));
   });
 
+  test('Parsimmon.makeSuccess', function() {
+    var index = 11;
+    var value = 'a lucky number';
+    var result = Parsimmon.makeSuccess(index, value);
+    assert.deepEqual(result, {
+      status: true,
+      index: index,
+      value: value,
+      furthest: -1,
+      expected: []
+    });
+  });
+
+  test('Parsimmon.makeFailure', function() {
+    var furthest = 4444;
+    var expected = 'waiting in the clock tower';
+    var result = Parsimmon.makeFailure(furthest, expected);
+    assert.deepEqual(result, {
+      status: false,
+      index: -1,
+      value: null,
+      furthest: furthest,
+      expected: [expected]
+    });
+  });
+
+  test('Parsimmon()', function() {
+    var good = 'just a Q';
+    var bad = 'all I wanted was a Q';
+    var justQ = Parsimmon.Parser(function(str, i) {
+      if (str.charAt(i) === 'Q') {
+        return Parsimmon.makeSuccess(i + 1, good);
+      } else {
+        return Parsimmon.makeFailure(i, bad);
+      }
+    });
+    var result1 = justQ.parse('Q');
+    var result2 = justQ.parse('x');
+    assert.deepEqual(result1, {
+      status: true,
+      value: good,
+    });
+    assert.deepEqual(result2, {
+      status: false,
+      index: {
+        offset: 0,
+        line: 1,
+        column: 1
+      },
+      expected: [bad]
+    });
+  });
+
   test('Parsimmon.string', function() {
     var parser = string('x');
     var res = parser.parse('x');
