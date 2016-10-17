@@ -357,6 +357,30 @@ suite('parser', function() {
     assert.deepEqual(Parsimmon.empty().parse(''), emptyParse);
   });
 
+  suite('fantasy-land/* method aliases', function() {
+    function makeTester(name) {
+      var flName = 'fantasy-land/' + name;
+      var parser = Parsimmon.of('burrito');
+      assert.equal(parser[name], parser[flName]);
+    }
+    var methods = [
+      'empty',
+      'concat',
+      'empty',
+      'of',
+      'ap',
+      'chain',
+      'empty'
+    ];
+    for (var i = 0; i < methods.length; i++) {
+      test('fantasy-land/' + methods[i] + ' alias', makeTester(methods[i]));
+    }
+  });
+
+  test('Fantasy Land Parsimmon.empty alias', function() {
+    assert.equal(Parsimmon.empty, Parsimmon['fantasy-land/empty']);
+  });
+
   suite('Parsimmon.sepBy/sepBy1', function() {
     var chars   = regex(/[a-zA-Z]+/);
     var comma   = string(',');
