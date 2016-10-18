@@ -396,6 +396,7 @@
       return mergeReplies(makeSuccess(result.index, fn(result.value)), result);
     });
   };
+  _['fantasy-land/map'] = _.map;
 
   _.skip = function(next) {
     return seq(this, next).map(function(results) { return results[0]; });
@@ -587,7 +588,7 @@
 
   // Fantasy Land Applicative support
   _.ap = function(other) {
-    return seqMap(this, other, function(f, x) {
+    return seqMap(other, this, function(f, x) {
       return f(x);
     });
   };
@@ -631,7 +632,6 @@
   Parsimmon.makeFailure = makeFailure;
   Parsimmon.makeSuccess = makeSuccess;
   Parsimmon.noneOf = noneOf;
-  Parsimmon.of = succeed;
   Parsimmon.oneOf = oneOf;
   Parsimmon.optWhitespace = optWhitespace;
   Parsimmon.Parser = Parsimmon;
@@ -650,6 +650,10 @@
   // Fantasy Land Semigroup support
   Parsimmon.empty = empty;
   Parsimmon['fantasy-land/empty'] = empty;
+
+  // Fantasy Land Applicative support
+  Parsimmon.of = succeed;
+  Parsimmon['fantasy-land/of'] = succeed;
 
   return Parsimmon;
 }));

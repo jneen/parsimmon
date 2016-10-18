@@ -37,6 +37,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "pretest": "npm run lint",
-    "test": "mocha --ui tdd --reporter dot test/intro.js test/*.test.js"
+    "test": "mocha --ui tdd --reporter dot test/intro.js test/*.test.js",
+    "watch:test": "mocha --ui tdd --reporter min --watch test/intro.js test/*.test.js"
   }
 }
