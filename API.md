@@ -513,7 +513,7 @@ pPairDesc | Expected a pair
 
 # FantasyLand support
 
-Parsimmon parsers are Semigroups, Applicative Functors, and Monads.
+Parsimmon parsers are Semigroups, Applicative Functors, and Monads. Both the old-style (`concat`) and new-style (`fantasy-land/concat`) method names are supported.
 
 ## Parsimmon.empty()
 
@@ -521,26 +521,26 @@ Returns `Parsimmon.fail("fantasy-land/empty")`.
 
 ## parser.empty()
 
-Returns `Parsimmon.fail("fantasy-land/empty")`.
+See `Parsimmon.empty()`.
 
 ## parser.concat(otherParser)
 
-Alias of `parser.or(otherParser)`.
+Equivalent to `parser.or(otherParser)`.
 
 ## parser.ap(otherParser)
 
 Takes `parser` which returns a function and applies it to the parsed value of `otherParser`.
 
 ```javascript
-Parsimmon.of(function(x) { return x + 1; })
-  .ap(Parsimmon.digit)
+Parsimmon.digit
+  .ap(Parsimmon.of(function(x) { return Number(x) + 1; }))
   .parse('4')
 // => {status: true, value: 5}
 ```
 
 ## parser.chain(newParserFunc)
 
-Description mentioned earlier.
+See `parser.chain(newParserFunc)` defined earlier.
 
 ## parser.of(result)
 

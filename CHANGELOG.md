@@ -1,6 +1,8 @@
 ## version ? (?)
 
 * **BREAKING:** `parser.empty` is now a function (`parser.empty()`).
+* **BREAKING:** `f.ap(x)` is now `x.ap(f)`.
+* Adds support for `fantasy-land/*` prefixed versions of methods.
 * `Parsimmon.Parser.empty()` is a copy of `parser.empty()`.
 * Adds `.desc` descriptions for `digits`, `letters`, `optWhitespace`.
 * Adds `Parsimmon.isParser`.
@@ -17,12 +19,12 @@
 
 ## version 0.9.1 (2016-07-08)
 
+* **BREAKING:** `P.seqMap` now throws when passed zero arguments, or when the final argument is not a function.
 * `P.regex` is now an alias for `P.regexp`.
-* `P.seqMap` now throws when passed zero arguments, or when the final argument is not a function.
 
 ## version 0.9.0 (2016-07-07)
 
-* `P.regex` throws on regexps with flags other than `imu` now.
+* **BREAKING:** `P.regex` throws on regexps with flags other than `imu` now.
 
 ## version 0.8.1 (2016-06-30)
 

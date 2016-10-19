@@ -15,6 +15,12 @@ suite('parser', function() {
   var lazy = Parsimmon.lazy;
   var fail = Parsimmon.fail;
 
+  function equivalentParsers(p1, p2, inputs) {
+    for (var i = 0; i < inputs.length; i++) {
+      assert.deepEqual(p1.parse(inputs[i]), p2.parse(inputs[i]));
+    }
+  }
+
   test('Parsimmon.isParser', function() {
     assert.isFalse(Parsimmon.isParser(undefined));
     assert.isFalse(Parsimmon.isParser({}));
@@ -357,21 +363,225 @@ suite('parser', function() {
     assert.deepEqual(Parsimmon.empty().parse(''), emptyParse);
   });
 
+  suite('fantasy-land/* method aliases', function() {
+    function makeTester(name) {
+      return function() {
+        var flName = 'fantasy-land/' + name;
+        var parser = Parsimmon.of('burrito');
+        assert.equal(parser[name], parser[flName]);
+      };
+    }
+    var methods = [
+      'ap',
+      'chain',
+      'concat',
+      'empty',
+      'map',
+      'of'
+    ];
+    for (var i = 0; i < methods.length; i++) {
+      test('fantasy-land/' + methods[i] + ' alias', makeTester(methods[i]));
+    }
+  });
+
+  test('Fantasy Land Parsimmon.empty alias', function() {
+    assert.equal(Parsimmon.empty, Parsimmon['fantasy-land/empty']);
+  });
+
+  test('Fantasy Land Parsimmon.of alias', function() {
+    assert.equal(Parsimmon.of, Parsimmon['fantasy-land/of']);
+    assert.equal(Parsimmon.of, Parsimmon.any.of);
+  });
+
+  suite('Fantasy Land Semigroup', function() {
+    test('associativity', function() {
+      var a = Parsimmon.string('a');
+      var b = Parsimmon.string('b');
+      var c = Parsimmon.string('c');
+      var abc1 = a.concat(b).concat(c);
+      var abc2 = a.concat(b.concat(c));
+      equivalentParsers(abc1, abc2, [
+        'abc',
+        'ac'
+      ]);
+    });
+  });
+
+  suite('Fantasy Land Functor', function() {
+    test('identity', function() {
+      var p1 = Parsimmon.digits;
+      var p2 = Parsimmon.digits.map(function(x) { return x; });
+      equivalentParsers(p1, p2, [
+        '091',
+        '111111',
+        '46782792',
+        'oops'
+      ]);
+    });
+
+    test('composition', function() {
+      function increment(x) {
+        return x + 1;
+      }
+      var p1 = Parsimmon.digits.map(function(x) {
+        return increment(Number(x));
+      });
+      var p2 = Parsimmon.digits.map(Number).map(increment);
+      equivalentParsers(p1, p2, [
+        '12',
+        '98789',
+        '89772371298389217387128937979839821738',
+        'oh no!'
+      ]);
+    });
+  });
+
+  suite('Fantasy Land Apply', function() {
+    test('composition', function() {
+      function reverse(s) {
+        return s.split('').reverse().join('');
+      }
+
+      function upperCase(s) {
+        return s.toUpperCase();
+      }
+
+      function compose(f) {
+        return function(g) {
+          return function(x) {
+            return f(g(x));
+          };
+        };
+      }
+
+      var p1 =
+        Parsimmon.all
+          .ap(Parsimmon.of(reverse))
+          .ap(Parsimmon.of(upperCase));
+
+      var p2 =
+        Parsimmon.all.ap(
+          Parsimmon.of(reverse).ap(
+            Parsimmon.of(upperCase).map(compose)
+          )
+        );
+
+      equivalentParsers(p1, p2, [
+        'ok cool'
+      ]);
+    });
+  });
+
+  suite('Fantasy Land Applicative', function() {
+    test('identity', function() {
+      var p1 = Parsimmon.any;
+      var p2 = p1.ap(Parsimmon.of(function(x) { return x; }));
+      equivalentParsers(p1, p2, [
+        'x',
+        'z',
+        'æ',
+        '1',
+        ''
+      ]);
+    });
+
+    test('homomorphism', function() {
+      function fn(s) {
+        return s.toUpperCase();
+      }
+      var input = 'nice';
+      var p1 = Parsimmon.of(input).ap(Parsimmon.of(fn));
+      var p2 = Parsimmon.of(fn(input));
+      assert.deepEqual(p1.parse(''), p2.parse(''));
+    });
+
+    test('interchange', function() {
+      function increment(x) {
+        return x + 1;
+      }
+      var input = 3;
+      var p1 = Parsimmon.of(input).ap(Parsimmon.of(increment));
+      var p2 = Parsimmon.of(increment).ap(Parsimmon.of(function(f) {
+        return f(input);
+      }));
+      assert.deepEqual(p1.parse(''), p2.parse(''));
+    });
+  });
+
+  suite('Fantasy Land Chain', function() {
+    test('associativity', function() {
+      function appender(x) {
+        return function(xs) {
+          return Parsimmon.of(xs.concat(x));
+        };
+      }
+      function reverse(xs) {
+        return Parsimmon.of(xs.slice().reverse());
+      }
+      var list = Parsimmon.sepBy(Parsimmon.letters, Parsimmon.whitespace);
+      var input = 'quuz foo bar baz';
+      var output = {
+        status: true,
+        value: ['baz', 'bar', 'foo', 'quuz', 'aaa']
+      };
+      var p1 = list.chain(reverse).chain(appender('aaa'));
+      var p2 = list.chain(function(x) {
+        return reverse(x).chain(appender('aaa'));
+      });
+      var out1 = p1.parse(input);
+      var out2 = p2.parse(input);
+      assert.deepEqual(out1, out2);
+      assert.deepEqual(out1, output);
+    });
+  });
+
+  suite('Fantasy Land Monad', function() {
+    test('left identity', function() {
+      function upperCase(x) {
+        return Parsimmon.of(x.toUpperCase());
+      }
+      var input = 'foo';
+      var output = {
+        status: true,
+        value: 'FOO'
+      };
+      var p1 = Parsimmon.of(input).chain(upperCase);
+      var p2 = upperCase(input);
+      var out1 = p1.parse('');
+      var out2 = p2.parse('');
+      assert.deepEqual(out1, out2);
+      assert.deepEqual(out1, output);
+    });
+
+    test('right identity', function() {
+      var input = 'monad burrito';
+      var output = {
+        status: true,
+        value: input
+      };
+      var p1 = Parsimmon.all.chain(Parsimmon.of);
+      var p2 = Parsimmon.all;
+      var out1 = p1.parse(input);
+      var out2 = p2.parse(input);
+      assert.deepEqual(out1, out2);
+      assert.deepEqual(out1, output);
+    });
+  });
+
   suite('Parsimmon.sepBy/sepBy1', function() {
     var chars   = regex(/[a-zA-Z]+/);
     var comma   = string(',');
     var csvSep  = Parsimmon.sepBy(chars, comma);
     var csvSep1 = Parsimmon.sepBy1(chars, comma);
 
-
     test('successful, returns an array of parsed elements', function(){
       var input  = 'Heres,a,csv,string,in,our,restrictive,dialect';
       var output = ['Heres', 'a', 'csv', 'string', 'in', 'our', 'restrictive', 'dialect'];
-
-
       assert.deepEqual(csvSep.parse(input).value, output);
       assert.deepEqual(csvSep1.parse(input).value, output);
-      assert.throws(function() { Parsimmon.sepBy('not a parser'); });
+      assert.throws(function() {
+        Parsimmon.sepBy('not a parser');
+      });
       assert.throws(function() {
         Parsimmon.sepBy(string('a'), 'not a parser');
       });

@@ -396,6 +396,7 @@
       return mergeReplies(makeSuccess(result.index, fn(result.value)), result);
     });
   };
+  _['fantasy-land/map'] = _.map;
 
   _.skip = function(next) {
     return seq(this, next).map(function(results) { return results[0]; });
@@ -573,22 +574,27 @@
     return fail('fantasy-land/empty');
   }
 
-  //- fantasyland compat
-
-  //- Monoid (Alternative, really)
+  // Fantasy Land Semigroup support
   _.concat = _.or;
+  _['fantasy-land/concat'] = _.concat;
+
+  // Fantasy Land Semigroup and Monoid support
   _.empty = empty;
+  _['fantasy-land/empty'] = _.empty;
 
-  //- Applicative
+  // Fantasy Land Applicative support
   _.of = succeed;
+  _['fantasy-land/of'] = _.of;
 
+  // Fantasy Land Applicative support
   _.ap = function(other) {
-    return seqMap(this, other, function(f, x) {
+    return seqMap(other, this, function(f, x) {
       return f(x);
     });
   };
+  _['fantasy-land/ap'] = _.ap;
 
-  //- Monad
+  // Fantasy Land Monad support
   _.chain = function(f) {
     var self = this;
     return Parsimmon(function(stream, i) {
@@ -600,6 +606,7 @@
       return mergeReplies(nextParser._(stream, result.index), result);
     });
   };
+  _['fantasy-land/chain'] = _.chain;
 
   var digit = regexp(/[0-9]/).desc('a digit');
   var digits = regexp(/[0-9]*/).desc('optional digits');
@@ -608,9 +615,6 @@
   var optWhitespace = regexp(/\s*/).desc('optional whitespace');
   var whitespace = regexp(/\s+/).desc('whitespace');
 
-  Parsimmon.empty = empty;
-  Parsimmon.makeSuccess = makeSuccess;
-  Parsimmon.makeFailure = makeFailure;
   Parsimmon.all = all;
   Parsimmon.alt = alt;
   Parsimmon.any = any;
@@ -625,8 +629,9 @@
   Parsimmon.lazy = lazy;
   Parsimmon.letter = letter;
   Parsimmon.letters = letters;
+  Parsimmon.makeFailure = makeFailure;
+  Parsimmon.makeSuccess = makeSuccess;
   Parsimmon.noneOf = noneOf;
-  Parsimmon.of = succeed;
   Parsimmon.oneOf = oneOf;
   Parsimmon.optWhitespace = optWhitespace;
   Parsimmon.Parser = Parsimmon;
@@ -641,6 +646,14 @@
   Parsimmon.takeWhile = takeWhile;
   Parsimmon.test = test;
   Parsimmon.whitespace = whitespace;
+
+  // Fantasy Land Semigroup support
+  Parsimmon.empty = empty;
+  Parsimmon['fantasy-land/empty'] = empty;
+
+  // Fantasy Land Applicative support
+  Parsimmon.of = succeed;
+  Parsimmon['fantasy-land/of'] = succeed;
 
   return Parsimmon;
 }));
