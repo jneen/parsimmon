@@ -191,6 +191,19 @@
     };
   };
 
+  _.tryParse = function(str) {
+    var result = this.parse(str);
+    if (result.status) {
+      return result.value;
+    } else {
+      var msg = formatError(str, result);
+      var err = new Error(msg);
+      err.type = 'ParsimmonError';
+      err.result = result;
+      throw err;
+    }
+  };
+
   // [Parsimmon a] -> Parsimmon [a]
   function seq() {
     var parsers = [].slice.call(arguments);

@@ -2,6 +2,7 @@
 
 * **BREAKING:** `parser.empty` is now a function (`parser.empty()`).
 * **BREAKING:** `f.ap(x)` is now `x.ap(f)`.
+* Adds `parser.tryParse(str)` which either returns the parsed value or throws an exception.
 * Adds support for `fantasy-land/*` prefixed versions of methods.
 * `Parsimmon.Parser.empty()` is a copy of `parser.empty()`.
 * Adds `.desc` descriptions for `digits`, `letters`, `optWhitespace`.

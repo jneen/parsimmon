@@ -325,6 +325,31 @@ parser.parse('a');    //=> {status:true, value:'a'}
 parser.parse('ccc');  //=> {status:false, index:{...}, expected:["'a' character", "'b' character"]}
 ```
 
+## parser.tryParse(string)
+
+Like `parser.parse(string)` but either returns the parsed value or throws an error on failure. The error object contains additional properties about the error.
+
+```javascript
+var parser = Parsimmon.sepBy1(Parsimmon.letters, Parsimmon.whitespace);
+
+parser.tryParse('foo bar baz'); // => ['foo', 'bar', 'baz']
+
+try {
+  parser.tryParse('123')
+} catch (err) {
+  err.message;
+  // => 'expected one of EOF, whitespace at line 1 column 1, got \'123\''
+
+  err.type;
+  // => 'ParsimmonError';
+
+  err.result;
+  // => { status: false,
+  //      index: { offset: 0, line: 1, column: 1 },
+  //      expected: [ 'EOF', 'whitespace' ] }
+}
+```
+
 ## parser.or(otherParser)
 
 Returns a new parser which tries `parser`, and if it fails uses `otherParser`. Example:
