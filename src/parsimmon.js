@@ -157,36 +157,36 @@
     return 'one of ' + expected.join(', ');
   }
 
-  function formatGot(stream, error) {
+  function formatGot(input, error) {
     var index = error.index;
     var i = index.offset;
-    if (i === stream.length) {
-      return ', got the end of the stream';
+    if (i === input.length) {
+      return ', got the end of the input';
     }
     var prefix = (i > 0 ? '\'...' : '\'');
-    var suffix = (stream.length - i > 12 ? '...\'' : '\'');
+    var suffix = (input.length - i > 12 ? '...\'' : '\'');
     return ' at line ' + index.line + ' column ' + index.column
-      +  ', got ' + prefix + stream.slice(i, i + 12) + suffix;
+      +  ', got ' + prefix + input.slice(i, i + 12) + suffix;
   }
 
-  function formatError(stream, error) {
+  function formatError(input, error) {
     return 'expected ' +
       formatExpected(error.expected) +
-      formatGot(stream, error);
+      formatGot(input, error);
   }
 
-  _.parse = function(stream) {
-    if (typeof stream !== 'string') {
+  _.parse = function(input) {
+    if (typeof input !== 'string') {
       throw new Error('.parse must be called with a string as its argument');
     }
-    var result = this.skip(eof)._(stream, 0);
+    var result = this.skip(eof)._(input, 0);
 
     return result.status ? {
       status: true,
       value: result.value
     } : {
       status: false,
-      index: makeLineColumnIndex(stream, result.furthest),
+      index: makeLineColumnIndex(input, result.furthest),
       expected: result.expected
     };
   };
@@ -211,11 +211,11 @@
     for (var j = 0; j < numParsers; j += 1) {
       assertParser(parsers[j]);
     }
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       var result;
       var accum = new Array(numParsers);
       for (var j = 0; j < numParsers; j += 1) {
-        result = mergeReplies(parsers[j]._(stream, i), result);
+        result = mergeReplies(parsers[j]._(input, i), result);
         if (!result.status) {
           return result;
         }
@@ -254,10 +254,10 @@
     for (var j = 0; j < numParsers; j += 1) {
       assertParser(parsers[j]);
     }
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       var result;
       for (var j = 0; j < parsers.length; j += 1) {
-        result = mergeReplies(parsers[j]._(stream, i), result);
+        result = mergeReplies(parsers[j]._(input, i), result);
         if (result.status) return result;
       }
       return result;
@@ -310,12 +310,12 @@
   _.many = function() {
     var self = this;
 
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       var accum = [];
       var result = undefined;
 
       for (;;) {
-        result = mergeReplies(self._(stream, i), result);
+        result = mergeReplies(self._(input, i), result);
         if (result.status) {
           i = result.index;
           accum.push(result.value);
@@ -353,12 +353,12 @@
     }
     assertNumber(min);
     assertNumber(max);
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       var accum = [];
       var result = undefined;
       var prevResult = undefined;
       for (var times = 0; times < min; times += 1) {
-        result = self._(stream, i);
+        result = self._(input, i);
         prevResult = mergeReplies(result, prevResult);
         if (result.status) {
           i = result.index;
@@ -368,7 +368,7 @@
         }
       }
       for (; times < max; times += 1) {
-        result = self._(stream, i);
+        result = self._(input, i);
         prevResult = mergeReplies(result, prevResult);
         if (result.status) {
           i = result.index;
@@ -401,8 +401,8 @@
   _.map = function(fn) {
     assertFunction(fn);
     var self = this;
-    return Parsimmon(function(stream, i) {
-      var result = self._(stream, i);
+    return Parsimmon(function(input, i) {
+      var result = self._(input, i);
       if (!result.status) {
         return result;
       }
@@ -427,8 +427,8 @@
 
   _.desc = function(expected) {
     var self = this;
-    return Parsimmon(function(stream, i) {
-      var reply = self._(stream, i);
+    return Parsimmon(function(input, i) {
+      var reply = self._(input, i);
       if (!reply.status) {
         reply.expected = [expected];
       }
@@ -444,9 +444,9 @@
   function string(str) {
     assertString(str);
     var expected = '\'' + str + '\'';
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       var j = i + str.length;
-      var head = stream.slice(i, j);
+      var head = input.slice(i, j);
       if (head === str) {
         return makeSuccess(j, head);
       } else {
@@ -469,8 +469,8 @@
     }
     var anchored = RegExp('^(?:' + re.source + ')', flags(re));
     var expected = '' + re;
-    return Parsimmon(function(stream, i) {
-      var match = anchored.exec(stream.slice(i));
+    return Parsimmon(function(input, i) {
+      var match = anchored.exec(input.slice(i));
       if (match) {
         var fullMatch = match[0];
         var groupMatch = match[group];
@@ -483,30 +483,30 @@
   }
 
   function succeed(value) {
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       return makeSuccess(i, value);
     });
   }
 
   function fail(expected) {
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       return makeFailure(i, expected);
     });
   }
 
-  var any = Parsimmon(function(stream, i) {
-    if (i >= stream.length) {
+  var any = Parsimmon(function(input, i) {
+    if (i >= input.length) {
       return makeFailure(i, 'any character');
     }
-    return makeSuccess(i+1, stream.charAt(i));
+    return makeSuccess(i+1, input.charAt(i));
   });
 
-  var all = Parsimmon(function(stream, i) {
-    return makeSuccess(stream.length, stream.slice(i));
+  var all = Parsimmon(function(input, i) {
+    return makeSuccess(input.length, input.slice(i));
   });
 
-  var eof = Parsimmon(function(stream, i) {
-    if (i < stream.length) {
+  var eof = Parsimmon(function(input, i) {
+    if (i < input.length) {
       return makeFailure(i, 'EOF');
     }
     return makeSuccess(i, null);
@@ -514,9 +514,9 @@
 
   function test(predicate) {
     assertFunction(predicate);
-    return Parsimmon(function(stream, i) {
-      var char = stream.charAt(i);
-      if (i < stream.length && predicate(char)) {
+    return Parsimmon(function(input, i) {
+      var char = input.charAt(i);
+      if (i < input.length && predicate(char)) {
         return makeSuccess(i + 1, char);
       } else {
         return makeFailure(i, 'a character matching ' + predicate);
@@ -539,12 +539,12 @@
   function takeWhile(predicate) {
     assertFunction(predicate);
 
-    return Parsimmon(function(stream, i) {
+    return Parsimmon(function(input, i) {
       var j = i;
-      while (j < stream.length && predicate(stream.charAt(j))) {
+      while (j < input.length && predicate(input.charAt(j))) {
         j++;
       }
-      return makeSuccess(j, stream.slice(i, j));
+      return makeSuccess(j, input.slice(i, j));
     });
   }
 
@@ -554,9 +554,9 @@
       desc = undefined;
     }
 
-    var parser = Parsimmon(function(stream, i) {
+    var parser = Parsimmon(function(input, i) {
       parser._ = f()._;
-      return parser._(stream, i);
+      return parser._(input, i);
     });
 
     if (desc) {
@@ -566,8 +566,8 @@
     }
   }
 
-  function makeLineColumnIndex(stream, i) {
-    var lines = stream.slice(0, i).split('\n');
+  function makeLineColumnIndex(input, i) {
+    var lines = input.slice(0, i).split('\n');
     // Note that unlike the character offset, the line and column offsets are
     // 1-based.
     var lineWeAreUpTo = lines.length;
@@ -579,8 +579,8 @@
     };
   }
 
-  var index = Parsimmon(function(stream, i) {
-    return makeSuccess(i, makeLineColumnIndex(stream, i));
+  var index = Parsimmon(function(input, i) {
+    return makeSuccess(i, makeLineColumnIndex(input, i));
   });
 
   function empty() {
@@ -610,13 +610,13 @@
   // Fantasy Land Monad support
   _.chain = function(f) {
     var self = this;
-    return Parsimmon(function(stream, i) {
-      var result = self._(stream, i);
+    return Parsimmon(function(input, i) {
+      var result = self._(input, i);
       if (!result.status) {
         return result;
       }
       var nextParser = f(result.value);
-      return mergeReplies(nextParser._(stream, result.index), result);
+      return mergeReplies(nextParser._(input, result.index), result);
     });
   };
   _['fantasy-land/chain'] = _.chain;

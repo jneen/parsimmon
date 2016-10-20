@@ -1,3 +1,17 @@
+# Terminology
+
+## Yields
+
+When the documentation says a function *yields an array of strings*, it means the function returns a parser that when called with `.parse` will return an object containing the array of strings.
+
+## Input
+
+The string passed to `.parse` is called the *input*.
+
+## Consumes
+
+A parser is said to *consume* the text that it parses, leaving only the unconsumed text for subsequent parsers to check.
+
 # Base parsers and parser generators
 
 These are either parsers or functions that return new parsers. These are the building blocks of parsers. They are all contained in the `Parsimmon` object.
@@ -10,8 +24,8 @@ You can add a primitive parser (similar to the included ones) by using `Parsimmo
 
 ```javascript
 function notChar(char) {
-  return Parsimmon(function(str, i) {
-    if (stream.charAt(i) !== char) {
+  return Parsimmon(function(input, i) {
+    if (input.charAt(i) !== char) {
       return Parsimmon.makeSuccess(i + 1, str.charAt(i));
     }
     return Parsimmon.makeFailure(i, 'anything different than "' + char + '"');
@@ -61,15 +75,19 @@ Returns a parser that looks for exactly one character *NOT* from `string`, and y
 
 ## Parsimmon.regexp(regexp, group=0)
 
-Returns a parser that looks for a match to the regexp and yields the given match group (defaulting to the entire match). The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. Any other flag will result in an error being thrown.
+Returns a parser that looks for a match to the regexp and yields the entire text matched. The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. Any other flag will result in an error being thrown.
+
+## Parsimmon.regexp(regexp, group)
+
+Like `Parsimmon.regexp(regexp)`, but yields only the text in the specific regexp match `group`, rather than the match of the entire regexp.
 
 ## Parsimmon.regex
 
-This was the original name for `Parsimmon.regexp`, but now it is just an alias.
+This is an alias for `Parsimmon.regexp`.
 
 ## Parsimmon.succeed(result)
 
-Returns a parser that doesn't consume any of the string, and yields `result`.
+Returns a parser that doesn't consume any input, and yields `result`.
 
 ## Parsimmon.of(result)
 
@@ -85,7 +103,7 @@ Takes the `string` passed to `parser.parse(string)` and the `error` returned fro
 
 ## Parsimmon.seqMap(p1, p2, ...pn, function(r1, r2, ...rn))
 
-Matches all parsers sequentially, and passes their results as the arguments to a function. Similar to calling `Parsimmon.seq` and then `.map`, but the values are not put in an array. Example:
+Matches all parsers sequentially, and passes their results as the arguments to a function, yielding the return value of that function. Similar to calling `Parsimmon.seq` and then `.map`, but the values are not put in an array. Example:
 
 ```javascript
 Parsimmon.seqMap(
@@ -96,6 +114,7 @@ Parsimmon.seqMap(
     console.log(first);    // => 'a'
     console.log(operator); // => '+'
     console.log(second);   // => 'x'
+    retur [operator, first, second];
   }
 ).parse('a+x')
 ```
@@ -143,9 +162,9 @@ Parsimmon.sepBy(
 
 ## Parsimmon.sepBy1(content, separator)
 
-This  is the same as `Parsimmon.sepBy`, but matches the `content` parser **at least once**.
+This is the same as `Parsimmon.sepBy`, but matches the `content` parser **at least once**.
 
-## Parsimmon.lazy(f)
+## Parsimmon.lazy(fn)
 
 Accepts a function that returns a parser, which is evaluated the first time the parser is used. This is useful for referencing parsers that haven't yet been defined, and for implementing recursive parsers. Example:
 
@@ -164,7 +183,7 @@ Value.parse('(X)');   // => {status: true, value: 'X'}
 Value.parse('((X))'); // => {status: true, value: 'X'}
 ```
 
-## Parsimmon.lazy(description, f)
+## Parsimmon.lazy(description, fn)
 
 Equivalent to `Parsimmon.lazy(f).desc(description)`.
 
@@ -198,19 +217,19 @@ Equivalent to `Parsimmon.regexp(/\s*/)`.
 
 ## Parsimmon.any
 
-A parser that consumes and yields the next character of the stream.
+A parser that consumes and yields the next character of the input.
 
 ## Parsimmon.all
 
-A parser that consumes and yields the entire remainder of the stream.
+A parser that consumes and yields the entire remainder of the input.
 
 ## Parsimmon.eof
 
-A parser that expects to be at the end of the stream (zero characters left).
+A parser that expects to be at the end of the input (zero characters left).
 
 ## Parsimmon.index
 
-A parser that consumes no text and yields an object an object representing the current offset into the parse: it has a 0-based character `offset` property and 1-based `line` and `column` properties. Example:
+A parser that consumes no input and yields an object an object representing the current offset into the parse: it has a 0-based character `offset` property and 1-based `line` and `column` properties. Example:
 
 ```javascript
 Parsimmon.seqMap(
@@ -277,9 +296,9 @@ You can add a primitive parser (similar to the included ones) by using `Parsimmo
 ```javascript
 function notChar(char) {
   return Parsimmon.custom(function(success, failure) {
-    return function(stream, i) {
-      if (stream.charAt(i) !== char) {
-        return success(i + 1, stream.charAt(i));
+    return function(input, i) {
+      if (input.charAt(i) !== char) {
+        return success(i + 1, input.charAt(i));
       }
       return failure(i, 'anything different than "' + char + '"');
     };
@@ -305,13 +324,13 @@ parser.parse('accccc');
 
 These methods are all called off of existing parsers, not from the `Parsimmon` object itself. They all return new parsers, so you can chain as many of them together as you like.
 
-## parser.parse(stream)
+## parser.parse(input)
 
-Apply `parser` on the provided string `stream`, yielding an object that contains the status and parsed result.
+Apply `parser` on the provided string `input`, returning an object that contains the status and parsed result.
 
 If the parser succeeds, `status` is set to *true*, and the value will be available in the `value` property.
 
-If the parser fails, `status` will be *false*. Further information on the error can be found at `index` and `expected`. `index` represents the furthest reached offset; it has a 0-based character `offset` and 1-based `line` and `column` properties. `expected` lists all tried parsers that were available at the offset, but the stream couldn't continue with any of these.
+If the parser fails, `status` will be *false*. Further information on the error can be found at `index` and `expected`. `index` represents the furthest reached offset; it has a 0-based character `offset` and 1-based `line` and `column` properties. `expected` lists all tried parsers that were available at the offset, but the input couldn't continue with any of these.
 
 ```javascript
 var parser =
@@ -321,18 +340,24 @@ var parser =
     Parsimmon.string('b').desc("'b' character")
   );
 
-parser.parse('a');    //=> {status:true, value:'a'}
-parser.parse('ccc');  //=> {status:false, index:{...}, expected:["'a' character", "'b' character"]}
+parser.parse('a');
+// => {status: true, value: 'a'}
+
+parser.parse('ccc');
+// => {status: false,
+//     index: {...},
+//     expected: ["'a' character", "'b' character"]}
 ```
 
-## parser.tryParse(string)
+## parser.tryParse(input)
 
-Like `parser.parse(string)` but either returns the parsed value or throws an error on failure. The error object contains additional properties about the error.
+Like `parser.parse(input)` but either returns the parsed value or throws an error on failure. The error object contains additional properties about the error.
 
 ```javascript
 var parser = Parsimmon.sepBy1(Parsimmon.letters, Parsimmon.whitespace);
 
-parser.tryParse('foo bar baz'); // => ['foo', 'bar', 'baz']
+parser.tryParse('foo bar baz');
+// => ['foo', 'bar', 'baz']
 
 try {
   parser.tryParse('123')
@@ -341,12 +366,12 @@ try {
   // => 'expected one of EOF, whitespace at line 1 column 1, got \'123\''
 
   err.type;
-  // => 'ParsimmonError';
+  // => 'ParsimmonError'
 
   err.result;
-  // => { status: false,
-  //      index: { offset: 0, line: 1, column: 1 },
-  //      expected: [ 'EOF', 'whitespace' ] }
+  // => {status: false,
+  //     index: {offset: 0, line: 1, column: 1},
+  //     expected: ['EOF', 'whitespace']}
 }
 ```
 
@@ -403,16 +428,21 @@ var parserA = p1.then(p2); // is equivalent to...
 var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x2; });
 ```
 
-## parser.map(function(result) { return anotherResult; })
+## parser.map(fn)
 
 Transforms the output of `parser` with the given function. Example:
 
 ```javascript
-var pNum = Parsimmon.regexp(/[0-9]+/).map(Number);
+var pNum =
+  Parsimmon.regexp(/[0-9]+/)
+    .map(Number)
+    .map(function(x) {
+      return x + 1;
+    });
 
-pNum.parse('9');   // => {status: true, value: 9}
-pNum.parse('123'); // => {status: true, value: 123}
-pNum.parse('3.1'); // => {status: true, value: 3.1}
+pNum.parse('9');   // => {status: true, value: 10}
+pNum.parse('123'); // => {status: true, value: 124}
+pNum.parse('3.1'); // => {status: true, value: 4.1}
 ```
 
 ## parser.result(value)
@@ -421,7 +451,7 @@ Returns a new parser with the same behavior, but which yields `value`. Equivalen
 
 ## parser.fallback(value)
 
-Returns a new parser which tries `parser` and, if it fails, yields `value` without consuming any character of the stream. Equivalent to `parser.or(Parsimmon.of(value))`.
+Returns a new parser which tries `parser` and, if it fails, yields `value` without consuming any input. Equivalent to `parser.or(Parsimmon.of(value))`.
 
 ```js
 var digitOrZero = Parsimmon.digit.fallback('0');
@@ -466,7 +496,7 @@ Expects `parser` at least `n` times. Yields an array of the results.
 Yields an object with `start`, `value`, and `end` keys,
 where `value` is the original value yielded by the parser, and `start` and
 `end` are are objects with a 0-based `offset` and 1-based `line` and
-`column` properties that represent the position in the stream that
+`column` properties that represent the position in the input that
 contained the parsed text. Works like this function:
 
 ```javascript
@@ -570,3 +600,27 @@ See `parser.chain(newParserFunc)` defined earlier.
 ## parser.of(result)
 
 Equivalent to `Parsimmon.of(result)`.
+
+# Tips
+
+For the sake of readability in your own parsers, it's recommended to either create a shortcut for the Parsimmon library:
+
+```javascript
+var P = Parsimmon;
+var parser P.sepBy(P.digits, P.whitespace);
+```
+
+Or to create shortcuts for the Parsimmon values you intend to use:
+
+```javascript
+var sepBy = Parsimmon.sepBy;
+var digits = Parsimmon.digits;
+var whitespace = Parsimmon.whitespace;
+var parser = sepBy(digits, whitespace);
+```
+
+Because it can become quite wordy to repeat Parsimmon everywhere:
+
+```javascript
+var parser = Parsimmon.sepBy(Parsimmon.digits, Parsimmon.whitespace);
+```
