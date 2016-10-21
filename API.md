@@ -607,7 +607,7 @@ For the sake of readability in your own parsers, it's recommended to either crea
 
 ```javascript
 var P = Parsimmon;
-var parser P.sepBy(P.digits, P.whitespace);
+var parser = P.sepBy(P.digits, P.whitespace);
 ```
 
 Or to create shortcuts for the Parsimmon values you intend to use:
