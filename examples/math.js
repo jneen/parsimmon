@@ -136,11 +136,11 @@ var Basic =
 // Now we can describe the operators in order by precedence. You just need to
 // re-order the table.
 var table = [
+  {type: PREFIX, ops: operators({Negate: '-'})},
+  {type: POSTFIX, ops: operators({Factorial: '!'})},
   {type: BINARY_RIGHT, ops: operators({Exponentiate: '^'})},
   {type: BINARY_LEFT, ops: operators({Multiply: '*', Divide: '/'})},
   {type: BINARY_LEFT, ops: operators({Add: '+', Subtract: '-'})},
-  {type: PREFIX, ops: operators({Negate: '-'})},
-  {type: POSTFIX, ops: operators({Factorial: '!'})}
 ];
 
 // Start off with Num as the base parser for numbers and thread that through the
@@ -152,11 +152,11 @@ var tableParser =
 
 // The above is equivalent to:
 //
-// POSTFIX(operators({...}),
-//   PREFIX(operators({...}),
-//     BINARY_LEFT(operators({...})),
-//       BINARY_LEFT(operators({...}),
-//         BINARY_RIGHT(operators({...}), Num))))
+// TYPE(operators({...}),
+//   TYPE(operators({...}),
+//     TYPE(operators({...})),
+//       TYPE(operators({...}),
+//         TYPE(operators({...}), ...))))
 //
 // But it's easier if to see what's going on and reorder the precedence if we
 // keep it in a table instead of nesting it all manually.
