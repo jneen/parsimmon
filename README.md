@@ -44,11 +44,19 @@ Calling `.parse(string)` on a parser parses the string and returns an object wit
 
 The error object can be passed along with the original source to `Parsimmon.formatError(source, error)` to obtain a human-readable error string.
 
-<a href="https://github.com/fantasyland/fantasy-land"><img align="right" alt="Fantasy Land" src="https://github.com/fantasyland/fantasy-land/raw/master/logo.png"></a>
+## Questions
+
+Feel free to ask a question by filing a GitHub Issue. I'm happy to help point you in the right direction with the library, and hopefully improve the documentation so less people get confused in the future.
+
+## Contributing
+
+Contributions are *not* just pull requests. Issues clearly describing bugs or confusing parts of Parsimmon are welcome! Also, documentation enhancements and examples are very desirable. Feeling overwhelmed about contributing? Open an issue about what you want to contribute and I'm happy to help you through to completion!
 
 ## Performance
 
 Thanks to [@bd82][] we have a good [benchmark comparing Parsimmon CPU performance to several other parser libraries][perf] with a simple JSON parser example.
+
+<a href="https://github.com/fantasyland/fantasy-land"><img align="right" alt="Fantasy Land" src="https://github.com/fantasyland/fantasy-land/raw/master/logo.png"></a>
 
 ## Fantasyland
 
