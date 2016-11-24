@@ -510,12 +510,13 @@
         }
       });
     } else if (x instanceof RegExp) {
+      assertRegexp(x);
       var regexp = RegExp('^(?:' + x.source + ')', flags(x));
       return Parsimmon(function(str, i) {
         if (regexp.test(str.slice(i))) {
-          return Parsimmon.makeSuccess(i, '');
+          return makeSuccess(i, '');
         }
-        return Parsimmon.makeFailure(i, '' + regexp);
+        return makeFailure(i, '' + regexp);
       });
     }
     throw new Error('not a string or regexp: '+x);

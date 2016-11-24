@@ -155,11 +155,10 @@ suite('parser', function() {
       assert.deepEqual(answer.value, ['abc', '', 'd']);
     });
     test('raises error if argument is not string or regexp', function() {
-      try {
-        lookahead(new Object());
-      } catch (err) {
-        true;
-      }
+      assert.throws(function() {lookahead({});});
+      assert.throws(function() {lookahead([]);});
+      assert.throws(function() {lookahead(true);});
+      assert.throws(function() {lookahead(12);});
     });
   });
 
