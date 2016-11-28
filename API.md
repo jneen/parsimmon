@@ -26,7 +26,7 @@ You can add a primitive parser (similar to the included ones) by using `Parsimmo
 function notChar(char) {
   return Parsimmon(function(input, i) {
     if (input.charAt(i) !== char) {
-      return Parsimmon.makeSuccess(i + 1, str.charAt(i));
+      return Parsimmon.makeSuccess(i + 1, input.charAt(i));
     }
     return Parsimmon.makeFailure(i, 'anything different than "' + char + '"');
   });
