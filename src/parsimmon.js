@@ -425,6 +425,9 @@
     });
   };
 
+  _.lookahead = function(x) {
+    return this.skip(lookahead(x));
+  };
   _.desc = function(expected) {
     var self = this;
     return Parsimmon(function(input, i) {
@@ -492,6 +495,31 @@
     return Parsimmon(function(input, i) {
       return makeFailure(i, expected);
     });
+  }
+
+  function lookahead(x) {
+    if (typeof x === 'string') {
+      // similar to string, but does not consume
+      return Parsimmon(function(input, i) {
+        var j = i + x.length;
+        var head = input.slice(i, j);
+        if (head === x) {
+          return makeSuccess(i, '');
+        } else {
+          return makeFailure(i, x);
+        }
+      });
+    } else if (x instanceof RegExp) {
+      assertRegexp(x);
+      var regexp = RegExp('^(?:' + x.source + ')', flags(x));
+      return Parsimmon(function(str, i) {
+        if (regexp.test(str.slice(i))) {
+          return makeSuccess(i, '');
+        }
+        return makeFailure(i, '' + regexp);
+      });
+    }
+    throw new Error('not a string or regexp: '+x);
   }
 
   var any = Parsimmon(function(input, i) {
@@ -642,6 +670,7 @@
   Parsimmon.lazy = lazy;
   Parsimmon.letter = letter;
   Parsimmon.letters = letters;
+  Parsimmon.lookahead = lookahead;
   Parsimmon.makeFailure = makeFailure;
   Parsimmon.makeSuccess = makeSuccess;
   Parsimmon.noneOf = noneOf;

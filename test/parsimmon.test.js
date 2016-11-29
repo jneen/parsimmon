@@ -14,6 +14,7 @@ suite('parser', function() {
   var index = Parsimmon.index;
   var lazy = Parsimmon.lazy;
   var fail = Parsimmon.fail;
+  var lookahead = Parsimmon.lookahead;
 
   function equivalentParsers(p1, p2, inputs) {
     for (var i = 0; i < inputs.length; i++) {
@@ -118,6 +119,47 @@ suite('parser', function() {
     var input = '';
     var answer = Parsimmon.formatError(input, parser.parse(input));
     assert.deepEqual(answer, expectation);
+  });
+
+  suite('Parsimmon.lookahead', function() {
+    test('should handle string', function() {
+      lookahead('');
+    });
+    test('should handle regexp', function() {
+      lookahead(/./);
+    });
+    test('can be chained as prototype', function() {
+      var parser = seq(
+        string('abc').lookahead('d'),
+        string('d')
+      );
+      var answer = parser.parse('abcd');
+      assert.deepEqual(answer.value, ['abc', 'd']);
+    });
+    test('does not consume string', function() {
+      var parser = seq(
+        string('abc'),
+        lookahead('d'),
+        string('d')
+      );
+      var answer = parser.parse('abcd');
+      assert.deepEqual(answer.value, ['abc', '', 'd']);
+    });
+    test('does not consume regex', function() {
+      var parser = seq(
+        string('abc'),
+        lookahead(/d/),
+        string('d')
+      );
+      var answer = parser.parse('abcd');
+      assert.deepEqual(answer.value, ['abc', '', 'd']);
+    });
+    test('raises error if argument is not string or regexp', function() {
+      assert.throws(function() {lookahead({});});
+      assert.throws(function() {lookahead([]);});
+      assert.throws(function() {lookahead(true);});
+      assert.throws(function() {lookahead(12);});
+    });
   });
 
   test('Parsimmon.regex', function() {
