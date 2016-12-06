@@ -114,7 +114,7 @@ Parsimmon.seqMap(
     console.log(first);    // => 'a'
     console.log(operator); // => '+'
     console.log(second);   // => 'x'
-    retur [operator, first, second];
+    return [operator, first, second];
   }
 ).parse('a+x')
 ```
