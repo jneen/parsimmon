@@ -619,6 +619,8 @@ Equivalent to `Parsimmon.of(result)`.
 
 # Tips
 
+## Readability
+
 For the sake of readability in your own parsers, it's recommended to either create a shortcut for the Parsimmon library:
 
 ```javascript
@@ -639,4 +641,31 @@ Because it can become quite wordy to repeat Parsimmon everywhere:
 
 ```javascript
 var parser = Parsimmon.sepBy(Parsimmon.digits, Parsimmon.whitespace);
+```
+
+## Side effects
+
+Do not perform [side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) parser actions. This is potentially unsafe, as Parsimmon will backtrack between parsers, but there's no way to undo your side effects.
+
+Side effects include pushing to an array, modifying an object, or `console.log`.
+
+In this example, the parser `pVariable` is called twice on the same text because of `Parsimmon.alt` backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
+
+```js
+var x = 0;
+var variableNames = [];
+var pVariable =
+  Parsimmon.regexp(/[a-z]+/i)
+    .map(function(name) {
+      variableNames.push(name);
+      return name;
+    });
+var pDeclaration =
+  Parsimmon.alt(
+    Parsimmon.string('var ').then(pVariable).then(Parsimmon.string('\n')),
+    Parsimmon.string('var ').then(pVariable).then(Parsimmon.string(';'))
+  );
+pDeclaration.parse('var gummyBear;');
+console.log(variableNames);
+// => ['gummyBear', 'gummyBear']
 ```
