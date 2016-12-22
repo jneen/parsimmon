@@ -1,3 +1,10 @@
+## version 1.1.0 (???)
+
+* Adds `Parsimmon.lookahead(string)`
+* Adds `Parsimmon.lookahead(regexp)`
+* Adds `parser.lookahead(string)`
+* Adds `parser.lookahead(regexp)`
+
 ## version 1.0.0 (2016-11-02)
 
 * **BREAKING:** `parser.empty` is now a function (`parser.empty()`).

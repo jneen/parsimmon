@@ -85,6 +85,14 @@ Like `Parsimmon.regexp(regexp)`, but yields only the text in the specific regexp
 
 This is an alias for `Parsimmon.regexp`.
 
+## Parsimmon.lookahead(string)
+
+Returns a parser that looks for `string` but does not consume it. Yields an empty string.
+
+## Parsimmon.lookahead(regexp)
+
+Returns a parser that wants the input to match `regexp`. Yields an empty string.
+
 ## Parsimmon.succeed(result)
 
 Returns a parser that doesn't consume any input, and yields `result`.
@@ -469,6 +477,14 @@ Expects `otherParser` after `parser`, but yields the value of `parser`.
 var parserA = p1.skip(p2); // is equivalent to...
 var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x1; });
 ```
+
+## parser.lookahead(string)
+
+Returns a parser that looks for `string` but does not consume it. Yields the same result as `parser`. Equivalent to `parser.skip(Parsimmon.lookahead(string))`.
+
+## parser.lookahead(regexp)
+
+Returns a parser that wants the input to match `regexp`. Yields the same result as `parser`. Equivalent to `parser.skip(Parsimmon.lookahead(regexp))`.
 
 ## parser.many()
 
