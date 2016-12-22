@@ -1,4 +1,4 @@
-## version 1.1.0 (???)
+## version 1.1.0 (2016-12-21)
 
 * Adds `Parsimmon.lookahead(string)`
 * Adds `Parsimmon.lookahead(regexp)`
