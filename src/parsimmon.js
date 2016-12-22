@@ -463,6 +463,10 @@
     return s.slice(s.lastIndexOf('/') + 1);
   }
 
+  function anchoredRegexp(re) {
+    return RegExp('^(?:' + re.source + ')', flags(re));
+  }
+
   function regexp(re, group) {
     assertRegexp(re);
     if (arguments.length >= 2) {
@@ -470,7 +474,7 @@
     } else {
       group = 0;
     }
-    var anchored = RegExp('^(?:' + re.source + ')', flags(re));
+    var anchored = anchoredRegexp(re);
     var expected = '' + re;
     return Parsimmon(function(input, i) {
       var match = anchored.exec(input.slice(i));
@@ -511,7 +515,7 @@
       });
     } else if (x instanceof RegExp) {
       assertRegexp(x);
-      var regexp = RegExp('^(?:' + x.source + ')', flags(x));
+      var regexp = anchoredRegexp(x);
       return Parsimmon(function(str, i) {
         if (regexp.test(str.slice(i))) {
           return makeSuccess(i, '');
