@@ -1,4 +1,4 @@
-## version 1.2.0 (???)
+## version 1.2.0 (2016-12-22)
 
 * Adds `Parsimmon.lookahead(parser)`
 * Adds `parser.lookahead(anotherParser)`
