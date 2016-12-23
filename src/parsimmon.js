@@ -502,28 +502,19 @@
   }
 
   function lookahead(x) {
-    if (typeof x === 'string') {
-      // similar to string, but does not consume
+    if (isParser(x)) {
       return Parsimmon(function(input, i) {
-        var j = i + x.length;
-        var head = input.slice(i, j);
-        if (head === x) {
-          return makeSuccess(i, '');
-        } else {
-          return makeFailure(i, x);
-        }
+        var result = x._(input, i);
+        result.index = i;
+        result.value = '';
+        return result;
       });
+    } else if (typeof x === 'string') {
+      return lookahead(string(x));
     } else if (x instanceof RegExp) {
-      assertRegexp(x);
-      var regexp = anchoredRegexp(x);
-      return Parsimmon(function(str, i) {
-        if (regexp.test(str.slice(i))) {
-          return makeSuccess(i, '');
-        }
-        return makeFailure(i, '' + regexp);
-      });
+      return lookahead(regexp(x));
     }
-    throw new Error('not a string or regexp: '+x);
+    throw new Error('not a string, regexp, or parser: ' + x);
   }
 
   var any = Parsimmon(function(input, i) {

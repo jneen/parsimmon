@@ -1,3 +1,8 @@
+## version 1.2.0 (???)
+
+* Adds `Parsimmon.lookahead(parser)`
+* Adds `parser.lookahead(anotherParser)`
+
 ## version 1.1.0 (2016-12-21)
 
 * Adds `Parsimmon.lookahead(string)`

@@ -122,11 +122,14 @@ suite('parser', function() {
   });
 
   suite('Parsimmon.lookahead', function() {
-    test('should handle string', function() {
+    test('should handle a string', function() {
       lookahead('');
     });
-    test('should handle regexp', function() {
+    test('should handle a regexp', function() {
       lookahead(/./);
+    });
+    test('should handle a parser', function() {
+      lookahead(Parsimmon.digit);
     });
     test('can be chained as prototype', function() {
       var parser = seq(
@@ -136,7 +139,7 @@ suite('parser', function() {
       var answer = parser.parse('abcd');
       assert.deepEqual(answer.value, ['abc', 'd']);
     });
-    test('does not consume string', function() {
+    test('does not consume from a string', function() {
       var parser = seq(
         string('abc'),
         lookahead('d'),
@@ -145,7 +148,7 @@ suite('parser', function() {
       var answer = parser.parse('abcd');
       assert.deepEqual(answer.value, ['abc', '', 'd']);
     });
-    test('does not consume regex', function() {
+    test('does not consume from a regexp', function() {
       var parser = seq(
         string('abc'),
         lookahead(/d/),
@@ -154,11 +157,21 @@ suite('parser', function() {
       var answer = parser.parse('abcd');
       assert.deepEqual(answer.value, ['abc', '', 'd']);
     });
-    test('raises error if argument is not string or regexp', function() {
-      assert.throws(function() {lookahead({});});
-      assert.throws(function() {lookahead([]);});
-      assert.throws(function() {lookahead(true);});
-      assert.throws(function() {lookahead(12);});
+    test('does not consume from a parser', function() {
+      var weirdParser = Parsimmon.string('Q').or(Parsimmon.string('d'));
+      var parser = seq(
+        string('abc'),
+        lookahead(weirdParser),
+        string('d')
+      );
+      var answer = parser.parse('abcd');
+      assert.deepEqual(answer.value, ['abc', '', 'd']);
+    });
+    test('raises error if argument is not a string, regexp, or parser', function() {
+      assert.throws(function() { lookahead({}); });
+      assert.throws(function() { lookahead([]); });
+      assert.throws(function() { lookahead(true); });
+      assert.throws(function() { lookahead(12); });
     });
   });
 
