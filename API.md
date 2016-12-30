@@ -183,7 +183,7 @@ Accepts a function that returns a parser, which is evaluated the first time the 
 ```javascript
 var Value = Parsimmon.lazy(function() {
   return Parsimmon.alt(
-    Parsimmon.string('x'),
+    Parsimmon.string('X'),
     Parsimmon.string('(')
       .then(Value)
       .skip(Parsimmon.string(')'))
