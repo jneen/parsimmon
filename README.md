@@ -44,20 +44,20 @@ Calling `.parse(string)` on a parser parses the string and returns an object wit
 
 The error object can be passed along with the original source to `Parsimmon.formatError(source, error)` to obtain a human-readable error string.
 
-Note: If you prefer throwing an error when the parse failed, call [`.tryParse(string)`][api#parsertryparseinput] instead. The returned value will be the parsing result itself when succeeded.
+Note: If you prefer throwing an error when the parse failed, call [`.tryParse(string)`](API.md#parsertryparseinput) instead. The returned value will be the parsing result itself when succeeded.
 
 ## Common Functions
 
-- [`.string(string)`][api#parsimmonstringstring]
-- [`.regexp(regexp)`][api#parsimmonregexpregexp]
-- [`.seq(p1, p2, ...pn)`][api#parsimmonseqp1-p2-pn]
-- [`.sepBy(content, separator)`][api#parsimmonsepbycontent]
-- [`.alt(p1, p2, ...pn)`][api#parsimmonaltp1-p2-pn]
-- [`.lazy(fn)`][api#parsimmonlazyfn]
-- [`.whitespace`][api#parsimmonwhitespace]
-- [`.index`][api#parsimmonindex]
-- [`parser.map(fn)`][api#parsermapfn]
-- [`parser.skip(otherParser)`][api#parserskipotherparser]
+- [`.string(string)`](API.md#parsimmonstringstring)
+- [`.regexp(regexp)`](API.md#parsimmonregexpregexp)
+- [`.seq(p1, p2, ...pn)`](API.md#parsimmonseqp1-p2-pn)
+- [`.sepBy(content, separator)`](API.md#parsimmonsepbycontent)
+- [`.alt(p1, p2, ...pn)`](API.md#parsimmonaltp1-p2-pn)
+- [`.lazy(fn)`](API.md#parsimmonlazyfn)
+- [`.whitespace`](API.md#parsimmonwhitespace)
+- [`.index`](API.md#parsimmonindex)
+- [`parser.map(fn)`](API.md#parsermapfn)
+- [`parser.skip(otherParser)`](API.md#parserskipotherparser)
 
 ## Questions
 
