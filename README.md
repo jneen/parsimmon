@@ -44,13 +44,32 @@ Calling `.parse(string)` on a parser parses the string and returns an object wit
 
 The error object can be passed along with the original source to `Parsimmon.formatError(source, error)` to obtain a human-readable error string.
 
+Note: If you prefer throwing an error when the parse failed, call [`.tryParse(string)`][api#parsertryparseinput] instead. The returned value will be the parsing result itself when succeeded.
+
+## Common Functions
+
+- [`.string(string)`][api#parsimmonstringstring]
+- [`.regexp(regexp)`][api#parsimmonregexpregexp]
+- [`.seq(p1, p2, ...pn)`][api#parsimmonseqp1-p2-pn]
+- [`.sepBy(content, separator)`][api#parsimmonsepbycontent]
+- [`.alt(p1, p2, ...pn)`][api#parsimmonaltp1-p2-pn]
+- [`.lazy(fn)`][api#parsimmonlazyfn]
+- [`.whitespace`][api#parsimmonwhitespace]
+- [`.index`][api#parsimmonindex]
+- [`parser.map(fn)`][api#parsermapfn]
+- [`parser.skip(otherParser)`][api#parserskipotherparser]
+
 ## Questions
 
 Feel free to ask a question by filing a GitHub Issue. I'm happy to help point you in the right direction with the library, and hopefully improve the documentation so less people get confused in the future.
 
 ## Contributing
 
-Contributions are *not* just pull requests. Issues clearly describing bugs or confusing parts of Parsimmon are welcome! Also, documentation enhancements and examples are very desirable. Feeling overwhelmed about contributing? Open an issue about what you want to contribute and I'm happy to help you through to completion!
+Contributions are *not* just pull requests.
+
+Issues clearly describing bugs or confusing parts of Parsimmon are welcome! Also, documentation enhancements and examples are very desirable.
+
+Feeling overwhelmed about contributing? Open an issue about what you want to contribute and I'm happy to help you through to completion!
 
 ## Performance
 
