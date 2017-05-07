@@ -85,6 +85,10 @@ Like `Parsimmon.regexp(regexp)`, but yields only the text in the specific regexp
 
 This is an alias for `Parsimmon.regexp`.
 
+## Parsimmon.notFollowedBy(parser)
+
+Parses using `parser`, but does not consume what it parses. Yields an empty string if the parser *does not match* the input. Otherwise it fails.
+
 ## Parsimmon.lookahead(parser)
 
 Parses using `parser`, but does not consume what it parses. Yields an empty string.
@@ -481,6 +485,10 @@ Expects `otherParser` after `parser`, but yields the value of `parser`.
 var parserA = p1.skip(p2); // is equivalent to...
 var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x1; });
 ```
+
+## parser.notFollowedBy(anotherParser)
+
+Returns a parser that looks for anything but whatever `anotherParser` wants to parse, and does not consume it. Yields the same result as `parser`. Equivalent to `parser.skip(Parsimmon.notFollowedBy(anotherParser))`.
 
 ## parser.lookahead(anotherParser)
 
