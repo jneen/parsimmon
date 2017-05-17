@@ -529,7 +529,7 @@
       var text = input.slice(i, result.index);
       return result.status
         ? makeFailure(i, 'not "' + text + '"')
-        : makeSuccess(i, '');
+        : makeSuccess(i, null);
     });
   }
 

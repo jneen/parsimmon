@@ -141,7 +141,7 @@ suite('parser', function() {
         string('d')
       );
       var answer = parser.parse('abcd');
-      assert.deepEqual(answer.value, ['abc', '', 'd']);
+      assert.deepEqual(answer.value, ['abc', null, 'd']);
     });
     test('can be chained from prototype', function() {
       var parser = seq(
