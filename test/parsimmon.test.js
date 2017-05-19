@@ -15,6 +15,7 @@ suite('parser', function() {
   var lazy = Parsimmon.lazy;
   var fail = Parsimmon.fail;
   var lookahead = Parsimmon.lookahead;
+  var notFollowedBy = Parsimmon.notFollowedBy;
 
   function equivalentParsers(p1, p2, inputs) {
     for (var i = 0; i < inputs.length; i++) {
@@ -121,6 +122,37 @@ suite('parser', function() {
     assert.deepEqual(answer, expectation);
   });
 
+  suite('Parsimmon.notFollowedBy', function() {
+    test('fails when its parser argument matches', function() {
+      var weirdParser = string('dx');
+      var parser = seq(
+        string('abc'),
+        notFollowedBy(weirdParser).result('NOT USED'),
+        string('dx')
+      );
+      var answer = parser.parse('abcdx');
+      assert.deepEqual(answer.expected, ['not "dx"']);
+    });
+    test('does not consume from its input', function() {
+      var weirdParser = string('Q');
+      var parser = seq(
+        string('abc'),
+        notFollowedBy(weirdParser),
+        string('d')
+      );
+      var answer = parser.parse('abcd');
+      assert.deepEqual(answer.value, ['abc', null, 'd']);
+    });
+    test('can be chained from prototype', function() {
+      var parser = seq(
+        string('abc').notFollowedBy(string('Q')),
+        string('d')
+      );
+      var answer = parser.parse('abcd');
+      assert.deepEqual(answer.value, ['abc', 'd']);
+    });
+  });
+
   suite('Parsimmon.lookahead', function() {
     test('should handle a string', function() {
       lookahead('');
@@ -225,7 +257,7 @@ suite('parser', function() {
     var parser =
         seq(
           string('('),
-          regex(/[^\)]/).many().map(function(xs) {
+          regex(/[^)]/).many().map(function(xs) {
             return xs.join('');
           }),
           string(')')
@@ -245,7 +277,7 @@ suite('parser', function() {
           line: 1,
           column: 8
         },
-        expected: ['\')\'', '/[^\\)]/']
+        expected: ['\')\'', '/[^)]/']
       }
       );
 

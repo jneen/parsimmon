@@ -1,3 +1,8 @@
+## version 1.3.0 (2017-??-??)
+
+* Adds `Parsimmon.notFollowedBy(parser)`
+* Adds `parser.notFollowedBy(anotherParser)`
+
 ## version 1.2.0 (2016-12-22)
 
 * Adds `Parsimmon.lookahead(parser)`
