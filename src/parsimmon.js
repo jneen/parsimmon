@@ -238,6 +238,21 @@
     });
   }
 
+  function createLanguage(parsers) {
+    var language = {};
+    for (var key in parsers) {
+      if ({}.hasOwnProperty.call(parsers, key)) {
+        (function(key) {
+          var func = function() {
+            return parsers[key](language);
+          };
+          language[key] = lazy(func);
+        }(key));
+      }
+    }
+    return language;
+  }
+
   /**
    * Allows to add custom primitive parsers
    */
@@ -283,6 +298,10 @@
   // -*- primitive combinators -*- //
   _.or = function(alternative) {
     return alt(this, alternative);
+  };
+
+  _.thru = function(wrapper) {
+    return wrapper(this);
   };
 
   _.then = function(next) {
@@ -420,6 +439,17 @@
       return {
         start: start,
         value: value,
+        end: end
+      };
+    });
+  };
+
+  _.node = function(name) {
+    return seqMap(index, this, index, function(start, value, end) {
+      return {
+        name: name,
+        value: value,
+        start: start,
         end: end
       };
     });
@@ -667,6 +697,7 @@
   var optWhitespace = regexp(/\s*/).desc('optional whitespace');
   var whitespace = regexp(/\s+/).desc('whitespace');
 
+  Parsimmon.createLanguage = createLanguage;
   Parsimmon.all = all;
   Parsimmon.alt = alt;
   Parsimmon.any = any;

@@ -16,6 +16,41 @@ A parser is said to *consume* the text that it parses, leaving only the unconsum
 
 These are either parsers or functions that return new parsers. These are the building blocks of parsers. They are all contained in the `Parsimmon` object.
 
+## Parsimmon.createLanguage(parsers)
+
+`createLanguage` is the best starting point for building a language parser in Parsimmon. It organizes all of your parsers, collects them into a single namespace, and removes the need to worry about using `Parsimmon.lazy`.
+
+Each function passed to `createLanguage` receives as its only parameter the entire language of parsers as an object. This is used for referring to other rules from within your current rule.
+
+Example:
+
+```js
+var Lang = Parsimmon.createLanguage({
+  Value: function(r) {
+    return Parsimmon.alt(
+      r.Number,
+      r.Symbol,
+      r.List
+    );
+  },
+  Number: function() {
+    return Parsimmon.regexp(/[0-9]+/).map(Number);
+  },
+  Symbol: function() {
+    return Parsimmon.regexp(/[a-z]+/);
+  },
+  List: function(r) {
+    return Parsimmon.string('(')
+      .then(Parsimmon.sepBy(r.Value, r._))
+      .skip(Parsimmon.string(')'));
+  },
+  _: function() {
+    return Parsimmon.optWhitespace;
+  }
+});
+Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
+```
+
 ## Parsimmon(fn)
 
 **NOTE:** You probably will never need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`.
@@ -181,6 +216,8 @@ Parsimmon.sepBy(
 This is the same as `Parsimmon.sepBy`, but matches the `content` parser **at least once**.
 
 ## Parsimmon.lazy(fn)
+
+**NOTE:** This is not needed if you're using `createLanguage`.
 
 Accepts a function that returns a parser, which is evaluated the first time the parser is used. This is useful for referencing parsers that haven't yet been defined, and for implementing recursive parsers. Example:
 
@@ -523,29 +560,71 @@ Expects `parser` at most `n` times. Yields an array of the results.
 
 Expects `parser` at least `n` times. Yields an array of the results.
 
-## parser.mark()
+## parser.node(name)
 
-Yields an object with `start`, `value`, and `end` keys,
-where `value` is the original value yielded by the parser, and `start` and
-`end` are are objects with a 0-based `offset` and 1-based `line` and
-`column` properties that represent the position in the input that
-contained the parsed text. Works like this function:
+Yields an object with `name`, `value`, `start`, and `end` keys, where `value` is the original value yielded by the parser, `name` is the argument passed in, and `start` and `end` are are objects with a 0-based `offset` and 1-based `line` and `column` properties that represent the position in the input that contained the parsed text.
+
+Example:
 
 ```javascript
-function mark(parser) {
-  return Parsimmon.seqMap(
-    Parsimmon.index,
-    parser,
-    Parsimmon.index,
-    function(start, value, end) {
-      return {
-        start: start,
-        value: value,
-        end: end
-      };
-    }
-  );
+var Identifier =
+  Parsimmon.regexp(/[a-z]+/).node('Identifier');
+
+Identifier.tryParse('hey');
+// => { name: 'Identifier',
+//      value: 'hey',
+//      start: { offset: 0, line: 1, column: 1 },
+//      end: { offset: 3, line: 1, column: 4 } }
+```
+
+## parser.mark()
+
+Yields an object with `start`, `value`, and `end` keys, where `value` is the original value yielded by the parser, and `start` and `end` are are objects with a 0-based `offset` and 1-based `line` and `column` properties that represent the position in the input that contained the parsed text. Works like this function:
+
+```javascript
+var Identifier =
+  Parsimmon.regexp(/[a-z]+/).mark();
+
+Identifier.tryParse('hey');
+// => { start: { offset: 0, line: 1, column: 1 },
+//      value: 'hey',
+//      end: { offset: 3, line: 1, column: 4 } }
+```
+
+## parser.thru(wrapper)
+
+Simply returns `wrapper(this)` from the parser. Useful for custom functions used to wrap your parsers, while keeping with Parsimmon chaining style.
+
+Example:
+
+```js
+function makeNode(name) {
+  return function(parser) {
+    return Parsimmon.seqMap(
+      Parsimmon.index,
+      parser,
+      Parsimmon.index,
+      function(start, value, end) {
+        return Object.freeze({
+          type: 'myLanguage.' + name,
+          value: value,
+          start: start,
+          end: end
+        });
+      }
+    );
+  };
 }
+
+var Identifier =
+  Parsimmon.regexp(/[a-z]+/)
+    .thru(makeNode('Identifier'));
+
+Identifier.tryParse('hey');
+// => { type: 'myLanguage.Identifier',
+//      value: 'hey',
+//      start: { offset: 0, line: 1, column: 1 },
+//      end: { offset: 3, line: 1, column: 4 } }
 ```
 
 ## parser.desc(description)
