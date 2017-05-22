@@ -1,11 +1,9 @@
-var fs = require('fs');
-var path = require('path');
 var util = require('util');
-var P = require('../src/parsimmon');
+var P = require('..');
 
 ///////////////////////////////////////////////////////////////////////
 
-// Turn escaped characters into real ones (e.g. "\\n" becoems "\n").
+// Turn escaped characters into real ones (e.g. "\\n" becomes "\n").
 function interpretEscapes(str) {
   var escapes = {
     b: '\b',
@@ -96,18 +94,27 @@ var object =
 
 ///////////////////////////////////////////////////////////////////////
 
-var source = process.argv[2] || path.resolve(__dirname, '..', 'package.json');
-var result = json.parse(fs.readFileSync(source, 'utf-8'));
+var text = `\
+{
+  "id": "a thing\\nice\tab",
+  "another property!"
+    : "also cool"
+  , "weird formatting is ok too........😂": 123.45e1,
+  "": [
+    true, false, null,
+    "",
+    " ",
+    {},
+    {"": {}}
+  ]
+}
+`;
 
 function prettyPrint(x) {
-  console.log(util.inspect(x, {depth: null, colors: 'auto'}));
+  var opts = {depth: null, colors: 'auto'};
+  var s = util.inspect(x, opts);
+  console.log(s);
 }
 
-if (result.status) {
-  prettyPrint(result.value);
-} else {
-  console.log('Parse failure');
-  console.log('=============');
-  console.log();
-  prettyPrint(result);
-}
+var ast = json.tryParse(text);
+prettyPrint(ast);
