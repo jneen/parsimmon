@@ -1,6 +1,5 @@
-var fs = require('fs');
 var util = require('util');
-var P = require('../src/parsimmon');
+var P = require('../');
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -38,18 +37,15 @@ var Lisp = spaced(LExpression);
 
 ///////////////////////////////////////////////////////////////////////
 
-var source = process.argv[2];
-var result = Lisp.parse(fs.readFileSync(source, 'utf-8'));
+var text = `\
+(list 1 2 (cons 1 (list)))
+`;
 
 function prettyPrint(x) {
-  console.log(util.inspect(x, {depth: null, colors: 'auto'}));
+  var opts = {depth: null, colors: 'auto'};
+  var s = util.inspect(x, opts);
+  console.log(s);
 }
 
-if (result.status) {
-  prettyPrint(result.value);
-} else {
-  console.log('Parse failure');
-  console.log('=============');
-  console.log();
-  prettyPrint(result);
-}
+var ast = Lisp.tryParse(text);
+prettyPrint(ast);

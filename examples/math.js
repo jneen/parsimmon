@@ -1,6 +1,5 @@
-var fs = require('fs');
 var util = require('util');
-var P = require('../src/parsimmon');
+var P = require('..');
 
 // This parser supports basic math with + - * / ^, unary negation, factorial,
 // and parentheses. It does not evaluate the math, just turn it into a series of
@@ -166,18 +165,15 @@ var MyMath = spaced(tableParser);
 
 ///////////////////////////////////////////////////////////////////////
 
-var source = process.argv[2];
-var result = MyMath.parse(fs.readFileSync(source, 'utf-8'));
+var text = `\
+2 + 3 * 4 / 1 - 3 ^ (2!)
+`;
 
 function prettyPrint(x) {
-  console.log(util.inspect(x, {depth: null, colors: 'auto'}));
+  var opts = {depth: null, colors: 'auto'};
+  var s = util.inspect(x, opts);
+  console.log(s);
 }
 
-if (result.status) {
-  prettyPrint(result.value);
-} else {
-  console.log('Parse failure');
-  console.log('=============');
-  console.log();
-  prettyPrint(result);
-}
+var ast = MyMath.tryParse(text);
+prettyPrint(ast);
