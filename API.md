@@ -87,7 +87,7 @@ This is an alias for `Parsimmon.regexp`.
 
 ## Parsimmon.notFollowedBy(parser)
 
-Parses using `parser`, but does not consume what it parses. Yields an empty string if the parser *does not match* the input. Otherwise it fails.
+Parses using `parser`, but does not consume what it parses. Yields `null` if the parser *does not match* the input. Otherwise it fails.
 
 ## Parsimmon.lookahead(parser)
 
