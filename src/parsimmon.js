@@ -238,6 +238,7 @@
     });
   }
 
+  // Revisit this with Object.keys and .bind when we drop ES3 support.
   function createLanguage(parsers) {
     var language = {};
     for (var key in parsers) {
