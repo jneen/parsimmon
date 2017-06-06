@@ -431,8 +431,15 @@
   };
   _['fantasy-land/map'] = _.map;
 
-  _.skip = function(next) {
-    return seq(this, next).map(function(results) { return results[0]; });
+  _.skip = function(next, fn) {
+    var numArgs = arguments.length;
+    return seq(this, next).map(function(results) {
+      if (numArgs >= 2) {
+        assertFunction(fn);
+        fn.call(null, results[1]);
+      }
+      return results[0];
+    });
   };
 
   _.mark = function() {
