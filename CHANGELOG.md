@@ -1,3 +1,8 @@
+## version 1.4.0 (2017-06-05)
+* Adds `Parsimmon.createLanguage(parsers)`
+* Adds `parser.thru(wrapper)`
+* Adds `parser.node(name)`
+
 ## version 1.3.0 (2017-05-28)
 
 * Adds `Parsimmon.notFollowedBy(parser)`
