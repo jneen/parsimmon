@@ -1,5 +1,7 @@
-var util = require('util');
-var P = require('..');
+// Run me with Node to see my output!
+
+let util = require('util');
+let P = require('..');
 
 // This parser supports basic math with + - * / ^, unary negation, factorial,
 // and parentheses. It does not evaluate the math, just turn it into a series of
@@ -15,7 +17,9 @@ var P = require('..');
 
 // Returns a new parser that ignores whitespace before and after the parser.
 function spaced(parser) {
-  return P.optWhitespace.then(parser).skip(P.optWhitespace);
+  return P.optWhitespace
+    .then(parser)
+    .skip(P.optWhitespace);
 }
 
 // Operators should allow whitespace around them, but not require it. This
@@ -26,10 +30,8 @@ function spaced(parser) {
 // Gives back an operator that parses either + or - surrounded by optional
 // whitespace, and gives back the word "Add" or "Sub" instead of the character.
 function operators(ops) {
-  var keys = Object.keys(ops).sort();
-  var ps = keys.map(function(k) {
-    return spaced(P.string(ops[k])).result(k);
-  });
+  let keys = Object.keys(ops).sort();
+  let ps = keys.map(k => P.string(ops[k]).thru(spaced).result(k));
   return P.alt.apply(null, ps);
 }
 
@@ -38,7 +40,7 @@ function operators(ops) {
 // Note that the parser is created using `P.lazy` because it's recursive. It's
 // valid for there to be zero occurrences of the prefix operator.
 function PREFIX(operatorsParser, nextParser) {
-  var parser = P.lazy(function() {
+  let parser = P.lazy(() => {
     return P.seq(operatorsParser, parser).or(nextParser);
   });
   return parser;
@@ -66,11 +68,8 @@ function POSTFIX(operatorsParser, nextParser) {
   return P.seqMap(
     nextParser,
     operatorsParser.many(),
-    function(x, suffixes) {
-      return suffixes.reduce(function(acc, x) {
-        return [x, acc];
-      }, x);
-    }
+    (x, suffixes) =>
+      suffixes.reduce((acc, x) => [x, acc], x)
   );
 }
 
@@ -79,11 +78,15 @@ function POSTFIX(operatorsParser, nextParser) {
 // that parses as many binary operations as possible, associating them to the
 // right. (e.g. 1^2^3 is 1^(2^3) not (1^2)^3)
 function BINARY_RIGHT(operatorsParser, nextParser) {
-  var parser = P.lazy(function() {
-    return nextParser.chain(function(next) {
-      return P.seq(operatorsParser, P.of(next), parser).or(P.of(next));
-    });
-  });
+  let parser = P.lazy(() =>
+    nextParser.chain(next =>
+      P.seq(
+        operatorsParser,
+        P.of(next),
+        parser
+      ).or(P.of(next))
+    )
+  );
   return parser;
 }
 
@@ -105,10 +108,9 @@ function BINARY_LEFT(operatorsParser, nextParser) {
   return P.seqMap(
     nextParser,
     P.seq(operatorsParser, nextParser).many(),
-    function(first, rest) {
-      return rest.reduce(function(acc, ch) {
-        var op = ch[0];
-        var another = ch[1];
+    (first, rest) => {
+      return rest.reduce((acc, ch) => {
+        let [op, another] = ch;
         return [op, acc, another];
       }, first);
     }
@@ -118,23 +120,23 @@ function BINARY_LEFT(operatorsParser, nextParser) {
 // Just match simple integers and turn them into JavaScript numbers. Wraps it up
 // in an array with a string tag so that our data is easy to manipulate at the
 // end and we don't have to use `typeof` to check it.
-var Num =
+let Num =
   P.regexp(/[0-9]+/)
-    .map(function(str) { return ['Number', +str]; })
+    .map(str => ['Number', +str])
     .desc('number');
 
 // A basic value is any parenthesized expression or a number.
-var Basic =
-  P.lazy(function() {
-    return P.string('(')
+let Basic =
+  P.lazy(() =>
+    P.string('(')
       .then(MyMath)
       .skip(P.string(')'))
-      .or(Num);
-  });
+      .or(Num)
+  );
 
 // Now we can describe the operators in order by precedence. You just need to
 // re-order the table.
-var table = [
+let table = [
   {type: PREFIX, ops: operators({Negate: '-'})},
   {type: POSTFIX, ops: operators({Factorial: '!'})},
   {type: BINARY_RIGHT, ops: operators({Exponentiate: '^'})},
@@ -144,10 +146,11 @@ var table = [
 
 // Start off with Num as the base parser for numbers and thread that through the
 // entire table of operator parsers.
-var tableParser =
-  table.reduce(function(acc, level) {
-    return level.type(level.ops, acc);
-  }, Basic);
+let tableParser =
+  table.reduce(
+    (acc, level) => level.type(level.ops, acc),
+    Basic
+  );
 
 // The above is equivalent to:
 //
@@ -161,19 +164,19 @@ var tableParser =
 // keep it in a table instead of nesting it all manually.
 
 // This is our version of a math expression.
-var MyMath = spaced(tableParser);
+let MyMath = spaced(tableParser);
 
 ///////////////////////////////////////////////////////////////////////
 
-var text = `\
+let text = `\
 2 + 3 * 4 / 1 - 3 ^ (2!)
 `;
 
 function prettyPrint(x) {
-  var opts = {depth: null, colors: 'auto'};
-  var s = util.inspect(x, opts);
+  let opts = {depth: null, colors: 'auto'};
+  let s = util.inspect(x, opts);
   console.log(s);
 }
 
-var ast = MyMath.tryParse(text);
+let ast = MyMath.tryParse(text);
 prettyPrint(ast);
