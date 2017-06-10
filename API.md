@@ -41,7 +41,7 @@ var Lang = Parsimmon.createLanguage({
   },
   List: function(r) {
     return Parsimmon.string('(')
-      .then(Parsimmon.sepBy(r.Value, r._))
+      .then(r.Value.sepBy(r._))
       .skip(Parsimmon.string(')'));
   },
   _: function() {
@@ -195,25 +195,11 @@ In the second case, `Parsimmon.alt` matches on the first parser, then there are 
 
 ## Parsimmon.sepBy(content, separator)
 
-Accepts two parsers, and expects zero or more matches for `content`, separated by `separator`, yielding an array. Example:
-
-```javascript
-Parsimmon.sepBy(
-  Parsimmon.oneOf('abc'),
-  Parsimmon.string('|')
-).parse('a|b|c|c|c|a');
-// => {status: true, value: ['a', 'b', 'c', 'c', 'c', 'a']}
-
-Parsimmon.sepBy(
-  Parsimmon.oneOf('XYZ'),
-  Parsimmon.string('-')
-).parse('');
-// => {status: true, value: []}
-```
+See `parser.sepBy(separator)`.
 
 ## Parsimmon.sepBy1(content, separator)
 
-This is the same as `Parsimmon.sepBy`, but matches the `content` parser **at least once**.
+See `parser.sepBy1(separator)`.
 
 ## Parsimmon.lazy(fn)
 
@@ -407,7 +393,7 @@ parser.parse('ccc');
 Like `parser.parse(input)` but either returns the parsed value or throws an error on failure. The error object contains additional properties about the error.
 
 ```javascript
-var parser = Parsimmon.sepBy1(Parsimmon.letters, Parsimmon.whitespace);
+var parser = Parsimmon.letters.sepBy1(Parsimmon.whitespace);
 
 parser.tryParse('foo bar baz');
 // => ['foo', 'bar', 'baz']
@@ -704,6 +690,30 @@ Parsimmon.digit
 // => {status: true, value: 5}
 ```
 
+## parser.sepBy(separator)
+
+Equivalent to `Parsimmon.sepBy(parser, separator)`.
+
+Expects zero or more matches for `parser`, separated by the parser `separator`, yielding an array. Example:
+
+```javascript
+Parsimmon.oneOf('abc')
+  .sepBy(Parsimmon.string('|'))
+  .parse('a|b|c|c|c|a');
+// => {status: true, value: ['a', 'b', 'c', 'c', 'c', 'a']}
+
+Parsimmon.oneOf('XYZ'),
+  .sepBy(Parsimmon.string('-'))
+  .parse('');
+// => {status: true, value: []}
+```
+
+## parser.sepBy1(separator)
+
+Equivalent to `Parsimmon.sepBy1(parser, separator)`.
+
+This is the same as `Parsimmon.sepBy`, but matches the `content` parser **at least once**.
+
 ## parser.chain(newParserFunc)
 
 See `parser.chain(newParserFunc)` defined earlier.
@@ -720,16 +730,14 @@ For the sake of readability in your own parsers, it's recommended to either crea
 
 ```javascript
 var P = Parsimmon;
-var parser = P.sepBy(P.digits, P.whitespace);
+var parser = P.digits.sepBy(P.whitespace);
 ```
 
-Or to create shortcuts for the Parsimmon values you intend to use:
+Or to create shortcuts for the Parsimmon values you intend to use (when using Babel):
 
 ```javascript
-var sepBy = Parsimmon.sepBy;
-var digits = Parsimmon.digits;
-var whitespace = Parsimmon.whitespace;
-var parser = sepBy(digits, whitespace);
+import { digits, whitespace } from 'parsimmon';
+var parser = digits.sepBy(whitespace);
 ```
 
 Because it can become quite wordy to repeat Parsimmon everywhere:
@@ -737,6 +745,8 @@ Because it can become quite wordy to repeat Parsimmon everywhere:
 ```javascript
 var parser = Parsimmon.sepBy(Parsimmon.digits, Parsimmon.whitespace);
 ```
+
+For clarity's sake, however, `Parsimmon` will refer to the Parsimmon library itself, and `parser` will refer to a parser being used as an object in a method, like `P.string('9')` in `P.string('9').map(Number)`.
 
 ## Side effects
 
