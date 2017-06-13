@@ -1,4 +1,10 @@
+## version 1.5.0 (????-??-??)
+
+* Adds `parser.sepBy(separator)` alias for `Parsimmon.sepBy(parser, separator)`
+* Adds `parser.sepBy1(separator)` alias for `Parsimmon.sepBy1(parser, separator)`
+
 ## version 1.4.0 (2017-06-05)
+
 * Adds `Parsimmon.createLanguage(parsers)`
 * Adds `parser.thru(wrapper)`
 * Adds `parser.node(name)`
