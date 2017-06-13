@@ -826,6 +826,84 @@ suite('parser', function() {
     });
   });
 
+  suite('parser.tie()', function() {
+    test('concatenates all the results', function() {
+      var parser = Parsimmon.seq(
+        Parsimmon.string('<| '),
+        Parsimmon.letter,
+        Parsimmon.digit,
+        Parsimmon.string(' |>')
+      ).tie();
+      var text = '<| o7 |>';
+      var result = parser.tryParse(text);
+      assert.strictEqual(result, text);
+    });
+
+    test('only accept array of string parsers', function() {
+      assert.throws(function() {
+        Parsimmon.of(1).tie().tryParse('');
+      });
+      assert.throws(function() {
+        Parsimmon.of([1]).tie().tryParse('');
+      });
+      assert.throws(function() {
+        Parsimmon.of(['1', 2]).tie().tryParse('');
+      });
+      assert.doesNotThrow(function() {
+        Parsimmon.of(['1']).tie().tryParse('');
+      });
+    });
+  });
+
+  suite('Parsimmon.range', function() {
+    var codes = {
+      a: 'a'.charCodeAt(0),
+      z: 'z'.charCodeAt(0),
+      MIN: 0,
+      MAX: 65535,
+    };
+    var a2z = Parsimmon.range('a', 'z');
+
+    test('should reject characters before the range', function() {
+      for (var i = codes.MIN; i < codes.a; i++) {
+        var s = String.fromCharCode(i);
+        assert.strictEqual(a2z.parse(s).status, false);
+      }
+    });
+
+    test('should reject characters after the range', function() {
+      for (var i = codes.z + 1; i <= codes.MAX; i++) {
+        var s = String.fromCharCode(i);
+        assert.strictEqual(a2z.parse(s).status, false);
+      }
+    });
+
+    test('should accept characters in the range', function() {
+      for (var i = codes.a; i <= codes.z; i++) {
+        var s = String.fromCharCode(i);
+        assert.strictEqual(a2z.parse(s).status, true);
+      }
+    });
+  });
+
+  suite('parser.trim', function() {
+    test('should remove stuff from the begin and end', function() {
+      var parser = Parsimmon.letters.trim(Parsimmon.whitespace);
+      var value = parser.tryParse('\t\n NICE    \t\t ');
+      assert.strictEqual(value, 'NICE');
+    });
+  });
+
+  suite('parser.wrap', function() {
+    test('should remove different stuff from the begin and end', function() {
+      var lParen = Parsimmon.string('(');
+      var rParen = Parsimmon.string(')');
+      var parser = Parsimmon.letters.wrap(lParen, rParen);
+      var value = parser.tryParse('(heyyy)');
+      assert.strictEqual(value, 'heyyy');
+    });
+  });
+
   suite('then', function() {
     test('with a parser, uses the last return value', function() {
       var parser = string('x').then(string('y'));
