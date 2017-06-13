@@ -17,8 +17,12 @@ function interpretEscapes(str) {
   return str.replace(/\\(u[0-9a-fA-F]{4}|[^u])/, (_, escape) => {
     let type = escape.charAt(0);
     let hex = escape.slice(1);
-    if (type === 'u') return String.fromCharCode(parseInt(hex, 16));
-    if (escapes.hasOwnProperty(type)) return escapes[type];
+    if (type === 'u') {
+      return String.fromCharCode(parseInt(hex, 16));
+    }
+    if (escapes.hasOwnProperty(type)) {
+      return escapes[type];
+    }
     return type;
   });
 }
@@ -81,7 +85,7 @@ let JSONParser = P.createLanguage({
   // they can contain any other JSON document within them.
   array: r =>
     r.lbracket
-      .then(P.sepBy(r.value, r.comma))
+      .then(r.value.sepBy(r.comma))
       .skip(r.rbracket),
 
   // Object parsing is a little trickier because we have to collect all the key-
@@ -92,7 +96,7 @@ let JSONParser = P.createLanguage({
 
   object: r =>
     r.lbrace
-      .then(P.sepBy(r.pair, r.comma))
+      .then(r.pair.sepBy(r.comma))
       .skip(r.rbrace)
       .map(pairs => {
         let object = {};

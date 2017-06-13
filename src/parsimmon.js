@@ -456,6 +456,14 @@
     });
   };
 
+  _.sepBy = function(separator) {
+    return sepBy(this, separator);
+  };
+
+  _.sepBy1 = function(separator) {
+    return sepBy1(this, separator);
+  };
+
   _.lookahead = function(x) {
     return this.skip(lookahead(x));
   };
