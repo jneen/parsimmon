@@ -33,7 +33,7 @@
     "build": "npm run build:browser && npm run build:browser.min",
     "build:browser": "ncp src/parsimmon.js build/parsimmon.browser.js",
     "build:browser.min": "uglifyjs --mangle < src/parsimmon.js > build/parsimmon.browser.min.js",
-    "prepublish": "npm run test && npm run build",
+    "prepublishOnly": "npm run test && npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "pretest": "npm run lint",
