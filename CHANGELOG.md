@@ -2,6 +2,10 @@
 
 * Adds `parser.sepBy(separator)` alias for `Parsimmon.sepBy(parser, separator)`
 * Adds `parser.sepBy1(separator)` alias for `Parsimmon.sepBy1(parser, separator)`
+* Adds `Parsimmon.range(begin, end)`
+* Adds `parser.wrap(before, after)`
+* Adds `parser.trim(anotherParser)`
+* Adds `parser.tie()`
 
 ## version 1.4.0 (2017-06-05)
 

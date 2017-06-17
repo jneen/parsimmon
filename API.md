@@ -108,6 +108,40 @@ Returns a parser that looks for exactly one character from `string`, and yields 
 
 Returns a parser that looks for exactly one character *NOT* from `string`, and yields that character.
 
+## Parsimmon.range(begin, end)
+
+Parsers a single character in from `begin` to `end`, inclusive.
+
+Example:
+
+```js
+var firstChar =
+  Parsimmon.alt(
+    Parsimmon.range('a', 'z'),
+    Parsimmon.range('A', 'Z'),
+    Parsimmon.oneOf('_$'),
+  );
+var restChar = firstChar.or(Parsimmon.range('0', '9'));
+var identifier = P.seq(
+  firstChar,
+  restChar.many().tie()
+).tie();
+
+identifier.tryParse('__name$cool10__');
+// => '__name$cool10__'
+
+identifier.tryParse('3d');
+// => Error
+```
+
+`Parsimmon.range(begin, end)` is equivalent to:
+
+```js
+Parsimmon.test(function(c) {
+  return begin <= c && c <= end;
+});
+```
+
 ## Parsimmon.regexp(regexp, group=0)
 
 Returns a parser that looks for a match to the regexp and yields the entire text matched. The regexp will always match starting at the current parse location. The regexp may only use the following flags: `imu`. Any other flag will result in an error being thrown.
@@ -509,6 +543,77 @@ var parserA = p1.skip(p2); // is equivalent to...
 var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x1; });
 ```
 
+## parser.trim(anotherParser)
+
+Expects `anotherParser` before and after `parser`, yielding the result of parser. Useful for trimming comments/whitespace around other parsers.
+
+Example:
+
+```js
+Parsimmon.digits
+  .map(Number)
+  .trim(Parsimmon.optWhitespace)
+  .sepBy(Parsimmon.string(','))
+  .tryParse('   1, 2,3     , 4  ')
+// => [1, 2, 3, 4]
+```
+
+It is equivalent to:
+
+```js
+anotherParser
+  .then(parser)
+  .skip(anotherParser)
+```
+
+It is also equivalent to:
+
+```js
+Parsimmon.seqMap(
+  anotherParser,
+  parser,
+  anotherParser,
+  function(before, middle) {
+    return middle;
+  }
+)
+```
+
+## parser.wrap(before, after)
+
+Expects the parser `before` before `parser` and `after` after `parser.
+
+Example:
+
+```js
+Parsimmon.letters
+  .trim(Parsimmon.optWhitespace)
+  .wrap(Parsimmon.string('('), Parsimmon.string(')'))
+  .tryParse('(   nice       )')
+// => 'nice'
+```
+
+It is equivalent to:
+
+```js
+before
+  .then(parser)
+  .skip(after)
+```
+
+It is also equivalent to:
+
+```js
+Parsimmon.seqMap(
+  before,
+  parser,
+  after,
+  function(before, middle) {
+    return middle;
+  }
+)
+```
+
 ## parser.notFollowedBy(anotherParser)
 
 Returns a parser that looks for anything but whatever `anotherParser` wants to parse, and does not consume it. Yields the same result as `parser`. Equivalent to `parser.skip(Parsimmon.notFollowedBy(anotherParser))`.
@@ -524,6 +629,33 @@ Returns a parser that looks for `string` but does not consume it. Yields the sam
 ## parser.lookahead(regexp)
 
 Returns a parser that wants the input to match `regexp`. Yields the same result as `parser`. Equivalent to `parser.skip(Parsimmon.lookahead(regexp))`.
+
+## parser.tie()
+
+When called on a parser yielding an array of strings, yields all their strings concatenated. Asserts that its input is actually an array of strings.
+
+Example:
+
+```js
+var number = Parsimmon.seq(
+  Parsimmon.digits,
+  Parsimmon.string('.'),
+  Parsimmon.digits
+).tie().map(Number);
+
+number.tryParse('1.23');
+// => 1.23
+```
+
+`parser.tie()` is similar to this:
+
+```js
+parser.map(function(array) {
+  return array.join('');
+});
+```
+
+Note: `parser.tie()` is usually used after `Parsimmon.seq(...parsers)` or `parser.many()`.
 
 ## parser.many()
 

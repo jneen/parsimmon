@@ -116,6 +116,13 @@
     }
   }
 
+  // TODO: Switch to Array.isArray eventually.
+  function assertArray(x) {
+    if ({}.toString.call(x) !== '[object Array]') {
+      throw new Error('not an array: ' + x);
+    }
+  }
+
   function assertNumber(x) {
     if (typeof x !== 'number') {
       throw new Error('not a number: ' + x);
@@ -301,6 +308,21 @@
     return alt(this, alternative);
   };
 
+  _.trim = function(parser) {
+    return this.wrap(parser, parser);
+  };
+
+  _.wrap = function(leftParser, rightParser) {
+    return seqMap(
+      leftParser,
+      this,
+      rightParser,
+      function(left, middle) {
+        return middle;
+      }
+    );
+  };
+
   _.thru = function(wrapper) {
     return wrapper(this);
   };
@@ -343,6 +365,18 @@
           return mergeReplies(makeSuccess(i, accum), result);
         }
       }
+    });
+  };
+
+  _.tie = function() {
+    return this.map(function(args) {
+      assertArray(args);
+      var s = '';
+      for (var i = 0; i < args.length; i++) {
+        assertString(args[i]);
+        s += args[i];
+      }
+      return s;
     });
   };
 
@@ -614,6 +648,13 @@
     });
   }
 
+  // TODO: Improve error message using JSON.stringify eventually.
+  function range(begin, end) {
+    return test(function(ch) {
+      return begin <= ch && ch <= end;
+    }).desc(begin + '-' + end);
+  }
+
   function takeWhile(predicate) {
     assertFunction(predicate);
 
@@ -727,6 +768,7 @@
   Parsimmon.makeSuccess = makeSuccess;
   Parsimmon.noneOf = noneOf;
   Parsimmon.oneOf = oneOf;
+  Parsimmon.range = range;
   Parsimmon.optWhitespace = optWhitespace;
   Parsimmon.Parser = Parsimmon;
   Parsimmon.regex = regexp;
