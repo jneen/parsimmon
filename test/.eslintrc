@@ -1,5 +1,11 @@
 {
   "env": {
     "node": true
+  },
+  "globals":{
+    "Parsimmon": true,
+    "assert": true,
+    "suite": true,
+    "test": true
   }
 }

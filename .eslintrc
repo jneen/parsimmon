@@ -1,5 +1,8 @@
 {
   "extends": ["eslint:recommended"],
+  "env": {
+    "commonjs": true
+  },
   "rules": {
     "brace-style": ["warn", "1tbs", {"allowSingleLine": true}],
     "comma-style": ["warn", "last"],
