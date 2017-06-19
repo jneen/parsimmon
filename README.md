@@ -12,6 +12,26 @@ Parsimmon is a small library for writing big parsers made up of lots of little p
 
 Parsimmon supports IE7 and newer browsers, along with [Node.js][]. It can be used as a standard Node module through [npm][] (named `parsimmon`), or directly in the browser through a script tag, where it exports a global variable called `Parsimmon`. To download the latest browser build, use the [unpkg version][]. For more information on how to use unpkg, see the [unpkg homepage][].
 
+<!--
+
+Parsimmon is officially tested against Node.js 4.x and higher. It should also work in [browsers with ES5 support][es5] (IE9* and up).
+
+If you need IE8 support, you may be able to get Parsimmon to work by using [es5-shim][], but this is **not officially supported**. Alternately, you can use an older version of Parsimmon which supports IE8.
+
+\* _IE9 does not support "strict mode", but Parsimmon does not require it._
+
+## Module usage
+
+```
+npm install --save parsimmon
+```
+
+## Browser usage
+
+ To download the latest browser build, use the [unpkg version][]. Parsimmon is exposed as a global variable called `Parsimmon`. For more information on how to use unpkg, see the [unpkg homepage][].
+
+-->
+
 ## API Documentation
 
 [Full API documentation in `API.md`.][api]
@@ -80,7 +100,7 @@ Thanks to [@bd82][] we have a good [benchmark comparing Parsimmon CPU performanc
 
 ## Fantasyland
 
-Parsimmon is also compatible with [fantasyland][]. It is a Semigroup, an Applicative Functor, and a Monad.
+Parsimmon is also compatible with [fantasyland][]. It implements Semigroup, Apply, Applicative, Functor, Chain, and Monad.
 
 [@bd82]: https://github.com/bd82
 [@laughinghan]: https://github.com/laughinghan
@@ -98,3 +118,5 @@ Parsimmon is also compatible with [fantasyland][]. It is a Semigroup, an Applica
 [parsec]: https://hackage.haskell.org/package/parsec
 [fantasyland]: https://github.com/fantasyland/fantasy-land
 [perf]: https://sap.github.io/chevrotain/performance/
+[es5]: https://kangax.github.io/compat-table/es5/
+[es5-shim]: https://github.com/es-shims/es5-shim

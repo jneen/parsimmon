@@ -17,27 +17,24 @@
     "build"
   ],
   "main": "src/parsimmon.js",
-  "browser": "build/parsimmon.browser.min.js",
+  "browser": "build/parsimmon.umd.min.js",
   "devDependencies": {
-    "chai": "^3.5.0",
     "eslint": "^3.6.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.5.3",
     "ncp": "^2.0.0",
     "rimraf": "^2.5.4",
-    "uglify-js": "2.x"
+    "webpack": "^2.6.1"
   },
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf build && mkdirp build",
-    "build": "npm run build:browser && npm run build:browser.min",
-    "build:browser": "ncp src/parsimmon.js build/parsimmon.browser.js",
-    "build:browser.min": "uglifyjs --mangle < src/parsimmon.js > build/parsimmon.browser.min.js",
+    "build": "webpack -p",
     "prepublishOnly": "npm run test && npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "pretest": "npm run lint",
-    "test": "mocha --ui tdd --reporter dot test/intro.js test/*.test.js",
-    "watch:test": "mocha --ui tdd --reporter min --watch test/intro.js test/*.test.js"
+    "test": "mocha --ui tdd --reporter dot test/setup.js test/core/*.test.js test/laws/*.test.js",
+    "watch:test": "mocha --ui tdd --reporter min --watch test/setup.js test/core/*.test.js test/laws/*.test.js"
   }
 }

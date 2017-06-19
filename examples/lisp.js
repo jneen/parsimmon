@@ -1,7 +1,9 @@
+'use strict';
+
 // Run me with Node to see my output!
 
-var util = require('util');
-var P = require('../');
+let util = require('util');
+let P = require('../');
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -13,7 +15,7 @@ function spaced(parser) {
     .skip(P.optWhitespace);
 }
 
-var Lisp = P.createLanguage({
+let Lisp = P.createLanguage({
   Expression: function(r) {
     return P.alt(
       r.Symbol,
@@ -54,16 +56,16 @@ var Lisp = P.createLanguage({
 
 ///////////////////////////////////////////////////////////////////////
 
-var text = `\
+let text = `\
 (list 1 2 (cons 1 (list)))
 (print 5 golden rings)
 `;
 
 function prettyPrint(x) {
-  var opts = {depth: null, colors: 'auto'};
-  var s = util.inspect(x, opts);
+  let opts = {depth: null, colors: 'auto'};
+  let s = util.inspect(x, opts);
   console.log(s);
 }
 
-var ast = Lisp.File.tryParse(text);
+let ast = Lisp.File.tryParse(text);
 prettyPrint(ast);
