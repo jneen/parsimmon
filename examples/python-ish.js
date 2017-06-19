@@ -1,7 +1,9 @@
+'use strict';
+
 // Run me with Node to see my output!
 
-var util = require('util');
-var P = require('..');
+let util = require('util');
+let P = require('..');
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -45,7 +47,7 @@ let Pythonish = P.createLanguage({
 
 ///////////////////////////////////////////////////////////////////////
 
-var text = `\
+let text = `\
 block:
     a()
     b()
@@ -62,10 +64,10 @@ block:
 `;
 
 function prettyPrint(x) {
-  var opts = {depth: null, colors: 'auto'};
-  var s = util.inspect(x, opts);
+  let opts = {depth: null, colors: 'auto'};
+  let s = util.inspect(x, opts);
   console.log(s);
 }
 
-var ast = Pythonish.Block.tryParse(text);
+let ast = Pythonish.Block.tryParse(text);
 prettyPrint(ast);

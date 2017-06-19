@@ -1,3 +1,5 @@
+'use strict';
+
 suite('skip', function() {
 
   test('uses the previous return value', function() {

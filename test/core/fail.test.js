@@ -1,3 +1,5 @@
+'use strict';
+
 suite('fail', function() {
   var fail = Parsimmon.fail;
   var succeed = Parsimmon.succeed;
@@ -26,8 +28,10 @@ suite('fail', function() {
       Parsimmon.string('x')
         .then(Parsimmon.string('+').or(Parsimmon.string('*')))
         .chain(function(operator) {
-          if (operator === allowedOperator) return succeed(operator);
-          else return fail(allowedOperator);
+          if (operator === allowedOperator) {
+            return succeed(operator);
+          }
+          return fail(allowedOperator);
         })
         .skip(Parsimmon.string('y'));
 

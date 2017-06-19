@@ -1,3 +1,5 @@
+'use strict';
+
 suite('fantasy-land/* method aliases', function() {
   function makeTester(name) {
     return function() {

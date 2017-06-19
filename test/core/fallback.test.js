@@ -1,3 +1,5 @@
+'use strict';
+
 suite('fallback', function() {
 
   test('allows fallback result if no match is found', function() {

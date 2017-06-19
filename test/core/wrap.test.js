@@ -1,3 +1,5 @@
+'use strict';
+
 suite('parser.wrap', function() {
 
   test('should remove different stuff from the begin and end', function() {

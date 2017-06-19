@@ -1,3 +1,5 @@
+'use strict';
+
 test('takeWhile', function() {
   var parser =
     Parsimmon.takeWhile(function(ch) {

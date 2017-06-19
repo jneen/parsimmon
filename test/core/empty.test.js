@@ -1,3 +1,5 @@
+'use strict';
+
 test('.empty()', function() {
   var emptyParse = {
     status: false,

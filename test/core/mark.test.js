@@ -1,3 +1,5 @@
+'use strict';
+
 test('mark', function() {
   var ys = Parsimmon.regexp(/^y*/).mark();
   var parser = Parsimmon.optWhitespace.then(ys).skip(Parsimmon.optWhitespace);

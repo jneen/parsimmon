@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.lookahead', function() {
 
   test('should handle a string', function() {

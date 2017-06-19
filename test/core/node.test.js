@@ -1,3 +1,5 @@
+'use strict';
+
 test('.node(name)', function() {
   var ys = Parsimmon.regexp(/^y*/).node('Y');
   var parser = ys.trim(Parsimmon.optWhitespace);

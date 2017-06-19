@@ -1,3 +1,5 @@
+'use strict';
+
 test('atLeast', function() {
   var atLeastTwo = Parsimmon.letter.atLeast(2);
   assert.deepEqual(atLeastTwo.parse('xy').value, ['x', 'y']);

@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.regexp', function() {
 
   test('general usage', function() {

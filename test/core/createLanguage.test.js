@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.createLanguage', function() {
 
   test('should return an object of parsers', function() {

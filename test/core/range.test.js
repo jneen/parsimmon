@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.range', function() {
 
   var codes = {

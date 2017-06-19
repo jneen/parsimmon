@@ -1,3 +1,5 @@
+'use strict';
+
 var H = require('../helpers');
 
 suite('Fantasy Land Apply', function() {

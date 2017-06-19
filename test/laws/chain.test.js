@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Fantasy Land Chain', function() {
   test('associativity', function() {
     function appender(x) {

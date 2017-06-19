@@ -1,3 +1,5 @@
+'use strict';
+
 test('Parsimmon.string', function() {
   var parser = Parsimmon.string('x');
   var res = parser.parse('x');

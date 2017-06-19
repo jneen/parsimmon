@@ -128,7 +128,7 @@ function assertRegexp(x) {
     // Only allow regexp flags [imu] for now, since [g] and [y] specifically
     // mess up Parsimmon. If more non-stateful regexp flags are added in the
     // future, this will need to be revisited.
-    if (c != 'i' && c != 'm' && c != 'u') {
+    if (c !== 'i' && c !== 'm' && c !== 'u') {
       throw new Error('unsupported regexp flag "' + c + '": ' + x);
     }
   }
@@ -244,7 +244,9 @@ function alt() {
     var result;
     for (var j = 0; j < parsers.length; j += 1) {
       result = mergeReplies(parsers[j]._(input, i), result);
-      if (result.status) return result;
+      if (result.status) {
+        return result;
+      }
     }
     return result;
   });
@@ -527,7 +529,7 @@ function regexp(re, group) {
     if (match) {
       var fullMatch = match[0];
       var groupMatch = match[group];
-      if (groupMatch != null) {
+      if (groupMatch !== null) {
         return makeSuccess(i + fullMatch.length, groupMatch);
       }
     }

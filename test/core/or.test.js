@@ -1,3 +1,5 @@
+'use strict';
+
 suite('or', function() {
 
   test('two parsers', function() {

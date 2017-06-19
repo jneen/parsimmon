@@ -1,3 +1,5 @@
+'use strict';
+
 suite('result', function() {
 
   test('returns a constant result', function() {

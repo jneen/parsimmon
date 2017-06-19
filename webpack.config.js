@@ -1,5 +1,7 @@
 /* eslint-env node */
 
+'use strict';
+
 // Let's  offer a minified UMD build of Parsimmon, while keeping the main
 // library as a Node.js module.
 

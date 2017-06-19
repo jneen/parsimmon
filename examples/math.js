@@ -1,3 +1,5 @@
+'use strict';
+
 // Run me with Node to see my output!
 
 let util = require('util');

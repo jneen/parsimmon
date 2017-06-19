@@ -1,3 +1,5 @@
+'use strict';
+
 suite('.then', function() {
 
   test('with a parser, uses the last return value', function() {

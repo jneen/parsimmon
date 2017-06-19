@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.seqMap', function() {
 
   test('like Parsimmon.seq and .map but spreads arguments', function() {

@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Fantasy Land Monad', function() {
 
   test('left identity', function() {

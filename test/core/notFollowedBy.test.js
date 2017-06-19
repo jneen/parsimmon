@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.notFollowedBy', function() {
 
   test('fails when its parser argument matches', function() {

@@ -1,3 +1,5 @@
+'use strict';
+
 suite('map', function() {
 
   test('with a function, pipes the value in and uses that return value', function() {

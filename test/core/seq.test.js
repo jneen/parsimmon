@@ -1,3 +1,5 @@
+'use strict';
+
 test('Parsimmon.seq', function() {
   var parser =
       Parsimmon.seq(

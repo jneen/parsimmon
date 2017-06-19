@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.custom', function(){
   test('simple parser definition', function(){
     function customAny() {

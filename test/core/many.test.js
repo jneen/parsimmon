@@ -1,3 +1,5 @@
+'use strict';
+
 suite('many', function() {
 
   test('simple case', function() {

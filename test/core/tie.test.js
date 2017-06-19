@@ -1,3 +1,5 @@
+'use strict';
+
 suite('parser.tie()', function() {
 
   test('concatenates all the results', function() {

@@ -1,3 +1,5 @@
+'use strict';
+
 test('Parsimmon.makeSuccess', function() {
   var index = 11;
   var value = 'a lucky number';

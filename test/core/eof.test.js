@@ -1,3 +1,5 @@
+'use strict';
+
 test('eof', function() {
   var parser =
     Parsimmon.optWhitespace

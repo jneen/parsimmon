@@ -1,3 +1,5 @@
+'use strict';
+
 suite('Parsimmon.sepBy/sepBy1', function() {
   var chars = Parsimmon.regexp(/[a-zA-Z]+/);
   var comma = Parsimmon.string(',');

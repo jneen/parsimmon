@@ -1,3 +1,5 @@
+'use strict';
+
 suite('times', function() {
 
   test('zero case', function() {

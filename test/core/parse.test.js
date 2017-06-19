@@ -1,3 +1,5 @@
+'use strict';
+
 suite('.parse', function() {
 
   test('Unique and sorted .expected array', function() {

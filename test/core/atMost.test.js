@@ -1,3 +1,5 @@
+'use strict';
+
 test('atMost', function() {
   var atMostTwo = Parsimmon.letter.atMost(2);
   assert.deepEqual(atMostTwo.parse('').value, []);

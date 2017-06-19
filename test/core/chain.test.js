@@ -1,3 +1,5 @@
+'use strict';
+
 suite('chain', function() {
 
   test('asserts that a parser is returned', function() {

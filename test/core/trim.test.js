@@ -1,3 +1,5 @@
+'use strict';
+
 suite('parser.trim', function() {
 
   test('should remove stuff from the begin and end', function() {

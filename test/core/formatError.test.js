@@ -1,3 +1,5 @@
+'use strict';
+
 test('Parsimmon.formatError', function() {
   var parser =
     Parsimmon.alt(

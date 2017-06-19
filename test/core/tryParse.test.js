@@ -1,3 +1,5 @@
+'use strict';
+
 suite('.tryParse', function() {
   test('returns just the value', function() {
     var x = 4;

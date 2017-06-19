@@ -1,3 +1,5 @@
+'use strict';
+
 test('Parsimmon()', function() {
   var good = 'just a Q';
   var bad = 'all I wanted was a Q';

@@ -1,3 +1,5 @@
+'use strict';
+
 test('Parsimmon.makeFailure', function() {
   var furthest = 4444;
   var expected = 'waiting in the clock tower';

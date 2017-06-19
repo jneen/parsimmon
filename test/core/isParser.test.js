@@ -1,3 +1,5 @@
+'use strict';
+
 test('Parsimmon.isParser', function() {
   assert.strictEqual(Parsimmon.isParser(undefined), false);
   assert.strictEqual(Parsimmon.isParser({}), false);

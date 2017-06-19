@@ -1,3 +1,5 @@
+'use strict';
+
 suite('desc', function() {
 
   test('allows custom error messages', function() {
