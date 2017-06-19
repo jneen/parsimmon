@@ -7,6 +7,29 @@ let P = require('..');
 
 ///////////////////////////////////////////////////////////////////////
 
+// LIMITATIONS: Python allows not only multiline blocks, but inline blocks too.
+//
+//   if x == y: print("nice")
+//
+// vs.
+//
+//   if x == y:
+//       print("nice")
+//
+// This parser only supports the multiline indented form.
+
+// NOTE: This is a hack and is not recommended. Maintaining state throughout
+// Parsimmon parsers is not reliable since backtracking may occur, leaving your
+// state inaccurate. See the relevant GitHub issue for discussion.
+//
+// https://github.com/jneen/parsimmon/issues/158
+//
+function indentPeek() {
+  return indentStack[indentStack.length - 1];
+}
+
+let indentStack = [0];
+
 let Pythonish = P.createLanguage({
   // If this were actually Python, "Block" wouldn't be a statement on its own,
   // but rather "If" and "While" would be statements that used "Block" inside.
@@ -29,18 +52,29 @@ let Pythonish = P.createLanguage({
   // indentation in front of it.
   Block: r =>
     P.seq(
-      P.string('block:\n'),
-      P.regexp(/[ ]+/),
+      P.string('block:\n').then(P.regexp(/[ ]+/)),
       r.Statement
     ).chain(args => {
       // `.chain` is called after a parser succeeds. It returns the next parser
       // to use for parsing. This allows subsequent parsing to be dependent on
       // previous text.
       let [indent, statement] = args;
+      let indentSize = indent.length;
+      let currentSize = indentPeek();
+      // Indentation must be deeper than the current block context. Otherwise
+      // you could indent *less* for a block and it would still work. This is
+      // not how any language I know of works.
+      if (indentSize <= currentSize) {
+        return P.fail('at least ' + currentSize + ' spaces');
+      }
+      indentStack.push(indentSize);
       return P.string(indent)
         .then(r.Statement)
         .many()
-        .map(statements => [statement].concat(statements));
+        .map(statements => {
+          indentStack.pop();
+          return [statement].concat(statements);
+        });
     })
     .node('Block'),
 });
@@ -53,9 +87,9 @@ block:
     b()
     c()
     block:
-        d()
-        e()
-        f()
+      d()
+      e()
+      f()
     block:
         g()
         h()
