@@ -17,12 +17,7 @@ let P = require('..');
 
 ///////////////////////////////////////////////////////////////////////
 
-// Returns a new parser that ignores whitespace before and after the parser.
-function spaced(parser) {
-  return P.optWhitespace
-    .then(parser)
-    .skip(P.optWhitespace);
-}
+let _ = P.optWhitespace;
 
 // Operators should allow whitespace around them, but not require it. This
 // helper combines multiple operators together with names.
@@ -33,7 +28,7 @@ function spaced(parser) {
 // whitespace, and gives back the word "Add" or "Sub" instead of the character.
 function operators(ops) {
   let keys = Object.keys(ops).sort();
-  let ps = keys.map(k => P.string(ops[k]).thru(spaced).result(k));
+  let ps = keys.map(k => P.string(ops[k]).trim(_).result(k));
   return P.alt.apply(null, ps);
 }
 
@@ -166,7 +161,7 @@ let tableParser =
 // keep it in a table instead of nesting it all manually.
 
 // This is our version of a math expression.
-let MyMath = spaced(tableParser);
+let MyMath = tableParser.trim(_);
 
 ///////////////////////////////////////////////////////////////////////
 

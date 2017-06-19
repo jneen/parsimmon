@@ -7,15 +7,12 @@ let P = require('../');
 
 ///////////////////////////////////////////////////////////////////////
 
-// A little helper to wrap a parser with optional whitespace. Helper functions
-// that take a parser can be passed to the .thru(wrapper) method.
-function spaced(parser) {
-  return P.optWhitespace
-    .then(parser)
-    .skip(P.optWhitespace);
-}
 
 let Lisp = P.createLanguage({
+
+  // An expression is just any of the other values we make in the language. Note
+  // that because we're using `.createLanguage` here we can reference other
+  // parsers off of the argument to our function. `r` is short for `rules` here.
   Expression: function(r) {
     return P.alt(
       r.Symbol,
@@ -24,8 +21,8 @@ let Lisp = P.createLanguage({
     );
   },
 
-// The basic parsers (usually the ones described via regexp) should have a
-// description for error message purposes.
+  // The basic parsers (usually the ones described via regexp) should have a
+  // description for error message purposes.
   Symbol: function() {
     return P.regexp(/[a-zA-Z_-][a-zA-Z0-9_-]*/)
       .desc('symbol');
@@ -39,18 +36,19 @@ let Lisp = P.createLanguage({
       .desc('number');
   },
 
-// `.then` throws away the first value, and `.skip` throws away the second
-// `.value, so we're left with just the `Expression.thru(spaced).many()` part as
-// the `.yielded value from this parser.
+  // `.trim(P.optWhitespace)` removes whitespace from both sides, then `.many()`
+  // repeats the expression zero or more times. Finally, `.wrap(...)` removes
+  // the '(' and ')' from both sides of the list.
   List: function(r) {
-    return P.string('(')
-      .then(r.Expression.thru(spaced).many())
-      .skip(P.string(')'));
+    return r.Expression
+      .trim(P.optWhitespace)
+      .many()
+      .wrap(P.string('('), P.string(')'));
   },
 
-  // Let's remember to throw away whitesapce at the top level of the parser.
+  // A file in Lisp is generally just zero or more expressions.
   File: function(r) {
-    return r.Expression.thru(spaced).many();
+    return r.Expression.trim(P.optWhitespace).many();
   }
 });
 
