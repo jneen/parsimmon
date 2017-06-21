@@ -178,13 +178,14 @@ Returns a parser that doesn't consume any input, and yields `result`.
 
 This is an alias for `Parsimmon.succeed(result)`.
 
+## Parsimmon.formatError(string, error)
+
+Takes the `string` passed to `parser.parse(string)` and the `error` returned from `parser.parse(string)` and turns it into a human readable error message string. Note that there are certainly better ways to format errors, so feel free to write your own.
+
 ## Parsimmon.seq(p1, p2, ...pn)
 
 Accepts any number of parsers and returns a new parser that expects them to match in order, yielding an array of all their results.
 
-## Parsimmon.formatError(string, error)
-
-Takes the `string` passed to `parser.parse(string)` and the `error` returned from `parser.parse(string)` and turns it into a human readable error message string. Note that there are certainly better ways to format errors, so feel free to write your own.
 
 ## Parsimmon.seqMap(p1, p2, ...pn, function(r1, r2, ...rn))
 
@@ -203,6 +204,38 @@ Parsimmon.seqMap(
   }
 ).parse('a+x')
 ```
+
+## Parsimmon.seqObj(...args)
+
+Similar to `Parsimmon.seq(...parsers)`, but yields an object of results named based on arguments.
+
+Takes one or more arguments, where each argument is either a parser or a named parser pair (`[stringKey, parser]`).
+
+Requires at least one named parser.
+
+All named parser keys must be unique.
+
+Example:
+
+```js
+var _ = Parsimmon.optWhitespace;
+var identifier = Parsimmon.regexp(/[a-z_][a-z0-9_]*/i);
+var lparen = Parsimmon.string('(');
+var rparen = Parsimmon.string(')');
+var comma = Parsimmon.string(',');
+var functionCall =
+  Parsimmon.seqObj(
+    ['function', identifier],
+    lparen,
+    ['arguments', identifier.trim(_).sepBy(comma)],
+    rparen
+  );
+functionCall.tryParse('foo(bar, baz, quux)');
+// => { function: 'foo',
+//      arguments: [ 'bar', 'baz', 'quux' ] }
+```
+
+Tip: Combines well with `.node(name)` for a full-featured AST node.
 
 ## Parsimmon.alt(p1, p2, ...pn)
 

@@ -1,4 +1,10 @@
+## version 1.6.0 (2017-06-26)
+
+* Adds `Parsimmon.seqObj(...args)`
+
 ## version 1.5.0 (2017-06-17)
+
+NOTE: Code was completed on 2017-06-17, but due to human error, was not published on npm until 2017-06-26.
 
 * Adds `parser.sepBy(separator)` alias for `Parsimmon.sepBy(parser, separator)`
 * Adds `parser.sepBy1(separator)` alias for `Parsimmon.sepBy1(parser, separator)`
