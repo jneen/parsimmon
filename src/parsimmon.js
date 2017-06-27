@@ -15,6 +15,10 @@ function isParser(obj) {
   return obj instanceof Parsimmon;
 }
 
+function isArray(x) {
+  return {}.toString.call(x) === '[object Array]';
+}
+
 function makeSuccess(index, value) {
   return {
     status: true,
@@ -107,7 +111,7 @@ function assertParser(p) {
 
 // TODO[ES5]: Switch to Array.isArray eventually.
 function assertArray(x) {
-  if ({}.toString.call(x) !== '[object Array]') {
+  if (!isArray(x)) {
     throw new Error('not an array: ' + x);
   }
 }
@@ -197,6 +201,65 @@ function seq() {
         return result;
       }
       accum[j] = result.value;
+      i = result.index;
+    }
+    return mergeReplies(makeSuccess(i, accum), result);
+  });
+}
+
+function seqObj() {
+  var seenKeys = {};
+  var totalKeys = 0;
+  var parsers = [].slice.call(arguments);
+  var numParsers = parsers.length;
+  for (var j = 0; j < numParsers; j += 1) {
+    var p = parsers[j];
+    if (isParser(p)) {
+      continue;
+    }
+    if (isArray(p)) {
+      var isWellFormed =
+        p.length === 2 &&
+        typeof p[0] === 'string' &&
+        isParser(p[1]);
+      if (isWellFormed) {
+        var key = p[0];
+        if (seenKeys[key]) {
+          throw new Error('seqObj: duplicate key ' + key);
+        }
+        seenKeys[key] = true;
+        totalKeys++;
+        continue;
+      }
+    }
+    throw new Error(
+      'seqObj arguments must be parsers or ' +
+      '[string, parser] array pairs.'
+    );
+  }
+  if (totalKeys === 0) {
+    throw new Error('seqObj expects at least one named parser, found zero');
+  }
+  return Parsimmon(function(input, i) {
+    var result;
+    var accum = {};
+    for (var j = 0; j < numParsers; j += 1) {
+      var name;
+      var parser;
+      if (isArray(parsers[j])) {
+        name = parsers[j][0];
+        parser = parsers[j][1];
+      } else {
+        name = null;
+        parser = parsers[j];
+      }
+      result = mergeReplies(parser._(input, i), result);
+      if (!result.status) {
+        return result;
+      }
+      if (name) {
+        accum[name] = result.value;
+      }
       i = result.index;
     }
     return mergeReplies(makeSuccess(i, accum), result);
@@ -720,6 +783,7 @@ Parsimmon.sepBy = sepBy;
 Parsimmon.sepBy1 = sepBy1;
 Parsimmon.seq = seq;
 Parsimmon.seqMap = seqMap;
+Parsimmon.seqObj = seqObj;
 Parsimmon.string = string;
 Parsimmon.succeed = succeed;
 Parsimmon.takeWhile = takeWhile;

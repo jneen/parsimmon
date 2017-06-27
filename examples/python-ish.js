@@ -51,14 +51,16 @@ let Pythonish = P.createLanguage({
   // block, and require that every other statement has the same exact string of
   // indentation in front of it.
   Block: r =>
-    P.seq(
-      P.string('block:\n').then(P.regexp(/[ ]+/)),
-      r.Statement
+    P.seqObj(
+      P.string('block:'),
+      P.string('\n'),
+      ['indent', P.regexp(/[ ]+/)],
+      ['statement', r.Statement]
     ).chain(args => {
       // `.chain` is called after a parser succeeds. It returns the next parser
       // to use for parsing. This allows subsequent parsing to be dependent on
       // previous text.
-      let [indent, statement] = args;
+      let {indent, statement} = args;
       let indentSize = indent.length;
       let currentSize = indentPeek();
       // Indentation must be deeper than the current block context. Otherwise
