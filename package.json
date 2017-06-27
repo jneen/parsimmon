@@ -20,6 +20,7 @@
   "browser": "build/parsimmon.umd.min.js",
   "devDependencies": {
     "eslint": "^3.6.0",
+    "istanbul": "^0.4.5",
     "mkdirp": "^0.5.1",
     "mocha": "^2.5.3",
     "ncp": "^2.0.0",
@@ -34,7 +35,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "pretest": "npm run lint",
-    "test": "mocha --ui tdd --reporter dot test/setup.js test/core/*.test.js test/laws/*.test.js",
+    "test": "istanbul cover  node_modules/mocha/bin/_mocha -- --ui tdd --reporter dot test/setup.js test/core/*.test.js test/laws/*.test.js",
     "watch:test": "mocha --ui tdd --reporter min --watch test/setup.js test/core/*.test.js test/laws/*.test.js"
   }
 }
