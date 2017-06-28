@@ -23,6 +23,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.5.3",
     "ncp": "^2.0.0",
+    "nyc": "^11.0.3",
     "rimraf": "^2.5.4",
     "webpack": "^2.6.1"
   },
@@ -31,10 +32,10 @@
     "prebuild": "rimraf build && mkdirp build",
     "build": "webpack -p",
     "prepublishOnly": "npm run test && npm run build",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint": "eslint src test",
+    "lint:fix": "eslint --fix src test",
     "pretest": "npm run lint",
-    "test": "mocha --ui tdd --reporter dot test/setup.js test/core/*.test.js test/laws/*.test.js",
+    "test": "nyc node_modules/.bin/mocha -i src --ui tdd --reporter dot test/setup.js test/core/*.test.js test/laws/*.test.js",
     "watch:test": "mocha --ui tdd --reporter min --watch test/setup.js test/core/*.test.js test/laws/*.test.js"
   }
 }
