@@ -38,4 +38,7 @@ test('Parsimmon.alt', function(){
   assert.throws(function() {
     Parsimmon.alt('not a parser');
   });
+
+
+  assert.strictEqual(Parsimmon.alt().parse('').status, false);
 });

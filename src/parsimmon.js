@@ -590,11 +590,14 @@ function regexp(re, group) {
   return Parsimmon(function(input, i) {
     var match = anchored.exec(input.slice(i));
     if (match) {
-      var fullMatch = match[0];
-      var groupMatch = match[group];
-      if (groupMatch !== null) {
+      if (0 <= group && group <= match.length) {
+        var fullMatch = match[0];
+        var groupMatch = match[group];
         return makeSuccess(i + fullMatch.length, groupMatch);
       }
+      return makeFailure(
+        'valid match group (0 to ' + match.length + ') in ' + expected
+      );
     }
     return makeFailure(i, expected);
   });

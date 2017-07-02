@@ -32,6 +32,17 @@ suite('Parsimmon.seqObj', function() {
     });
   });
 
+
+  test('every parser is used', function() {
+    var parser = Parsimmon.seqObj(
+      ['a', Parsimmon.of(1)],
+      ['b', Parsimmon.of(2)],
+      ['c', Parsimmon.fail('oopsy')]
+    );
+    var result = parser.parse('');
+    assert.strictEqual(result.status, false);
+  });
+
   test('every parser is used', function() {
     var parser = Parsimmon.seqObj(
       Parsimmon.string('a'),
@@ -59,6 +70,9 @@ suite('Parsimmon.seqObj', function() {
     });
     assert.throws(function() {
       Parsimmon.seqObj(['cool', 'potato']);
+    });
+    assert.throws(function() {
+      Parsimmon.seqObj(0);
     });
   });
 

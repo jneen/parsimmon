@@ -2,6 +2,14 @@
 
 suite('Parsimmon.createLanguage', function() {
 
+  setup(function() {
+    Object.prototype.NASTY = 'dont extend Object.prototype please';
+  });
+
+  teardown(function() {
+    delete Object.prototype.NASTY;
+  });
+
   test('should return an object of parsers', function() {
     var lang = Parsimmon.createLanguage({
       a: function() {
@@ -27,6 +35,16 @@ suite('Parsimmon.createLanguage', function() {
       }
     });
     lang.Parentheses.tryParse('(((())))');
+  });
+
+  test('should ignore non-own properties', function() {
+    var obj = Object.create({
+      foo: function() {
+        return Parsimmon.of(1);
+      }
+    });
+    var lang = Parsimmon.createLanguage(obj);
+    assert.strictEqual(lang.foo, undefined);
   });
 
   test('should allow indirect recursion in parsers', function() {
