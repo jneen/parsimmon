@@ -43,9 +43,11 @@ suite('Parsimmon.regexp', function() {
     var parser0 = Parsimmon.regexp(/(\w)(\d)/, 0);
     var parser1 = Parsimmon.regexp(/(\w)(\d)/, 1);
     var parser2 = Parsimmon.regexp(/(\w)(\d)/, 2);
-    assert.equal(parser0.parse('a1').value, 'a1');
-    assert.equal(parser1.parse('a1').value, 'a');
-    assert.equal(parser2.parse('a1').value, '1');
+    var parser3 = Parsimmon.regexp(/(\w)(\d)/, 8);
+    assert.strictEqual(parser0.parse('a1').value, 'a1');
+    assert.strictEqual(parser1.parse('a1').value, 'a');
+    assert.strictEqual(parser2.parse('a1').value, '1');
+    assert.strictEqual(parser3.parse('a1').status, false);
   });
 
 });

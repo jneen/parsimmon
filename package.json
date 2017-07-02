@@ -1,6 +1,6 @@
 {
   "name": "parsimmon",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "A monadic LL(infinity) parser combinator library",
   "keywords": [
     "parsing",
@@ -38,7 +38,8 @@
     "precoverage": "npm run test",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "pretest": "npm run lint",
-    "test": "nyc node_modules/.bin/mocha -i src --ui tdd --reporter dot test/setup.js test/core/*.test.js test/laws/*.test.js",
+    "test": "nyc --reporter=lcov npm run test:mocha",
+    "test:mocha": "mocha -i src --ui tdd --reporter dot test/setup.js test/core/*.test.js test/laws/*.test.js",
     "watch:test": "mocha --ui tdd --reporter min --watch test/setup.js test/core/*.test.js test/laws/*.test.js"
   }
 }

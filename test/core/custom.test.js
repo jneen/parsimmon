@@ -58,4 +58,5 @@ suite('Parsimmon.custom', function(){
 
     assert.deepEqual(parser.parse('acccccb'), {status: true, value: 'acccccb'});
   });
+
 });

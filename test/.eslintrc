@@ -6,6 +6,8 @@
     "Parsimmon": true,
     "assert": true,
     "suite": true,
+    "setup": true,
+    "teardown": true,
     "test": true
   }
 }

@@ -3,3 +3,4 @@ node_modules
 npm-*.log
 .nyc_output
 coverage
+.DS_Store

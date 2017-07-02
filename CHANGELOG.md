@@ -1,3 +1,8 @@
+## version 1.6.1 (2017-07-01)
+
+* **100% unit test coverage!** This does not mean bugs won't exist, but it keeps us much safer against regressions in the future.
+* **BUGFIX:** `Parsimmon.regexp(regexp, group)` will now correctly fail to parse if the `group` number is out of range for the `regexp` number of groups. This worked correctly in the past, but was broken during a minor code clean up due to missing tests.
+
 ## version 1.6.0 (2017-06-26)
 
 * Adds `Parsimmon.seqObj(...args)`

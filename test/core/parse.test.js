@@ -17,4 +17,13 @@ suite('.parse', function() {
     assert.deepEqual(result.expected, ['a', 'b', 'c']);
   });
 
+  test('throws when given a non-string argument', function() {
+    assert.throws(function() {
+      Parsimmon.of('kaboom').parse(0);
+    });
+    assert.throws(function() {
+      Parsimmon.of('kaboom').parse();
+    });
+  });
+
 });
