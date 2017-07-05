@@ -321,7 +321,6 @@ function alt() {
       if (result.status) {
         return result;
       }
-      state = result.state;
     }
     return result;
   });
@@ -458,7 +457,7 @@ _.times = function(min, max) {
     for (var times = 0; times < min; times += 1) {
       result = self._(input, i, state);
       prevResult = mergeReplies(result, prevResult);
-      state = result.state;
+      state = prevResult.state;
       if (result.status) {
         i = result.index;
         accum.push(result.value);
@@ -467,9 +466,9 @@ _.times = function(min, max) {
       }
     }
     for (; times < max; times += 1) {
-      result = self._(input, i);
+      result = self._(input, i, state);
       prevResult = mergeReplies(result, prevResult);
-      state = result.state;
+      state = prevResult.state;
       if (result.status) {
         i = result.index;
         accum.push(result.value);
@@ -618,11 +617,9 @@ function regexp(re, group) {
         var groupMatch = match[group];
         return makeSuccess(i + fullMatch.length, groupMatch, state);
       }
-      return makeFailure(
-        i,
-        'valid match group (0 to ' + match.length + ') in ' + expected,
-        state
-      );
+      var expected2 =
+        'valid match group (0 to ' + match.length + ') in ' + expected;
+      return makeFailure(i, expected2, state);
     }
     return makeFailure(i, expected, state);
   });
