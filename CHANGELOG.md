@@ -8,6 +8,8 @@
   * `.tryParse`
   * `Parsimmon.makeSuccess`
   * `Parsimmon.makeFailure`
+* Adds `Parsimmon.initialStateIndent`
+* Adds `Parsimmon.countIndentation`
 * Adds `Parsimmon.indentMore`
 * Adds `Parsimmon.indentLess`
 * Adds `Parsimmon.indentSame`

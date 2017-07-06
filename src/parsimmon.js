@@ -349,7 +349,7 @@ _.parse = function(input, initialState) {
     throw new Error('.parse must be called with a string as its argument');
   }
   if (arguments.length < 2) {
-    initialState = indentInitialState;
+    initialState = initialStateIndent;
   }
   var result = this.skip(eof)._(input, 0, initialState);
   if (result.status) {
@@ -369,7 +369,7 @@ _.parse = function(input, initialState) {
 
 _.tryParse = function(str, initialState) {
   if (arguments.length < 2) {
-    initialState = indentInitialState;
+    initialState = initialStateIndent;
   }
   var result = this.parse(str, initialState);
   if (result.status) {
@@ -749,50 +749,52 @@ _['fantasy-land/map'] = _.map;
 
 // -*- Base Parsers -*-
 
-var indentInitialState = [0];
+var initialStateIndent = [0];
 
-var spaces0Count = regexp(/[ ]*/).map(function(s) {
-  return s.length;
-});
-
-var indentMore = spaces0Count.chain(function(count) {
-  return Parsimmon(function(input, i, state) {
-    var j = state.length - 1;
-    if (count > state[j]) {
-      return makeSuccess(i, null, state.concat(count));
-    }
-    var message = 'more than ' + state[j] + ' spaces of indentation';
-    return makeFailure(i, message, undefined);
+var countIndentation =
+  alt(
+    regexp(/[ ]*/).desc('at least one space'),
+    regexp(/\t+/).desc('at least one tab'),
+    lazy(function() { return eof; })
+  ).desc('indentation').map(function(s) {
+    return s.length;
   });
-});
 
-var indentLess = spaces0Count.chain(function(count) {
-  return Parsimmon(function(input, i, state) {
-    var stack = state.slice();
-    if (count < stack[stack.length - 1]) {
-      while (count < stack[stack.length - 1]) {
-        stack.pop();
+function indentMore(indentationCounter) {
+  return indentationCounter.chain(function(count) {
+    return Parsimmon(function(input, i, state) {
+      var j = state.length - 1;
+      if (count > state[j]) {
+        return makeSuccess(i, null, state.concat(count));
       }
-      return makeSuccess(i, null, stack);
-    }
-    var message =
-      'less than ' +
-      stack[stack.length - 1] +
-      ' spaces of indentation';
-    return makeFailure(i, message, undefined);
+      return makeFailure(i, 'more indentation', state);
+    });
   });
-});
+}
 
-var indentSame = spaces0Count.chain(function(count) {
-  return Parsimmon(function(input, i, state) {
-    var j = state.length - 1;
-    if (count === state[j]) {
-      return makeSuccess(i, null, state);
-    }
-    var message = 'exactly ' + count + ' spaces of indentation';
-    return makeFailure(i, message, undefined);
+function indentLess(indentationCounter) {
+  return indentationCounter.chain(function(count) {
+    return Parsimmon(function(input, i, state) {
+      var j = state.length - 1;
+      if (count < state[j]) {
+        return makeSuccess(i, null, state.slice(0, j));
+      }
+      return makeFailure(i, 'less indentation', state);
+    });
   });
-});
+}
+
+function indentSame(indentationCounter) {
+  return indentationCounter.chain(function(count) {
+    return Parsimmon(function(input, i, state) {
+      var j = state.length - 1;
+      if (count === state[j]) {
+        return makeSuccess(i, null, state);
+      }
+      return makeFailure(i, 'the same indentation', state);
+    });
+  });
+}
 
 var index = Parsimmon(function(input, i, state) {
   return makeSuccess(i, makeLineColumnIndex(input, i), state);
@@ -826,6 +828,8 @@ var whitespace = regexp(/\s+/).desc('whitespace');
 Parsimmon.all = all;
 Parsimmon.alt = alt;
 Parsimmon.any = any;
+Parsimmon.initialStateIndent = initialStateIndent;
+Parsimmon.countIndentation = countIndentation;
 Parsimmon.createLanguage = createLanguage;
 Parsimmon.custom = custom;
 Parsimmon.digit = digit;

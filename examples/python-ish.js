@@ -15,24 +15,31 @@ let Pythonish = P.createLanguage({
     P.alt(r.Call, r.Block),
 
   Call: r =>
-    P.letter.skip(P.string('()')).skip(r.End).node('Call'),
+    P.regexp(/[a-z]+/).skip(P.string('()')).skip(r.End).node('Call'),
 
   Block: r =>
     P.seqObj(
       P.string('block:'),
       r.End,
-      P.indentMore,
+      r.IndentMore,
       ['first', r.Statement],
-      ['rest', P.indentSame.then(r.Statement).many()],
-      P.indentLess
+      ['rest', r.IndentSame.then(r.Statement).many()],
+      r.IndentLess
     ).map(args => {
       let {first, rest} = args;
       let statements = [first, ...rest];
       return {statements};
     }).node('Block'),
 
+  IndentMore: () => P.indentMore(P.countIndentation),
+  IndentLess: () => P.indentLess(P.countIndentation),
+  IndentSame: () => P.indentSame(P.countIndentation),
+
   _: () => P.optWhitespace,
-  NL: () => P.string('\n'),
+  CR: () => P.string('\r'),
+  LF: () => P.string('\n'),
+  CRLF: () => P.string('\r\n'),
+  NL: r => P.alt(r.CRLF, r.LF, r.CR).desc('newline'),
   End: r => P.alt(r.NL, P.eof),
 });
 
@@ -46,7 +53,16 @@ block:
   block:
     c()
     d()
-e()
+    block:
+      aa()
+      ab()
+      ac()
+      block:
+        ba()
+        bb()
+        bc()
+      e()
+f()
 `;
 
 function prettyPrint(x) {

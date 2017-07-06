@@ -395,6 +395,14 @@ Parsimmon.regexp(/[ ]*/).map(function(str) {
 })
 ```
 
+## Parsimmon.initialStateIndent
+
+**TODO**
+
+## Parsimmon.countIndentation
+
+**TODO**
+
 ## Parsimmon.indentMore(parser)
 
 **TODO**
