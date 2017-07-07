@@ -395,27 +395,50 @@ Parsimmon.regexp(/[ ]*/).map(function(str) {
 })
 ```
 
-## Parsimmon.initialStateIndent
-
-**TODO**
-
 ## Parsimmon.countIndentation
 
-**TODO**
+This parser accepts zero or more spaces **or** zero or more tabs, then returns the number of characters consumed. Tabs count as one character. Mixed spaces and tabs are not supported. This is intended to be passed as an argument to `Parsimmon.indentMore`, `Parsimmon.indentLess`, and `Parsimmon.indentSame`.
+
+**Note:** This is slightly less involved than the [indentation rules offered by Python](https://docs.python.org/3/reference/lexical_analysis.html#indentation). Feel free to implement your own indentation counting parser to suit your own needs. That's what the `Parsimmon.indent*` parsers take a parameter.
+
+Example:
+
+```js
+Parsimmon.countIndentation.tryParse('  ');
+// => 2
+
+Parsimmon.countIndentation.tryParse('\t\t\t');
+// => 3
+
+// Fails on mixed tabs and spaces.
+Parsimmon.countIndentation.parse('\t\t ').status;
+// => false
+```
 
 ## Parsimmon.indentMore(parser)
 
-**TODO**
+Using the indentation count returned from `parser`, succeed if the new indentation count is greater than the current indentation count. Adds the new indentation count to the end of the parser state array.
 
+See the `python-ish.js` file in the `examples/` directory for a complete example of how to use this parser.
+
+**Note:** This parser assumes the parsing state is an array of numbers, with `0` as the first item. Parsimmon sets this up by default if you don't pass an initial state parameter to `.parse` or `.tryParse`.
 
 ## Parsimmon.indentLess(parser)
 
-**TODO**
+Using the indentation count returned from `parser`, succeed if the new indentation count is less than the current indentation count **and** the new indentation level is equal to one already in the parser state array. Removes the last item from the end of the parser state array.
+
+See the `python-ish.js` file in the `examples/` directory for a complete example of how to use this parser.
+
+**Note:** This parser assumes the parsing state is an array of numbers, with `0` as the first item. Parsimmon sets this up by default if you don't pass an initial state parameter to `.parse` or `.tryParse`.
 
 
 ## Parsimmon.indentSame(parser)
 
-**TODO**
+Using the indentation count returned from `parser`, succeed if the new indentation count is equal to the current indentation count.
+
+See the `python-ish.js` file in the `examples/` directory for a complete example of how to use this parser.
+
+**Note:** This parser assumes the parsing state is an array of numbers, with `0` as the first item. Parsimmon sets this up by default if you don't pass an initial state parameter to `.parse` or `.tryParse`.
 
 ## Parsimmon.letter
 

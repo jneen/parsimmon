@@ -112,6 +112,16 @@ function unsafeUnion(xs, ys) {
   return keys;
 }
 
+// TODO: Remove this in favor of the ES5 method when we drop ES3 support.
+function arrayIndexOf(array, item) {
+  for (var j = 0; j < array.length; j++) {
+    if (item === array[j]) {
+      return j;
+    }
+  }
+  return -1;
+}
+
 function assertParser(p) {
   if (!isParser(p)) {
     throw new Error('not a parser: ' + p);
@@ -349,7 +359,7 @@ _.parse = function(input, initialState) {
     throw new Error('.parse must be called with a string as its argument');
   }
   if (arguments.length < 2) {
-    initialState = initialStateIndent;
+    initialState = [0];
   }
   var result = this.skip(eof)._(input, 0, initialState);
   if (result.status) {
@@ -369,7 +379,7 @@ _.parse = function(input, initialState) {
 
 _.tryParse = function(str, initialState) {
   if (arguments.length < 2) {
-    initialState = initialStateIndent;
+    initialState = [0];
   }
   var result = this.parse(str, initialState);
   if (result.status) {
@@ -749,8 +759,6 @@ _['fantasy-land/map'] = _.map;
 
 // -*- Base Parsers -*-
 
-var initialStateIndent = [0];
-
 var countIndentation =
   alt(
     regexp(/[ ]*/).desc('at least one space'),
@@ -776,6 +784,9 @@ function indentLess(indentationCounter) {
   return indentationCounter.chain(function(count) {
     return Parsimmon(function(input, i, state) {
       var j = state.length - 1;
+      if (arrayIndexOf(state, count) < 0) {
+        return makeFailure(i, 'consistent indentation', state);
+      }
       if (count < state[j]) {
         return makeSuccess(i, null, state.slice(0, j));
       }
@@ -828,7 +839,6 @@ var whitespace = regexp(/\s+/).desc('whitespace');
 Parsimmon.all = all;
 Parsimmon.alt = alt;
 Parsimmon.any = any;
-Parsimmon.initialStateIndent = initialStateIndent;
 Parsimmon.countIndentation = countIndentation;
 Parsimmon.createLanguage = createLanguage;
 Parsimmon.custom = custom;
