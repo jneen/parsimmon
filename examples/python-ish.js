@@ -17,12 +17,15 @@ let Pythonish = P.createLanguage({
   // We only defined two kinds of statements here, so just collect them and then
   // ignore leading and trailing blank lines
   Statement: r =>
-    P.alt(r.Call, r.Block).trim(r._),
+    r.Join0.then(P.alt(r.Call, r.Block)).trim(r._),
 
   // A simplified version of function call statements
   Call: r =>
     P.regexp(/[a-z]+/)
-      .skip(P.string('()'))
+      .skip(r.Join0)
+      .skip(P.string('('))
+      .skip(r.AnyWhitespace)
+      .skip(P.string(')'))
       .skip(r.Terminator)
       .node('Call'),
 
@@ -72,14 +75,40 @@ let Pythonish = P.createLanguage({
   // significant whitespace is the kind to the left of statements.
   _: r => r.BlankLine.many(),
 
+  // Python allows joining physical lines together into logical lines by ending
+  // a line with a single backslash. All whitespace after the line join is
+  // ignored. You *can* start a line with an explicit line join, but its
+  // indentation must be the correct indentation for that block.
+  ExplicitLineJoin: r =>
+    P.string('\\').then(r.Newline).then(r.Spaces0),
+
+  // Explicit line joins are always optional and can be repeated as many times
+  // consecutively as you like, so this helpers is used instead
+  Join0: r =>
+    r.ExplicitLineJoin.many(),
+
   // A blank line which should be completely ignored for all parsing purposes
-  BlankLine: r => r.Spaces0.then(P.alt(r.Comment, r.Newline)),
+  BlankLine: r =>
+    P.seq(
+      r.Join0,
+      r.Spaces0.then(P.alt(r.Comment, r.Newline)),
+      r.Join0
+    ),
 
   // A logical "end" of a line can include spaces or a comment before the end
   Terminator: r => r.Spaces0.then(P.alt(r.Comment, r.End)),
 
-  // Zero or more spaces or tabs
+  // Zero or more spaces or tabs. Note that Python actually allows a few more
+  // whitespace characters than this.
   Spaces0: () => P.regexp(/[ \t]*/),
+
+  // In Python, once you're inside a grouping structure like (parentheses) or
+  // [brackets] or {braces}, whitespace (even newlines) are completely ignored!
+  // You can still add explicit line joins, though they are totally unnecessary.
+  AnyWhitespace: r =>
+    P.optWhitespace
+      .then(r.Join0)
+      .then(P.optWhitespace),
 
   // Logical newlines can be:
   //
@@ -113,6 +142,17 @@ block:    #   c2\r
   a() #c3
 
   b() #       c4
+  \\
+\\
+\\
+             \\
+  c()
+  d\\
+(
+  \\
+
+  \\
+)
 
 ${SPACE}${SPACE}
 ${SPACE}${SPACE}# comment
@@ -137,5 +177,8 @@ function prettyPrint(x) {
   console.log(s);
 }
 
-let ast = Pythonish.Program.tryParse(text);
-prettyPrint(ast);
+// console.log(new Date().toLocaleTimeString());
+// let ast = Pythonish.Program.tryParse(text);
+console.log(text);
+// console.log('SUCCESS!');
+// prettyPrint(ast);
