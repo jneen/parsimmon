@@ -18,4 +18,18 @@ suite('many', function() {
     assert.equal(parser.parse('xxxxxy').value, 'y');
   });
 
+  test('should pass state through each parser', function() {
+    function test(n) {
+      return Parsimmon(function(input, i, state) {
+        assert.strictEqual(state, n);
+        return Parsimmon.makeSuccess(i, undefined, state);
+      });
+    }
+    var inc = Parsimmon(function(input, i, state) {
+      return Parsimmon.makeSuccess(i, null, state + 1);
+    });
+    var parser = Parsimmon.any.then(inc).many().then(test(4));
+    parser.tryParse('abcd', 0);
+  });
+
 });

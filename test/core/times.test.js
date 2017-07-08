@@ -72,4 +72,22 @@ suite('times', function() {
     });
   });
 
+  test('should pass state through each parser', function() {
+    function test(n) {
+      return Parsimmon(function(input, i, state) {
+        assert.strictEqual(state, n);
+        return Parsimmon.makeSuccess(i, undefined, state);
+      });
+    }
+    var inc = Parsimmon(function(input, i, state) {
+      return Parsimmon.makeSuccess(i, null, state + 1);
+    });
+    var parser = Parsimmon.any.then(inc).times(2, 6);
+    parser.then(test(2)).tryParse('ab', 0);
+    parser.then(test(3)).tryParse('abc', 0);
+    parser.then(test(4)).tryParse('abcd', 0);
+    parser.then(test(5)).tryParse('abcde', 0);
+    parser.then(test(6)).tryParse('abcdef', 0);
+  });
+
 });

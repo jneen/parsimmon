@@ -4,8 +4,8 @@ suite('Parsimmon.custom', function(){
   test('simple parser definition', function(){
     function customAny() {
       return Parsimmon.custom(function(success){
-        return function(input, i) {
-          return success(i+1, input.charAt(i));
+        return function(input, i, state) {
+          return success(i + 1, input.charAt(i), state);
         };
       });
     }
@@ -21,8 +21,8 @@ suite('Parsimmon.custom', function(){
   test('failing parser', function(){
     function failer() {
       return Parsimmon.custom(function(success, failure){
-        return function(input, i) {
-          return failure(i, 'nothing');
+        return function(input, i, state) {
+          return failure(i, 'nothing', state);
         };
       });
     }
@@ -41,11 +41,12 @@ suite('Parsimmon.custom', function(){
   test('composes with existing parsers', function(){
     function notChar(char) {
       return Parsimmon.custom(function(success, failure) {
-        return function(input, i) {
+        return function(input, i, state) {
           if (input.charCodeAt(i) !== char.charCodeAt(0)) {
-            return success(i+1, input.charAt(i));
+            return success(i + 1, input.charAt(i), state);
           }
-          return failure(i, 'something different than "' + input.charAt(i)) + '"';
+          var message = 'something different than "' + input.charAt(i) + '"';
+          return failure(i, message, state);
         };
       });
     }

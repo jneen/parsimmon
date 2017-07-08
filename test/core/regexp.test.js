@@ -50,4 +50,19 @@ suite('Parsimmon.regexp', function() {
     assert.strictEqual(parser3.parse('a1').status, false);
   });
 
+  test('should pass state through', function() {
+    function test(n) {
+      return Parsimmon(function(input, i, state) {
+        assert.strictEqual(state, n);
+        return Parsimmon.makeSuccess(i, undefined, state);
+      });
+    }
+    var inc = Parsimmon(function(input, i, state) {
+      return Parsimmon.makeSuccess(i, null, state + 1);
+    });
+    var parser = Parsimmon.regexp(/./);
+    test(0).then(parser).skip(test(0)).tryParse('a', 0);
+    inc.then(parser).skip(test(1)).tryParse('b', 0);
+  });
+
 });

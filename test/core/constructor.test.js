@@ -5,11 +5,11 @@ suite('Parsimmon()', function() {
   test('should work in general', function() {
     var good = 'just a Q';
     var bad = 'all I wanted was a Q';
-    var justQ = Parsimmon(function(str, i) {
+    var justQ = Parsimmon(function(str, i, state) {
       if (str.charAt(i) === 'Q') {
-        return Parsimmon.makeSuccess(i + 1, good);
+        return Parsimmon.makeSuccess(i + 1, good, state);
       } else {
-        return Parsimmon.makeFailure(i, bad);
+        return Parsimmon.makeFailure(i, bad, state);
       }
     });
     var result1 = justQ.parse('Q');
@@ -31,13 +31,14 @@ suite('Parsimmon()', function() {
 
   test('unsafeUnion works on poorly formatted custom parser', function() {
     var p1 = Parsimmon.string('a').or(Parsimmon.string('b'));
-    var p2 = Parsimmon(function(str, i) {
+    var p2 = Parsimmon(function(str, i, state) {
       return {
         status: false,
         index: -1,
         value: null,
         furthest: i,
-        expected: []
+        expected: [],
+        state: state
       };
     });
     var p3 = Parsimmon.alt(p2, p1);

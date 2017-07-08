@@ -12,6 +12,63 @@ The string passed to `.parse` is called the *input*.
 
 A parser is said to *consume* the text that it parses, leaving only the unconsumed text for subsequent parsers to check.
 
+# Tips
+
+## Readability
+
+For the sake of readability in your own parsers, it's recommended to either create a shortcut for the Parsimmon library:
+
+```javascript
+var P = Parsimmon;
+var parser = P.digits.sepBy(P.whitespace);
+```
+
+Or to create shortcuts for the Parsimmon values you intend to use (when using Babel):
+
+```javascript
+import { digits, whitespace } from 'parsimmon';
+var parser = digits.sepBy(whitespace);
+```
+
+Because it can become quite wordy to repeat Parsimmon everywhere:
+
+```javascript
+var parser = Parsimmon.sepBy(Parsimmon.digits, Parsimmon.whitespace);
+```
+
+For clarity's sake, however, `Parsimmon` will refer to the Parsimmon library itself, and `parser` will refer to a parser being used as an object in a method, like `P.string('9')` in `P.string('9').map(Number)`.
+
+## Side effects
+
+Do not perform [side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) parser actions. This is potentially unsafe, as Parsimmon will backtrack between parsers, but there's no way to undo your side effects.
+
+Side effects include pushing to an array, modifying an object, or `console.log`.
+
+In this example, the parser `pVariable` is called twice on the same text because of `Parsimmon.alt` backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
+
+```js
+var x = 0;
+var variableNames = [];
+var pVariable =
+  Parsimmon.regexp(/[a-z]+/i)
+    .map(function(name) {
+      variableNames.push(name);
+      return name;
+    });
+var pDeclaration =
+  Parsimmon.alt(
+    Parsimmon.string('var ').then(pVariable).then(Parsimmon.string('\n')),
+    Parsimmon.string('var ').then(pVariable).then(Parsimmon.string(';'))
+  );
+pDeclaration.parse('var gummyBear;');
+console.log(variableNames);
+// => ['gummyBear', 'gummyBear']
+```
+
+## Custom parsers
+
+`Parsimmon.custom(fn)` is no longer recommended, please use `Parsimmon(fn)` instead. That being said, *most* of the time you will not need to ever create a custom parser using `Parsimmon(fn)`. Custom parsers have access to internal parsing state, which is primarily useful if you are parsing an indentation-sensitive language, such as Python. That being said, the functions `Parsimmon.indentMore`, `Parsimmon.indentLess`, and `Parsimmon.indentSame` are designed to handle that sort of thing for you anyway, so you still might not need to do it.
+
 # Base parsers and parser generators
 
 These are either parsers or functions that return new parsers. These are the building blocks of parsers. They are all contained in the `Parsimmon` object.
@@ -53,17 +110,46 @@ Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
 
 ## Parsimmon(fn)
 
-**NOTE:** You probably will never need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`.
+**NOTE:** You probably will never need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`, and friends.
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon(fn)`. This is an example of how to create a parser that matches any character except the one provided:
 
+- The parameter `input` is the entire string passed to `.parse` or `.tryParse`.
+- The paremter `i` is the current parsing index into the `input` string.
+- The parameter `state` is the current parsing state. Generally this is not necessary, but parsing indentation-sensitive languages such as Python requires maintaining some state during parsing, so this is provided for such tasks.
+
+The return value from a custom parser should is somewhat complicated, so `Parsimmon.makeSuccess(i, value, state)` and `Parsimmon.makeFailure(i, expected, state)` are provided to ease implementation.
+
+**NOTE**: You should not modify `state`. Parsimmon does not track changes to it, so if your parser backtracks at any point, you may end up with incorrect state. Example:
+
+```js
+// -*- BAD -*-
+// Do not modify state
+state[key] = value;
+state.member = value;
+state.push(value);
+state.unshift(value);
+state.number++;
+
+// -*- GOOD -*-
+// Use new state based on old state
+var newState = Object.assign({}, state, {[key]: value});
+var newState = Object.assign({}, state, {member: value});
+var newState = state.concat([value]);
+var newState = [value].concat(state);
+var newState = Object.assign({}, state, {number: state.number + 1});
+```
+
+That example uses some ES6 features for the sake of brevity, but rest assured that libraries like Lodash can provide similar functionality as `Object.assign` if you need to target ES5 environments.
+
 ```javascript
 function notChar(char) {
-  return Parsimmon(function(input, i) {
+  return Parsimmon(function(input, i, state) {
     if (input.charAt(i) !== char) {
-      return Parsimmon.makeSuccess(i + 1, input.charAt(i));
+      return Parsimmon.makeSuccess(i + 1, input.charAt(i), state);
     }
-    return Parsimmon.makeFailure(i, 'anything different than "' + char + '"');
+    var expected = 'anything different than "' + char + '"';
+    return Parsimmon.makeFailure(i, expected, state);
   });
 }
 ```
@@ -84,13 +170,13 @@ parser.parse('accccc');
 
 Alias of `Parsimmon(fn)` for backwards compatibility.
 
-## Parsimmon.makeSuccess(index, value)
+## Parsimmon.makeSuccess(index, value, state)
 
-To be used inside of `Parsimmon(fn)`. Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for `Parsimmon(fn)`.
+To be used inside of `Parsimmon(fn)`. Generates an object describing how far the successful parse went (`index`), what `value` it created doing so, and the new `state` after it's done. See documentation for `Parsimmon(fn)`.
 
-## Parsimmon.makeFailure(furthest, expectation)
+## Parsimmon.makeFailure(furthest, expectation, state)
 
-To be used inside of `Parsimmon(fn)`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). See documentation for `Parsimmon(fn)`.
+To be used inside of `Parsimmon(fn)`. Generates an object describing how far the unsuccessful parse went (`index`), what kind of syntax it expected to see (`expectation`), and what the parsing `state` before it failed. See documentation for `Parsimmon(fn)`.
 
 ## Parsimmon.isParser(obj)
 
@@ -297,6 +383,63 @@ Equivalent to `Parsimmon.lazy(f).desc(description)`.
 
 Returns a failing parser with the given message.
 
+## Parsimmon.countSpaces
+
+Parser that expectes zero or more spaces and yields the number of spaces consumed. Intended to be used with the `Parsimmon.indent*` family of functions.
+
+Equivalent to:
+
+```js
+Parsimmon.regexp(/[ ]*/).map(function(str) {
+  return str.length;
+})
+```
+
+## Parsimmon.countIndentation
+
+This parser accepts zero or more spaces **or** zero or more tabs, then returns the number of characters consumed. Tabs count as one character. Mixed spaces and tabs are not supported. This is intended to be passed as an argument to `Parsimmon.indentMore`, `Parsimmon.indentLess`, and `Parsimmon.indentSame`.
+
+**Note:** This is slightly less involved than the [indentation rules offered by Python](https://docs.python.org/3/reference/lexical_analysis.html#indentation). Feel free to implement your own indentation counting parser to suit your own needs. That's what the `Parsimmon.indent*` parsers take a parameter.
+
+Example:
+
+```js
+Parsimmon.countIndentation.tryParse('  ');
+// => 2
+
+Parsimmon.countIndentation.tryParse('\t\t\t');
+// => 3
+
+// Fails on mixed tabs and spaces.
+Parsimmon.countIndentation.parse('\t\t ').status;
+// => false
+```
+
+## Parsimmon.indentMore(parser)
+
+Using the indentation count returned from `parser`, succeed if the new indentation count is greater than the current indentation count. Adds the new indentation count to the end of the parser state array.
+
+See the `python-ish.js` file in the `examples/` directory for a complete example of how to use this parser.
+
+**Note:** This parser assumes the parsing state is an array of numbers, with `0` as the first item. Parsimmon sets this up by default if you don't pass an initial state parameter to `.parse` or `.tryParse`.
+
+## Parsimmon.indentLess(parser)
+
+Using the indentation count returned from `parser`, succeed if the new indentation count is less than the current indentation count **and** the new indentation level is equal to one already in the parser state array. Removes the last item from the end of the parser state array.
+
+See the `python-ish.js` file in the `examples/` directory for a complete example of how to use this parser.
+
+**Note:** This parser assumes the parsing state is an array of numbers, with `0` as the first item. Parsimmon sets this up by default if you don't pass an initial state parameter to `.parse` or `.tryParse`.
+
+
+## Parsimmon.indentSame(parser)
+
+Using the indentation count returned from `parser`, succeed if the new indentation count is equal to the current indentation count.
+
+See the `python-ish.js` file in the `examples/` directory for a complete example of how to use this parser.
+
+**Note:** This parser assumes the parsing state is an array of numbers, with `0` as the first item. Parsimmon sets this up by default if you don't pass an initial state parameter to `.parse` or `.tryParse`.
+
 ## Parsimmon.letter
 
 Equivalent to `Parsimmon.regexp(/[a-z]/i)`.
@@ -395,7 +538,7 @@ CustomString.parse('%<a string>'); // => {status: true, value: 'a string'}
 
 ## Parsimmon.custom(fn)
 
-**Deprecated:** Please use `Parsimmon(fn)` going forward.
+**DEPRECATED:** Please use `Parsimmon(fn)` going forward.
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon.custom`. This is an example of how to create a parser that matches any character except the one provided:
 
@@ -455,6 +598,10 @@ parser.parse('ccc');
 //     expected: ["'a' character", "'b' character"]}
 ```
 
+## parser.parse(input, initialState)
+
+Like `.parse(input)`, but passes `initialState` to the parser. When omitted, `initialState` is set to `[0]` for use with `Parsimmon.indentMore`, `Parsimmon.indentLess`, and `Parsimmon.indentSame`.
+
 ## parser.tryParse(input)
 
 Like `parser.parse(input)` but either returns the parsed value or throws an error on failure. The error object contains additional properties about the error.
@@ -480,6 +627,10 @@ try {
   //     expected: ['EOF', 'whitespace']}
 }
 ```
+
+## parser.tryParse(input, initialState)
+
+Like `.tryParse(input)`, but passes `initialState` to the parser. When omitted, `initialState` is set to `[0]` for use with `Parsimmon.indentMore`, `Parsimmon.indentLess`, and `Parsimmon.indentSame`.
 
 ## parser.or(otherParser)
 
@@ -886,56 +1037,3 @@ See `parser.chain(newParserFunc)` defined earlier.
 ## parser.of(result)
 
 Equivalent to `Parsimmon.of(result)`.
-
-# Tips
-
-## Readability
-
-For the sake of readability in your own parsers, it's recommended to either create a shortcut for the Parsimmon library:
-
-```javascript
-var P = Parsimmon;
-var parser = P.digits.sepBy(P.whitespace);
-```
-
-Or to create shortcuts for the Parsimmon values you intend to use (when using Babel):
-
-```javascript
-import { digits, whitespace } from 'parsimmon';
-var parser = digits.sepBy(whitespace);
-```
-
-Because it can become quite wordy to repeat Parsimmon everywhere:
-
-```javascript
-var parser = Parsimmon.sepBy(Parsimmon.digits, Parsimmon.whitespace);
-```
-
-For clarity's sake, however, `Parsimmon` will refer to the Parsimmon library itself, and `parser` will refer to a parser being used as an object in a method, like `P.string('9')` in `P.string('9').map(Number)`.
-
-## Side effects
-
-Do not perform [side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) parser actions. This is potentially unsafe, as Parsimmon will backtrack between parsers, but there's no way to undo your side effects.
-
-Side effects include pushing to an array, modifying an object, or `console.log`.
-
-In this example, the parser `pVariable` is called twice on the same text because of `Parsimmon.alt` backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
-
-```js
-var x = 0;
-var variableNames = [];
-var pVariable =
-  Parsimmon.regexp(/[a-z]+/i)
-    .map(function(name) {
-      variableNames.push(name);
-      return name;
-    });
-var pDeclaration =
-  Parsimmon.alt(
-    Parsimmon.string('var ').then(pVariable).then(Parsimmon.string('\n')),
-    Parsimmon.string('var ').then(pVariable).then(Parsimmon.string(';'))
-  );
-pDeclaration.parse('var gummyBear;');
-console.log(variableNames);
-// => ['gummyBear', 'gummyBear']
-```

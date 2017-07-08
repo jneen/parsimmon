@@ -61,4 +61,23 @@ suite('Parsimmon.lookahead', function() {
     assert.throws(function() { Parsimmon.lookahead(12); });
   });
 
+  test('should pass state through unchanged', function() {
+    function test(n) {
+      return Parsimmon(function(input, i, state) {
+        assert.strictEqual(state, n);
+        return Parsimmon.makeSuccess(i, undefined, state);
+      });
+    }
+    var inc = Parsimmon(function(input, i, state) {
+      return Parsimmon.makeSuccess(i, null, state + 1);
+    });
+    var parser = Parsimmon.lookahead(Parsimmon.regexp(/a/));
+    test(0)
+      .then(inc)
+      .then(parser)
+      .skip(test(1))
+      .then(Parsimmon.string('a'))
+      .tryParse('a', 0);
+  });
+
 });

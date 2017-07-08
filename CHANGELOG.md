@@ -1,3 +1,19 @@
+## version 2.0.0 (????-??-??)
+
+* **BREAKING:** Adds optional `initialState` parameter to:
+  * `.parse`
+  * `.tryParse`
+* **BREAKING:** Adds extra `state` parameter to:
+  * `.parse`
+  * `.tryParse`
+  * `Parsimmon.makeSuccess`
+  * `Parsimmon.makeFailure`
+* Adds `Parsimmon.initialStateIndent`
+* Adds `Parsimmon.countIndentation`
+* Adds `Parsimmon.indentMore`
+* Adds `Parsimmon.indentLess`
+* Adds `Parsimmon.indentSame`
+
 ## version 1.6.1 (2017-07-01)
 
 * **100% unit test coverage!** This does not mean bugs won't exist, but it keeps us much safer against regressions in the future.

@@ -59,4 +59,33 @@ suite('fail', function() {
       expected: ['*']
     });
   });
+
+  test('.fail should pass state through', function() {
+    function test(n) {
+      return Parsimmon(function(input, i, state) {
+        assert.strictEqual(state, n);
+        return Parsimmon.makeSuccess(i, undefined, state);
+      });
+    }
+    var result =
+      test(10)
+        .then(Parsimmon.fail('nice'))
+        ._(0, 'a', 10);
+    assert.strictEqual(result.state, 10);
+  });
+
+  test('.succeed should pass state through', function() {
+    function test(n) {
+      return Parsimmon(function(input, i, state) {
+        assert.strictEqual(state, n);
+        return Parsimmon.makeSuccess(i, undefined, state);
+      });
+    }
+    var result =
+      test(10)
+        .then(Parsimmon.succeed('anything at all'))
+        ._(0, 'a', 10);
+    assert.strictEqual(result.state, 10);
+  });
+
 });

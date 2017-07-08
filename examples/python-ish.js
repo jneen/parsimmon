@@ -7,96 +7,168 @@ let P = require('..');
 
 ///////////////////////////////////////////////////////////////////////
 
-// LIMITATIONS: Python allows not only multiline blocks, but inline blocks too.
-//
-//   if x == y: print("nice")
-//
-// vs.
-//
-//   if x == y:
-//       print("nice")
-//
-// This parser only supports the multiline indented form.
-
-// NOTE: This is a hack and is not recommended. Maintaining state throughout
-// Parsimmon parsers is not reliable since backtracking may occur, leaving your
-// state inaccurate. See the relevant GitHub issue for discussion.
-//
-// https://github.com/jneen/parsimmon/issues/158
-//
-function indentPeek() {
-  return indentStack[indentStack.length - 1];
-}
-
-let indentStack = [0];
-
 let Pythonish = P.createLanguage({
-  // If this were actually Python, "Block" wouldn't be a statement on its own,
-  // but rather "If" and "While" would be statements that used "Block" inside.
+
+  // A program is just zero or more statements optionally surrounded by blank
+  // lines and comments.
+  Program: r =>
+    r.Statement.many().trim(r._).node('Program'),
+
+  // We only defined two kinds of statements here, so just collect them and then
+  // ignore leading and trailing blank lines
   Statement: r =>
-    P.alt(r.ExpressionStatement, r.Block),
+    r.Join0.then(P.alt(r.Call, r.Block)).trim(r._),
 
-  // Just a simple `foo()` style function call.
-  FunctionCall: () =>
-    P.regexp(/[a-z]+/).skip(P.string('()'))
-      .node('FunctionCall')
-      .desc('a function call'),
+  // A simplified version of function call statements
+  Call: r =>
+    P.regexp(/[a-z]+/)
+      .skip(r.Join0)
+      .skip(P.string('('))
+      .skip(r.AnyWhitespace)
+      .skip(P.string(')'))
+      .skip(r.Terminator)
+      .node('Call'),
 
-  // To make it a statement we just need a newline afterward.
-  ExpressionStatement: r =>
-    r.FunctionCall.skip(P.string('\n')),
-
-  // The general idea of this is to assume there's "block:" on its own line,
-  // then we capture the whitespace used to indent the first statement of the
-  // block, and require that every other statement has the same exact string of
-  // indentation in front of it.
+  // If this were actually Python we would strip off the parts before
+  // `r.IndentMore` and reuse this for all the language structures which take
+  // indented blocks. Note that the first statement is preceeded by
+  // `r.IndentMore` because the indentation level must increase for it to be a
+  // valid block. Also note that there must be *at least* one statement in a
+  // block for it to be valid. This is why Python has the `pass` statement which
+  // does nothing at all. Every other statement must explicitly use
+  // `r.IndentSame` to consume and check its indentation, then finish with
+  // `r.IndentLess` to close the block.
   Block: r =>
     P.seqObj(
       P.string('block:'),
-      P.string('\n'),
-      ['indent', P.regexp(/[ ]+/)],
-      ['statement', r.Statement]
-    ).chain(args => {
-      // `.chain` is called after a parser succeeds. It returns the next parser
-      // to use for parsing. This allows subsequent parsing to be dependent on
-      // previous text.
-      let {indent, statement} = args;
-      let indentSize = indent.length;
-      let currentSize = indentPeek();
-      // Indentation must be deeper than the current block context. Otherwise
-      // you could indent *less* for a block and it would still work. This is
-      // not how any language I know of works.
-      if (indentSize <= currentSize) {
-        return P.fail('at least ' + currentSize + ' spaces');
-      }
-      indentStack.push(indentSize);
-      return P.string(indent)
-        .then(r.Statement)
-        .many()
-        .map(statements => {
-          indentStack.pop();
-          return [statement].concat(statements);
-        });
-    })
-    .node('Block'),
+      r.Terminator,
+      r._,
+      r.IndentMore,
+      ['first', r.Statement],
+      ['rest', r.IndentSame.then(r.Statement).many()],
+      r.IndentLess
+    ).map(args => {
+      let {first, rest} = args;
+      let statements = [first, ...rest];
+      return {statements};
+    }).node('Block'),
+
+  // Uses standard Parsimmon indentation tracking. This includes either tabs or
+  // spaces, but does not support them mixed. Please note that Python actually
+  // allows mixed tabs and spaces, despite it being a not very good idea.
+  //
+  // https://docs.python.org/3/reference/lexical_analysis.html#indentation
+  IndentMore: () => P.indentMore(P.countIndentation),
+  IndentLess: () => P.indentLess(P.countIndentation),
+  IndentSame: () => P.indentSame(P.countIndentation),
+
+  // Standard Python style comments
+  Comment: r =>
+    P.seq(
+      P.string('#'),
+      P.regexp(/[^\r\n]*/),
+      r.End
+    ),
+
+  // Zero or more blank lines; should be ignore for parsing purposes. This can
+  // generally occur between any token in Python and is ignored. The only
+  // significant whitespace is the kind to the left of statements.
+  _: r => r.BlankLine.many(),
+
+  // Python allows joining physical lines together into logical lines by ending
+  // a line with a single backslash. All whitespace after the line join is
+  // ignored. You *can* start a line with an explicit line join, but its
+  // indentation must be the correct indentation for that block.
+  ExplicitLineJoin: r =>
+    P.string('\\').then(r.Newline).then(r.Spaces0),
+
+  // Explicit line joins are always optional and can be repeated as many times
+  // consecutively as you like, so this helpers is used instead
+  Join0: r =>
+    r.ExplicitLineJoin.many(),
+
+  // A blank line which should be completely ignored for all parsing purposes
+  BlankLine: r =>
+    P.seq(
+      r.Join0,
+      r.Spaces0.then(P.alt(r.Comment, r.Newline)),
+      r.Join0
+    ),
+
+  // A logical "end" of a line can include spaces or a comment before the end
+  Terminator: r => r.Spaces0.then(P.alt(r.Comment, r.End)),
+
+  // Zero or more spaces or tabs. Note that Python actually allows a few more
+  // whitespace characters than this.
+  Spaces0: () => P.regexp(/[ \t]*/),
+
+  // In Python, once you're inside a grouping structure like (parentheses) or
+  // [brackets] or {braces}, whitespace (even newlines) are completely ignored!
+  // You can still add explicit line joins, though they are totally unnecessary.
+  AnyWhitespace: r =>
+    P.optWhitespace
+      .then(r.Join0)
+      .then(P.optWhitespace),
+
+  // Logical newlines can be:
+  //
+  // - Windows style ("\r\n" aka CRLF)
+  // - UNIX style ("\n" aka LF)
+  // - Mac OS 9 style ("\r" aka CR)
+  //
+  // Realistically, nobody uses Mac OS 9 style any more, but oh well.
+  Newline: () => P.alt(P.string('\r\n'), P.oneOf('\r\n')).desc('newline'),
+
+  // Typically text files *end* each line with a newline, rather than just
+  // separating them, but many files are malformed, so we should support the
+  // "end of file" as a form of newline.
+  End: r => P.alt(r.Newline, P.eof),
 });
 
 ///////////////////////////////////////////////////////////////////////
 
+// We need to test that trailing whitespace doesn't mess up a line, trailing
+// whitespace is confusing, so let's make it completely explicit
+let SPACE = ' ';
+
 let text = `\
-block:
-    a()
-    b()
+
+
+#c0
+
+
+z() #c1'\r\n\
+block:    #   c2\r
+  a() #c3
+
+  b() #       c4
+  \\
+\\
+\\
+             \\
+  c()
+  d\\
+(
+  \\
+
+  \\
+)
+
+${SPACE}${SPACE}
+${SPACE}${SPACE}# comment
+  block:
     c()
+    d()
     block:
-      d()
+      aa()
+      ab()
+      ac()
+      block:
+        ba()
+        bb()
+        bc()
       e()
-      f()
-    block:
-        g()
-        h()
-        i()
-        j()
+f()#c
 `;
 
 function prettyPrint(x) {
@@ -105,5 +177,8 @@ function prettyPrint(x) {
   console.log(s);
 }
 
-let ast = Pythonish.Block.tryParse(text);
-prettyPrint(ast);
+// console.log(new Date().toLocaleTimeString());
+// let ast = Pythonish.Program.tryParse(text);
+console.log(text);
+// console.log('SUCCESS!');
+// prettyPrint(ast);
