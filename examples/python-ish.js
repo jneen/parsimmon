@@ -8,18 +8,33 @@ let P = require('..');
 ///////////////////////////////////////////////////////////////////////
 
 let Pythonish = P.createLanguage({
+
+  // A program is just zero or more statements optionally surrounded by blank
+  // lines and comments.
   Program: r =>
     r.Statement.many().trim(r._).node('Program'),
 
+  // We only defined two kinds of statements here, so just collect them and then
+  // ignore leading and trailing blank lines
   Statement: r =>
     P.alt(r.Call, r.Block).trim(r._),
 
+  // A simplified version of function call statements
   Call: r =>
     P.regexp(/[a-z]+/)
       .skip(P.string('()'))
       .skip(r.Terminator)
       .node('Call'),
 
+  // If this were actually Python we would strip off the parts before
+  // `r.IndentMore` and reuse this for all the language structures which take
+  // indented blocks. Note that the first statement is preceeded by
+  // `r.IndentMore` because the indentation level must increase for it to be a
+  // valid block. Also note that there must be *at least* one statement in a
+  // block for it to be valid. This is why Python has the `pass` statement which
+  // does nothing at all. Every other statement must explicitly use
+  // `r.IndentSame` to consume and check its indentation, then finish with
+  // `r.IndentLess` to close the block.
   Block: r =>
     P.seqObj(
       P.string('block:'),
@@ -52,7 +67,9 @@ let Pythonish = P.createLanguage({
       r.End
     ),
 
-  // Zero or more blank lines; should be ignore for parsing purposes
+  // Zero or more blank lines; should be ignore for parsing purposes. This can
+  // generally occur between any token in Python and is ignored. The only
+  // significant whitespace is the kind to the left of statements.
   _: r => r.BlankLine.many(),
 
   // A blank line which should be completely ignored for all parsing purposes
@@ -81,6 +98,8 @@ let Pythonish = P.createLanguage({
 
 ///////////////////////////////////////////////////////////////////////
 
+// We need to test that trailing whitespace doesn't mess up a line, trailing
+// whitespace is confusing, so let's make it completely explicit
 let SPACE = ' ';
 
 let text = `\
@@ -118,7 +137,5 @@ function prettyPrint(x) {
   console.log(s);
 }
 
-console.log(new Date().toTimeString());
-console.log();
 let ast = Pythonish.Program.tryParse(text);
 prettyPrint(ast);
