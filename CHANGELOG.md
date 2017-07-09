@@ -1,3 +1,7 @@
+## version 1.6.2 (2017-07-08)
+
+* Fixes another bug with match groups outside the correct range in `Parsimmon.regexp(regexp, group)`.
+
 ## version 1.6.1 (2017-07-01)
 
 * **100% unit test coverage!** This does not mean bugs won't exist, but it keeps us much safer against regressions in the future.

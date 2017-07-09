@@ -47,7 +47,11 @@ suite('Parsimmon.regexp', function() {
     assert.strictEqual(parser0.parse('a1').value, 'a1');
     assert.strictEqual(parser1.parse('a1').value, 'a');
     assert.strictEqual(parser2.parse('a1').value, '1');
-    assert.strictEqual(parser3.parse('a1').status, false);
+    assert.deepStrictEqual(parser3.parse('a1'), {
+      status: false,
+      expected: ['valid match group (0 to 3) in /(\\w)(\\d)/'],
+      index: {column: 1, line: 1, offset: 0},
+    });
   });
 
 });
