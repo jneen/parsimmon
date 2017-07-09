@@ -595,9 +595,9 @@ function regexp(re, group) {
         var groupMatch = match[group];
         return makeSuccess(i + fullMatch.length, groupMatch);
       }
-      return makeFailure(
-        'valid match group (0 to ' + match.length + ') in ' + expected
-      );
+      var message =
+        'valid match group (0 to ' + match.length + ') in ' + expected;
+      return makeFailure(i, message);
     }
     return makeFailure(i, expected);
   });
