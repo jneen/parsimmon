@@ -18,4 +18,9 @@ suite('many', function() {
     assert.equal(parser.parse('xxxxxy').value, 'y');
   });
 
+  test('can process infinite loop', function() {
+    var parser = Parsimmon.string('').many();
+    assert.equal(parser.parse('y').status, false);
+  });
+
 });
