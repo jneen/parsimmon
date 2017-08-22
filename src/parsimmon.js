@@ -541,7 +541,16 @@ _.desc = function(expected) {
 };
 
 _.fallback = function(result) {
-  return this.or(succeed(result));
+  var isCalled = {};
+  var self = this;
+  return Parsimmon(function(input, i) {
+    var reply = self._(input, i);
+    if (reply.status || isCalled[i]) {
+      return reply;
+    }
+    isCalled[i] = true;
+    return succeed(result)._(input, i);
+  });
 };
 
 _.ap = function(other) {
