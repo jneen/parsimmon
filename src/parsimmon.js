@@ -396,7 +396,6 @@ _.then = function(next) {
 
 _.many = function() {
   var self = this;
-
   return Parsimmon(function(input, i) {
     var accum = [];
     var result = undefined;
@@ -404,6 +403,9 @@ _.many = function() {
     for (;;) {
       result = mergeReplies(self._(input, i), result);
       if (result.status) {
+        if (i === result.index) {
+          return makeFailure(i, 'Infinite loop has been detected in many() parser');
+        }
         i = result.index;
         accum.push(result.value);
       } else {

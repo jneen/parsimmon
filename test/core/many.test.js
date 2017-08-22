@@ -18,4 +18,9 @@ suite('many', function() {
     assert.equal(parser.parse('xxxxxy').value, 'y');
   });
 
+  test('aborts on 0-character parse', function() {
+    var parser = Parsimmon.string('').many();
+    assert.equal(parser.parse('y').status, false);
+  });
+
 });
