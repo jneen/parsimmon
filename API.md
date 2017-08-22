@@ -917,7 +917,9 @@ For clarity's sake, however, `Parsimmon` will refer to the Parsimmon library its
 
 Do not perform [side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) parser actions. This is potentially unsafe, as Parsimmon will backtrack between parsers, but there's no way to undo your side effects.
 
-Side effects include pushing to an array, modifying an object, or `console.log`.
+Side effects include pushing to an array, modifying an object, `console.log`, reading data from outside sources (an array or object used to track things during parsing), or any random numbers.
+
+Parsimmon expects that parsers and all `.map` statements do not perform side effects (i.e. they are *pure*).
 
 In this example, the parser `pVariable` is called twice on the same text because of `Parsimmon.alt` backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
 
