@@ -399,7 +399,7 @@ _.many = function() {
   return Parsimmon(function(input, i) {
     var accum = [];
     var result = undefined;
-    
+
     for (;;) {
       result = mergeReplies(self._(input, i), result);
       if (result.status) {
