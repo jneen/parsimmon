@@ -5,7 +5,7 @@
   "keywords": ["parsing", "parse", "parsers", "parser combinators"],
   "author": "Jeanine Adkisson <jneen at jneen dot net>",
   "contributors": ["Brian Mock <brian@mockbrian.com>"],
-  "repository": "git://github.com/jneen/parsimmon",
+  "repository": "https://github.com/jneen/parsimmon",
   "files": ["src", "build"],
   "main": "src/parsimmon.js",
   "browser": "build/parsimmon.umd.min.js",
