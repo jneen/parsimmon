@@ -1,41 +1,39 @@
-'use strict';
+"use strict";
 
 // Run me with Node to see my output!
 
-let util = require('util');
-let P = require('../');
+let util = require("util");
+let P = require("../");
 
 ///////////////////////////////////////////////////////////////////////
 
 let Lang = P.createLanguage({
-
   _: () => P.optWhitespace,
 
-  LParen: () => P.string('('),
-  RParen: () => P.string(')'),
-  Comma: () => P.string(','),
-  Dot: () => P.string('.'),
+  LParen: () => P.string("("),
+  RParen: () => P.string(")"),
+  Comma: () => P.string(","),
+  Dot: () => P.string("."),
 
-  Identifier: () => P.letters.node('Identifier'),
+  Identifier: () => P.letters.node("Identifier"),
 
   MethodCall: r =>
     P.seqObj(
-      ['receiver', r.Identifier],
+      ["receiver", r.Identifier],
       r.Dot.trim(r._),
-      ['method', r.Identifier],
+      ["method", r.Identifier],
       r.LParen,
-      ['arguments', r.Identifier.trim(r._).sepBy(r.Comma)],
+      ["arguments", r.Identifier.trim(r._).sepBy(r.Comma)],
       r.RParen
-    ).node('MethodCall'),
-
+    ).node("MethodCall")
 });
 
 ///////////////////////////////////////////////////////////////////////
 
-let text = 'console.log(bar, baz, quux)';
+let text = "console.log(bar, baz, quux)";
 
 function prettyPrint(x) {
-  let opts = {depth: null, colors: 'auto'};
+  let opts = { depth: null, colors: "auto" };
   let s = util.inspect(x, opts);
   console.log(s);
 }

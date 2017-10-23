@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
-global.assert = require('assert');
-global.Parsimmon = require('..');
+global.assert = require("assert");
+global.Parsimmon = require("..");

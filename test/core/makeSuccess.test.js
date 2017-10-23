@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-test('Parsimmon.makeSuccess', function() {
+test("Parsimmon.makeSuccess", function() {
   var index = 11;
-  var value = 'a lucky number';
+  var value = "a lucky number";
   var result = Parsimmon.makeSuccess(index, value);
   assert.deepEqual(result, {
     status: true,

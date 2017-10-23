@@ -1,75 +1,70 @@
-'use strict';
+"use strict";
 
 // Run me with Node to see my output!
 
-let util = require('util');
-let P = require('..');
+let util = require("util");
+let P = require("..");
 
 ///////////////////////////////////////////////////////////////////////
 
 // -*- Parser -*-
 
 let Lang = P.createLanguage({
-
   s0: () => P.regexp(/[ ]*/),
   s1: () => P.regexp(/[ ]+/),
   Whitespace: () => P.regexp(/[ \n]*/),
   NotNewline: () => P.regexp(/[^\n]*/),
-  Comma: () => P.string(','),
-  Comment: r => r.NotNewline.wrap(P.string('//'), P.string('\n')),
-  End: r => P.alt(P.string(';'), r._, P.string('\n'), P.eof),
+  Comma: () => P.string(","),
+  Comment: r => r.NotNewline.wrap(P.string("//"), P.string("\n")),
+  End: r => P.alt(P.string(";"), r._, P.string("\n"), P.eof),
   _: r => r.Comment.sepBy(r.Whitespace).trim(r.Whitespace),
 
   Program: r =>
     r.Statement
       .many()
       .trim(r._)
-      .node('Program'),
+      .node("Program"),
 
-  Statement: r =>
-    P.alt(
-      r.Declaration,
-      r.Assignment,
-      r.Call
-    ),
+  Statement: r => P.alt(r.Declaration, r.Assignment, r.Call),
 
   Declaration: r =>
     P.seqObj(
-      P.string('var'),
+      P.string("var"),
       r.s1,
-      ['identifier', r.Identifier],
+      ["identifier", r.Identifier],
       r.s0,
-      P.string('='),
+      P.string("="),
       r.s0,
-      ['initialValue', r.Expression],
+      ["initialValue", r.Expression],
       r.End
-    ).node('Declaration'),
+    ).node("Declaration"),
 
   Assignment: r =>
     P.seqObj(
-      ['identifier', r.Identifier],
+      ["identifier", r.Identifier],
       r.s0,
-      P.string('='),
+      P.string("="),
       r.s0,
-      ['newValue', r.Expression],
+      ["newValue", r.Expression],
       r.End
-    ).node('Assignment'),
+    ).node("Assignment"),
 
   Call: r =>
     P.seqObj(
-      ['function', r.Expression],
-      P.string('('),
-      ['arguments', r.Expression.trim(r._).sepBy(r.Comma)],
-      P.string(')')
-    ).node('Call'),
+      ["function", r.Expression],
+      P.string("("),
+      ["arguments", r.Expression.trim(r._).sepBy(r.Comma)],
+      P.string(")")
+    ).node("Call"),
 
-  Expression: r =>
-    P.alt(r.Number, r.Reference),
+  Expression: r => P.alt(r.Number, r.Reference),
 
-  Number: () => P.regexp(/[0-9]+/).map(Number).node('Number'),
-  Identifier: () => P.regexp(/[a-z]+/).node('Identifier'),
-  Reference: r => r.Identifier.node('Reference'),
-
+  Number: () =>
+    P.regexp(/[0-9]+/)
+      .map(Number)
+      .node("Number"),
+  Identifier: () => P.regexp(/[a-z]+/).node("Identifier"),
+  Reference: r => r.Identifier.node("Reference")
 });
 
 // -*- Linter -*-
@@ -86,7 +81,6 @@ function noLint() {
 }
 
 let lintHelpers = {
-
   Program(node) {
     node.value.forEach(lint_);
   },
@@ -99,7 +93,7 @@ let lintHelpers = {
   Reference(node) {
     let name = node.value.value;
     if (!scope.hasOwnProperty(name)) {
-      messages.push('undeclared variable ' + name);
+      messages.push("undeclared variable " + name);
     }
   },
 
@@ -112,16 +106,15 @@ let lintHelpers = {
     node.value.arguments.forEach(lint_);
   },
 
-  Number: noLint,
-
+  Number: noLint
 };
 
 function lint_(node) {
   if (!node) {
-    throw new TypeError('not an AST node: ' + node);
+    throw new TypeError("not an AST node: " + node);
   }
   if (!lintHelpers.hasOwnProperty(node.name)) {
-    throw new TypeError('no lint helper for ' + node.name);
+    throw new TypeError("no lint helper for " + node.name);
   }
   return lintHelpers[node.name](node);
 }
@@ -149,7 +142,7 @@ f(x, y, 3)
 `;
 
 function prettyPrint(x) {
-  let opts = {depth: null, colors: 'auto'};
+  let opts = { depth: null, colors: "auto" };
   let s = util.inspect(x, opts);
   console.log(s);
 }

@@ -1,11 +1,14 @@
-'use strict';
+"use strict";
 
-var H = require('../helpers');
+var H = require("../helpers");
 
-suite('Fantasy Land Apply', function() {
-  test('composition', function() {
+suite("Fantasy Land Apply", function() {
+  test("composition", function() {
     function reverse(s) {
-      return s.split('').reverse().join('');
+      return s
+        .split("")
+        .reverse()
+        .join("");
     }
 
     function upperCase(s) {
@@ -20,20 +23,14 @@ suite('Fantasy Land Apply', function() {
       };
     }
 
-    var p1 =
-      Parsimmon.all
-        .ap(Parsimmon.of(reverse))
-        .ap(Parsimmon.of(upperCase));
+    var p1 = Parsimmon.all
+      .ap(Parsimmon.of(reverse))
+      .ap(Parsimmon.of(upperCase));
 
-    var p2 =
-      Parsimmon.all.ap(
-        Parsimmon.of(reverse).ap(
-          Parsimmon.of(upperCase).map(compose)
-        )
-      );
+    var p2 = Parsimmon.all.ap(
+      Parsimmon.of(reverse).ap(Parsimmon.of(upperCase).map(compose))
+    );
 
-    H.equivalentParsers(p1, p2, [
-      'ok cool'
-    ]);
+    H.equivalentParsers(p1, p2, ["ok cool"]);
   });
 });

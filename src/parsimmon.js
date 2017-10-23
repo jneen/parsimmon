@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function Parsimmon(action) {
   if (!(this instanceof Parsimmon)) {
@@ -16,7 +16,7 @@ function isParser(obj) {
 }
 
 function isArray(x) {
-  return {}.toString.call(x) === '[object Array]';
+  return {}.toString.call(x) === "[object Array]";
 }
 
 function makeSuccess(index, value) {
@@ -46,9 +46,10 @@ function mergeReplies(result, last) {
   if (result.furthest > last.furthest) {
     return result;
   }
-  var expected = (result.furthest === last.furthest)
-    ? unsafeUnion(result.expected, last.expected)
-    : last.expected;
+  var expected =
+    result.furthest === last.furthest
+      ? unsafeUnion(result.expected, last.expected)
+      : last.expected;
   return {
     status: result.status,
     index: result.index,
@@ -59,7 +60,7 @@ function mergeReplies(result, last) {
 }
 
 function makeLineColumnIndex(input, i) {
-  var lines = input.slice(0, i).split('\n');
+  var lines = input.slice(0, i).split("\n");
   // Note that unlike the character offset, the line and column offsets are
   // 1-based.
   var lineWeAreUpTo = lines.length;
@@ -105,26 +106,26 @@ function unsafeUnion(xs, ys) {
 
 function assertParser(p) {
   if (!isParser(p)) {
-    throw new Error('not a parser: ' + p);
+    throw new Error("not a parser: " + p);
   }
 }
 
 // TODO[ES5]: Switch to Array.isArray eventually.
 function assertArray(x) {
   if (!isArray(x)) {
-    throw new Error('not an array: ' + x);
+    throw new Error("not an array: " + x);
   }
 }
 
 function assertNumber(x) {
-  if (typeof x !== 'number') {
-    throw new Error('not a number: ' + x);
+  if (typeof x !== "number") {
+    throw new Error("not a number: " + x);
   }
 }
 
 function assertRegexp(x) {
   if (!(x instanceof RegExp)) {
-    throw new Error('not a regexp: '+x);
+    throw new Error("not a regexp: " + x);
   }
   var f = flags(x);
   for (var i = 0; i < f.length; i++) {
@@ -132,21 +133,21 @@ function assertRegexp(x) {
     // Only allow regexp flags [imu] for now, since [g] and [y] specifically
     // mess up Parsimmon. If more non-stateful regexp flags are added in the
     // future, this will need to be revisited.
-    if (c !== 'i' && c !== 'm' && c !== 'u') {
+    if (c !== "i" && c !== "m" && c !== "u") {
       throw new Error('unsupported regexp flag "' + c + '": ' + x);
     }
   }
 }
 
 function assertFunction(x) {
-  if (typeof x !== 'function') {
-    throw new Error('not a function: ' + x);
+  if (typeof x !== "function") {
+    throw new Error("not a function: " + x);
   }
 }
 
 function assertString(x) {
-  if (typeof x !== 'string') {
-    throw new Error('not a string: ' + x);
+  if (typeof x !== "string") {
+    throw new Error("not a string: " + x);
   }
 }
 
@@ -154,34 +155,40 @@ function formatExpected(expected) {
   if (expected.length === 1) {
     return expected[0];
   }
-  return 'one of ' + expected.join(', ');
+  return "one of " + expected.join(", ");
 }
 
 function formatGot(input, error) {
   var index = error.index;
   var i = index.offset;
   if (i === input.length) {
-    return ', got the end of the input';
+    return ", got the end of the input";
   }
-  var prefix = (i > 0 ? '\'...' : '\'');
-  var suffix = (input.length - i > 12 ? '...\'' : '\'');
-  return ' at line ' + index.line + ' column ' + index.column
-    +  ', got ' + prefix + input.slice(i, i + 12) + suffix;
+  var prefix = i > 0 ? "'..." : "'";
+  var suffix = input.length - i > 12 ? "...'" : "'";
+  return (
+    " at line " +
+    index.line +
+    " column " +
+    index.column +
+    ", got " +
+    prefix +
+    input.slice(i, i + 12) +
+    suffix
+  );
 }
 
 function formatError(input, error) {
-  return 'expected ' +
-    formatExpected(error.expected) +
-    formatGot(input, error);
+  return "expected " + formatExpected(error.expected) + formatGot(input, error);
 }
 
 function flags(re) {
-  var s = '' + re;
-  return s.slice(s.lastIndexOf('/') + 1);
+  var s = "" + re;
+  return s.slice(s.lastIndexOf("/") + 1);
 }
 
 function anchoredRegexp(re) {
-  return RegExp('^(?:' + re.source + ')', flags(re));
+  return RegExp("^(?:" + re.source + ")", flags(re));
 }
 
 // -*- Combinators -*-
@@ -219,13 +226,11 @@ function seqObj() {
     }
     if (isArray(p)) {
       var isWellFormed =
-        p.length === 2 &&
-        typeof p[0] === 'string' &&
-        isParser(p[1]);
+        p.length === 2 && typeof p[0] === "string" && isParser(p[1]);
       if (isWellFormed) {
         var key = p[0];
         if (seenKeys[key]) {
-          throw new Error('seqObj: duplicate key ' + key);
+          throw new Error("seqObj: duplicate key " + key);
         }
         seenKeys[key] = true;
         totalKeys++;
@@ -233,12 +238,11 @@ function seqObj() {
       }
     }
     throw new Error(
-      'seqObj arguments must be parsers or ' +
-      '[string, parser] array pairs.'
+      "seqObj arguments must be parsers or [string, parser] array pairs."
     );
   }
   if (totalKeys === 0) {
-    throw new Error('seqObj expects at least one named parser, found zero');
+    throw new Error("seqObj expects at least one named parser, found zero");
   }
   return Parsimmon(function(input, i) {
     var result;
@@ -269,7 +273,7 @@ function seqObj() {
 function seqMap() {
   var args = [].slice.call(arguments);
   if (args.length === 0) {
-    throw new Error('seqMap needs at least one argument');
+    throw new Error("seqMap needs at least one argument");
   }
   var mapper = args.pop();
   assertFunction(mapper);
@@ -288,7 +292,7 @@ function createLanguage(parsers) {
           return parsers[key](language);
         };
         language[key] = lazy(func);
-      }(key));
+      })(key);
     }
   }
   return language;
@@ -298,7 +302,7 @@ function alt() {
   var parsers = [].slice.call(arguments);
   var numParsers = parsers.length;
   if (numParsers === 0) {
-    return fail('zero alternates');
+    return fail("zero alternates");
   }
   for (var j = 0; j < numParsers; j += 1) {
     assertParser(parsers[j]);
@@ -334,8 +338,8 @@ function sepBy1(parser, separator) {
 // -*- Core Parsing Methods -*-
 
 _.parse = function(input) {
-  if (typeof input !== 'string') {
-    throw new Error('.parse must be called with a string as its argument');
+  if (typeof input !== "string") {
+    throw new Error(".parse must be called with a string as its argument");
   }
   var result = this.skip(eof)._(input, 0);
   if (result.status) {
@@ -360,7 +364,7 @@ _.tryParse = function(str) {
   } else {
     var msg = formatError(str, result);
     var err = new Error(msg);
-    err.type = 'ParsimmonError';
+    err.type = "ParsimmonError";
     err.result = result;
     throw err;
   }
@@ -375,14 +379,9 @@ _.trim = function(parser) {
 };
 
 _.wrap = function(leftParser, rightParser) {
-  return seqMap(
-    leftParser,
-    this,
-    rightParser,
-    function(left, middle) {
-      return middle;
-    }
-  );
+  return seqMap(leftParser, this, rightParser, function(left, middle) {
+    return middle;
+  });
 };
 
 _.thru = function(wrapper) {
@@ -391,7 +390,9 @@ _.thru = function(wrapper) {
 
 _.then = function(next) {
   assertParser(next);
-  return seq(this, next).map(function(results) { return results[1]; });
+  return seq(this, next).map(function(results) {
+    return results[1];
+  });
 };
 
 _.many = function() {
@@ -416,7 +417,7 @@ _.many = function() {
 _.tie = function() {
   return this.map(function(args) {
     assertArray(args);
-    var s = '';
+    var s = "";
     for (var i = 0; i < args.length; i++) {
       assertString(args[i]);
       s += args[i];
@@ -489,7 +490,9 @@ _.map = function(fn) {
 };
 
 _.skip = function(next) {
-  return seq(this, next).map(function(results) { return results[0]; });
+  return seq(this, next).map(function(results) {
+    return results[0];
+  });
 };
 
 _.mark = function() {
@@ -566,7 +569,7 @@ _.chain = function(f) {
 
 function string(str) {
   assertString(str);
-  var expected = '\'' + str + '\'';
+  var expected = "'" + str + "'";
   return Parsimmon(function(input, i) {
     var j = i + str.length;
     var head = input.slice(i, j);
@@ -586,7 +589,7 @@ function regexp(re, group) {
     group = 0;
   }
   var anchored = anchoredRegexp(re);
-  var expected = '' + re;
+  var expected = "" + re;
   return Parsimmon(function(input, i) {
     var match = anchored.exec(input.slice(i));
     if (match) {
@@ -596,7 +599,7 @@ function regexp(re, group) {
         return makeSuccess(i + fullMatch.length, groupMatch);
       }
       var message =
-        'valid match group (0 to ' + match.length + ') in ' + expected;
+        "valid match group (0 to " + match.length + ") in " + expected;
       return makeFailure(i, message);
     }
     return makeFailure(i, expected);
@@ -620,15 +623,15 @@ function lookahead(x) {
     return Parsimmon(function(input, i) {
       var result = x._(input, i);
       result.index = i;
-      result.value = '';
+      result.value = "";
       return result;
     });
-  } else if (typeof x === 'string') {
+  } else if (typeof x === "string") {
     return lookahead(string(x));
   } else if (x instanceof RegExp) {
     return lookahead(regexp(x));
   }
-  throw new Error('not a string, regexp, or parser: ' + x);
+  throw new Error("not a string, regexp, or parser: " + x);
 }
 
 function notFollowedBy(parser) {
@@ -649,7 +652,7 @@ function test(predicate) {
     if (i < input.length && predicate(char)) {
       return makeSuccess(i + 1, char);
     } else {
-      return makeFailure(i, 'a character matching ' + predicate);
+      return makeFailure(i, "a character matching " + predicate);
     }
   });
 }
@@ -674,7 +677,7 @@ function custom(parsingFunction) {
 function range(begin, end) {
   return test(function(ch) {
     return begin <= ch && ch <= end;
-  }).desc(begin + '-' + end);
+  }).desc(begin + "-" + end);
 }
 
 function takeWhile(predicate) {
@@ -710,18 +713,18 @@ function lazy(desc, f) {
 // -*- Fantasy Land Extras -*-
 
 function empty() {
-  return fail('fantasy-land/empty');
+  return fail("fantasy-land/empty");
 }
 
 _.concat = _.or;
 _.empty = empty;
 _.of = succeed;
-_['fantasy-land/ap'] = _.ap;
-_['fantasy-land/chain'] = _.chain;
-_['fantasy-land/concat'] = _.concat;
-_['fantasy-land/empty'] = _.empty;
-_['fantasy-land/of'] = _.of;
-_['fantasy-land/map'] = _.map;
+_["fantasy-land/ap"] = _.ap;
+_["fantasy-land/chain"] = _.chain;
+_["fantasy-land/concat"] = _.concat;
+_["fantasy-land/empty"] = _.empty;
+_["fantasy-land/of"] = _.of;
+_["fantasy-land/map"] = _.map;
 
 // -*- Base Parsers -*-
 
@@ -731,7 +734,7 @@ var index = Parsimmon(function(input, i) {
 
 var any = Parsimmon(function(input, i) {
   if (i >= input.length) {
-    return makeFailure(i, 'any character');
+    return makeFailure(i, "any character");
   }
   return makeSuccess(i + 1, input.charAt(i));
 });
@@ -742,17 +745,17 @@ var all = Parsimmon(function(input, i) {
 
 var eof = Parsimmon(function(input, i) {
   if (i < input.length) {
-    return makeFailure(i, 'EOF');
+    return makeFailure(i, "EOF");
   }
   return makeSuccess(i, null);
 });
 
-var digit = regexp(/[0-9]/).desc('a digit');
-var digits = regexp(/[0-9]*/).desc('optional digits');
-var letter = regexp(/[a-z]/i).desc('a letter');
-var letters = regexp(/[a-z]*/i).desc('optional letters');
-var optWhitespace = regexp(/\s*/).desc('optional whitespace');
-var whitespace = regexp(/\s+/).desc('whitespace');
+var digit = regexp(/[0-9]/).desc("a digit");
+var digits = regexp(/[0-9]*/).desc("optional digits");
+var letter = regexp(/[a-z]/i).desc("a letter");
+var letters = regexp(/[a-z]*/i).desc("optional letters");
+var optWhitespace = regexp(/\s*/).desc("optional whitespace");
+var whitespace = regexp(/\s+/).desc("whitespace");
 
 Parsimmon.all = all;
 Parsimmon.alt = alt;
@@ -792,7 +795,7 @@ Parsimmon.succeed = succeed;
 Parsimmon.takeWhile = takeWhile;
 Parsimmon.test = test;
 Parsimmon.whitespace = whitespace;
-Parsimmon['fantasy-land/empty'] = empty;
-Parsimmon['fantasy-land/of'] = succeed;
+Parsimmon["fantasy-land/empty"] = empty;
+Parsimmon["fantasy-land/of"] = succeed;
 
 module.exports = Parsimmon;
