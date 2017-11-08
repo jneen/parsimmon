@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 // Run me with Node to see my output!
 
-let util = require('util');
-let P = require('..');
+let util = require("util");
+let P = require("..");
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -27,41 +27,36 @@ function PyX(indent) {
     // indentation level.
     Block: r =>
       P.seqObj(
-        P.string('block:'),
+        P.string("block:"),
         r.NL,
-        ['n', r.IndentMore],
-        ['first', r.Statement]
+        ["n", r.IndentMore],
+        ["first", r.Statement]
       ).chain(args => {
-        const {n, first} = args;
+        const { n, first } = args;
         return PyX(n)
-          .RestStatement
-          .many()
-          .map(rest => ['BLOCK', first, ...rest]);
+          .RestStatement.many()
+          .map(rest => ["BLOCK", first, ...rest]);
       }),
 
     // This is just a statement in our language. To simplify, this is either a
     // block of code or just an identifier
-    Statement: r =>
-      P.alt(r.Block, r.Ident),
+    Statement: r => P.alt(r.Block, r.Ident),
 
     // This is a statement which is indented to the level of the current parse
     // state. It's called RestStatement because the first statement in a block
     // is indented more than the previous state, but the *rest* of the
     // statements match up with the new state.
-    RestStatement: r =>
-      r.IndentSame.then(r.Statement),
+    RestStatement: r => r.IndentSame.then(r.Statement),
 
     // Just a variable and then the end of the line.
-    Ident: r =>
-      P.regexp(/[a-z]+/i).skip(r.End),
+    Ident: r => P.regexp(/[a-z]+/i).skip(r.End),
 
     // Consume zero or more spaces and then return the number consumed. For a
     // more Python-like language, this parser would also accept tabs and then
     // expand them to the correct number of spaces
     //
     // https://docs.python.org/3/reference/lexical_analysis.html#indentation
-    CountSpaces: () =>
-      P.regexp(/[ ]*/).map(s => s.length),
+    CountSpaces: () => P.regexp(/[ ]*/).map(s => s.length),
 
     // Count the current indentation level and assert it's more than the current
     // parse state's desired indentation
@@ -84,15 +79,11 @@ function PyX(indent) {
       }),
 
     // Support all three standard text file line endings
-    NL: () =>
-      P.alt(
-        P.string('\r\n'),
-        P.oneOf('\r\n')
-      ),
+    NL: () => P.alt(P.string("\r\n"), P.oneOf("\r\n")),
 
     // Lines should always end in a newline sequence, but many files are missing
     // the final newline
-    End: r => P.alt(r.NL, P.eof),
+    End: r => P.alt(r.NL, P.eof)
   });
 }
 
@@ -115,7 +106,7 @@ block:
 `;
 
 function prettyPrint(x) {
-  let opts = {depth: null, colors: 'auto'};
+  let opts = { depth: null, colors: "auto" };
   let s = util.inspect(x, opts);
   console.log(s);
 }

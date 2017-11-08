@@ -1,39 +1,39 @@
-'use strict';
+"use strict";
 
-var H = require('../helpers');
+var H = require("../helpers");
 
-suite('Fantasy Land Applicative', function() {
-  test('identity', function() {
+suite("Fantasy Land Applicative", function() {
+  test("identity", function() {
     var p1 = Parsimmon.any;
-    var p2 = p1.ap(Parsimmon.of(function(x) { return x; }));
-    H.equivalentParsers(p1, p2, [
-      'x',
-      'z',
-      'æ',
-      '1',
-      ''
-    ]);
+    var p2 = p1.ap(
+      Parsimmon.of(function(x) {
+        return x;
+      })
+    );
+    H.equivalentParsers(p1, p2, ["x", "z", "æ", "1", ""]);
   });
 
-  test('homomorphism', function() {
+  test("homomorphism", function() {
     function fn(s) {
       return s.toUpperCase();
     }
-    var input = 'nice';
+    var input = "nice";
     var p1 = Parsimmon.of(input).ap(Parsimmon.of(fn));
     var p2 = Parsimmon.of(fn(input));
-    assert.deepEqual(p1.parse(''), p2.parse(''));
+    assert.deepEqual(p1.parse(""), p2.parse(""));
   });
 
-  test('interchange', function() {
+  test("interchange", function() {
     function increment(x) {
       return x + 1;
     }
     var input = 3;
     var p1 = Parsimmon.of(input).ap(Parsimmon.of(increment));
-    var p2 = Parsimmon.of(increment).ap(Parsimmon.of(function(f) {
-      return f(input);
-    }));
-    assert.deepEqual(p1.parse(''), p2.parse(''));
+    var p2 = Parsimmon.of(increment).ap(
+      Parsimmon.of(function(f) {
+        return f(input);
+      })
+    );
+    assert.deepEqual(p1.parse(""), p2.parse(""));
   });
 });

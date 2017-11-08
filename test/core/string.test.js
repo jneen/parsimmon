@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-test('Parsimmon.string', function() {
-  var parser = Parsimmon.string('x');
-  var res = parser.parse('x');
+test("Parsimmon.string", function() {
+  var parser = Parsimmon.string("x");
+  var res = parser.parse("x");
   assert.ok(res.status);
-  assert.equal(res.value, 'x');
+  assert.equal(res.value, "x");
 
-  res = parser.parse('y');
+  res = parser.parse("y");
   assert.deepEqual(res, {
     status: false,
     index: {
@@ -14,13 +14,15 @@ test('Parsimmon.string', function() {
       line: 1,
       column: 1
     },
-    expected: ['\'x\'']
+    expected: ["'x'"]
   });
 
   assert.equal(
-    'expected \'x\' at line 1 column 1, got \'y\'',
-    Parsimmon.formatError('y', res)
+    "expected 'x' at line 1 column 1, got 'y'",
+    Parsimmon.formatError("y", res)
   );
 
-  assert.throws(function() { Parsimmon.string(34); });
+  assert.throws(function() {
+    Parsimmon.string(34);
+  });
 });

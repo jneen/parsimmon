@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function equivalentParsers(p1, p2, inputs) {
   for (var i = 0; i < inputs.length; i++) {
