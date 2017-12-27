@@ -694,6 +694,8 @@ Note: `parser.tie()` is usually used after `Parsimmon.seq(...parsers)` or `parse
 
 Expects `parser` zero or more times, and yields an array of the results.
 
+**NOTE:** If `parser`  is capable of parsing an empty string (i.e. `parser.parse("")` succeeds) then `parser.many()` will throw an error. Otherwise `parser.many()` would get stuck in an infinite loop.
+
 ## parser.times(n)
 
 Expects `parser` exactly `n` times, and yields an array of the results.
