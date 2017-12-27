@@ -18,4 +18,17 @@ suite("many", function() {
     assert.equal(parser.parse("xy").value, "y");
     assert.equal(parser.parse("xxxxxy").value, "y");
   });
+
+  test("throws on parsers that accept zero characters", function() {
+    var parser = Parsimmon.regexp(/a*/).many();
+    assert.throws(function() {
+      parser.parse("a");
+    });
+    assert.throws(function() {
+      parser.parse("b");
+    });
+    assert.throws(function() {
+      parser.parse("");
+    });
+  });
 });

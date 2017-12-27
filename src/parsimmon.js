@@ -403,6 +403,12 @@ _.many = function() {
     for (;;) {
       result = mergeReplies(self._(input, i), result);
       if (result.status) {
+        if (i === result.index) {
+          throw new Error(
+            "infinite loop detected in .many() parser --- calling .many() on " +
+              "a parser which can accept zero characters is usually the cause"
+          );
+        }
         i = result.index;
         accum.push(result.value);
       } else {
