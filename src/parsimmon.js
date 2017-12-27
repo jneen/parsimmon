@@ -328,10 +328,8 @@ function sepBy1(parser, separator) {
   assertParser(parser);
   assertParser(separator);
   var pairs = separator.then(parser).many();
-  return parser.chain(function(r) {
-    return pairs.map(function(rs) {
-      return [r].concat(rs);
-    });
+  return seqMap(parser, pairs, function(r, rs) {
+    return [r].concat(rs);
   });
 }
 
