@@ -1,3 +1,7 @@
+## version 1.6.3 (2018-01-01)
+
+* Fixes `parser.many()` to throw an error if it detects an infinite parse loop.
+
 ## version 1.6.2 (2017-07-08)
 
 * Fixes another bug with match groups outside the correct range in `Parsimmon.regexp(regexp, group)`.
