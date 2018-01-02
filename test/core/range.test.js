@@ -5,7 +5,7 @@ suite("Parsimmon.range", function() {
     a: "a".charCodeAt(0),
     z: "z".charCodeAt(0),
     MIN: 0,
-    MAX: 65535
+    MAX: 255
   };
   var a2z = Parsimmon.range("a", "z");
 
