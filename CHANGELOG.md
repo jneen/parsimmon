@@ -1,6 +1,10 @@
-## version 1.6.3 (2018-01-01)
+## version 1.6.4 (2018-01-01)
 
 * Fixes `parser.many()` to throw an error if it detects an infinite parse loop.
+
+## version 1.6.3 (2018-01-01)
+
+* Unpublished due to a Travis CI build issues.
 
 ## version 1.6.2 (2017-07-08)
 
