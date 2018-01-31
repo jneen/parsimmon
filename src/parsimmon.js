@@ -19,6 +19,12 @@ function isArray(x) {
   return {}.toString.call(x) === "[object Array]";
 }
 
+var hasBuffer = typeof Buffer !== "undefined";
+function isBuffer(x) {
+  /* global Buffer */
+  return hasBuffer && Buffer.isBuffer(x);
+}
+
 function makeSuccess(index, value) {
   return {
     status: true,
@@ -60,6 +66,13 @@ function mergeReplies(result, last) {
 }
 
 function makeLineColumnIndex(input, i) {
+  if (isBuffer(input)) {
+    return {
+      offset: i,
+      line: -1,
+      column: -1
+    };
+  }
   var lines = input.slice(0, i).split("\n");
   // Note that unlike the character offset, the line and column offsets are
   // 1-based.
@@ -108,6 +121,13 @@ function assertParser(p) {
   if (!isParser(p)) {
     throw new Error("not a parser: " + p);
   }
+}
+
+function get(input, i) {
+  if (typeof input === "string") {
+    return input.charAt(i);
+  }
+  return input[i];
 }
 
 // TODO[ES5]: Switch to Array.isArray eventually.
@@ -163,6 +183,9 @@ function formatGot(input, error) {
   var i = index.offset;
   if (i === input.length) {
     return ", got the end of the input";
+  }
+  if (isBuffer(input)) {
+    return " at byte " + index.offset;
   }
   var prefix = i > 0 ? "'..." : "'";
   var suffix = input.length - i > 12 ? "...'" : "'";
@@ -336,8 +359,10 @@ function sepBy1(parser, separator) {
 // -*- Core Parsing Methods -*-
 
 _.parse = function(input) {
-  if (typeof input !== "string") {
-    throw new Error(".parse must be called with a string as its argument");
+  if (typeof input !== "string" && !isBuffer(input)) {
+    throw new Error(
+      ".parse must be called with a string or Buffer as its argument"
+    );
   }
   var result = this.skip(eof)._(input, 0);
   if (result.status) {
@@ -585,6 +610,19 @@ function string(str) {
   });
 }
 
+function byte(b) {
+  assertNumber(b);
+  var expected = (b > 0xf ? "0x" : "0x0") + b.toString(16);
+  return Parsimmon(function(input, i) {
+    var head = get(input, i);
+    if (head === b) {
+      return makeSuccess(i + 1, head);
+    } else {
+      return makeFailure(i, expected);
+    }
+  });
+}
+
 function regexp(re, group) {
   assertRegexp(re);
   if (arguments.length >= 2) {
@@ -652,11 +690,11 @@ function notFollowedBy(parser) {
 function test(predicate) {
   assertFunction(predicate);
   return Parsimmon(function(input, i) {
-    var char = input.charAt(i);
+    var char = get(input, i);
     if (i < input.length && predicate(char)) {
       return makeSuccess(i + 1, char);
     } else {
-      return makeFailure(i, "a character matching " + predicate);
+      return makeFailure(i, "a character/byte matching " + predicate);
     }
   });
 }
@@ -689,7 +727,7 @@ function takeWhile(predicate) {
 
   return Parsimmon(function(input, i) {
     var j = i;
-    while (j < input.length && predicate(input.charAt(j))) {
+    while (j < input.length && predicate(get(input, j))) {
       j++;
     }
     return makeSuccess(j, input.slice(i, j));
@@ -738,9 +776,9 @@ var index = Parsimmon(function(input, i) {
 
 var any = Parsimmon(function(input, i) {
   if (i >= input.length) {
-    return makeFailure(i, "any character");
+    return makeFailure(i, "any character/byte");
   }
-  return makeSuccess(i + 1, input.charAt(i));
+  return makeSuccess(i + 1, get(input, i));
 });
 
 var all = Parsimmon(function(input, i) {
@@ -764,6 +802,7 @@ var whitespace = regexp(/\s+/).desc("whitespace");
 Parsimmon.all = all;
 Parsimmon.alt = alt;
 Parsimmon.any = any;
+Parsimmon.byte = byte;
 Parsimmon.createLanguage = createLanguage;
 Parsimmon.custom = custom;
 Parsimmon.digit = digit;
