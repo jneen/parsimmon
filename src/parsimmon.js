@@ -767,6 +767,11 @@ function string(str) {
 
 function byte(b) {
   assertNumber(b);
+  if (b > 0xff) {
+    throw new Error(
+      "Value specified to byte constructor is larger in value than a single byte."
+    );
+  }
   var expected = (b > 0xf ? "0x" : "0x0") + b.toString(16);
   return Parsimmon(function(input, i) {
     var head = get(input, i);
