@@ -1000,22 +1000,21 @@ Parsimmon.whitespace = whitespace;
 Parsimmon["fantasy-land/empty"] = empty;
 Parsimmon["fantasy-land/of"] = succeed;
 
-function noBufferError() {
-  throw new Error(
-    "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
-  );
+function ensureBuffer(f) {
+  return function() {
+    if (typeof Buffer === "undefined") {
+      throw new Error(
+        "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
+      );
+    }
+    return f.apply(null, arguments);
+  };
 }
 
-Parsimmon.Binary = hasBuffer
-  ? {
-      bitSeq: bitSeq,
-      bitSeqObj: bitSeqObj,
-      byte: byte
-    }
-  : {
-      bitSeq: noBufferError,
-      bitSeqObj: noBufferError,
-      byte: noBufferError
-    };
+Parsimmon.Binary = {
+  bitSeq: ensureBuffer(bitSeq),
+  bitSeqObj: ensureBuffer(bitSeqObj),
+  byte: ensureBuffer(byte)
+};
 
 module.exports = Parsimmon;

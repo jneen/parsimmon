@@ -25,4 +25,22 @@ describe("byte", function() {
       Parsimmon.Binary.byte(0xfff);
     }, /larger in value/);
   });
+
+  context("Buffer is not present.", function() {
+    var buff;
+    before(function() {
+      buff = global.Buffer;
+      global.Buffer = undefined;
+    });
+
+    after(function() {
+      global.Buffer = buff;
+    });
+
+    it("Disallows construction.", function() {
+      assert.throws(function() {
+        Parsimmon.Binary.byte(0xf);
+      }, /buffer global/i);
+    });
+  });
 });
