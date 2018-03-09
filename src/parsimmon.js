@@ -957,11 +957,6 @@ var whitespace = regexp(/\s+/).desc("whitespace");
 Parsimmon.all = all;
 Parsimmon.alt = alt;
 Parsimmon.any = any;
-Parsimmon.buffers = {
-  bitSeq: bitSeq,
-  bitSeqObj: bitSeqObj,
-  byte: byte
-};
 Parsimmon.createLanguage = createLanguage;
 Parsimmon.custom = custom;
 Parsimmon.digit = digit;
@@ -999,5 +994,23 @@ Parsimmon.test = test;
 Parsimmon.whitespace = whitespace;
 Parsimmon["fantasy-land/empty"] = empty;
 Parsimmon["fantasy-land/of"] = succeed;
+
+function noBufferError() {
+  throw new Error(
+    "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
+  );
+}
+
+Parsimmon.Binary = hasBuffer
+  ? {
+      bitSeq: bitSeq,
+      bitSeqObj: bitSeqObj,
+      byte: byte
+    }
+  : {
+      bitSeq: noBufferError,
+      bitSeqObj: noBufferError,
+      byte: noBufferError
+    };
 
 module.exports = Parsimmon;
