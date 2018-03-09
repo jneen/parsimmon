@@ -434,7 +434,13 @@ robust binary parsers.  These constructors live in the Parsimmon.Binary namespac
 
 Returns a parser that yields a byte that matches the given input.  Similar to digit/letter.
 
-## Parsimmon.bitSeq(...alignments)
+```javascript
+var parser = Parsimmon.Binary.byte(0xFF);
+parser.parse(Buffer.from([0xFF]));
+//=> { status: true, value: 255 }
+```
+
+## Parsimmon.bitSeq(alignments)
 
 Specify a series of bit alignments that do not have to be byte aligned and consume them from a buffer.  The bits must
 sum to a byte boundary.
@@ -445,7 +451,7 @@ parser.parse(Buffer.from([0x04, 0xFF]));
 //=> {status: true, value: [ 0, 4, 31, 7 ]}
 ```
 
-## Parsimmon.bitSeqObj(...namedAlignments)
+## Parsimmon.bitSeqObj(namedAlignments)
 
 Specify a series of bit alignments with names that will output an object with those alignments.  Very similar to seqObj,
 however, but only accepts numeric values.  Will discard unnamed alignments.

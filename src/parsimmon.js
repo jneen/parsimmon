@@ -93,10 +93,29 @@ function find(pred, arr) {
   );
 }
 
+function bufferExists() {
+  return typeof Buffer !== "undefined";
+}
+
+function ensureBuffer() {
+  if (!bufferExists()) {
+    throw new Error(
+      "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
+    );
+  }
+}
+
 function bitSeq(alignments) {
+  ensureBuffer();
   var totalBits = sum(alignments);
   if (totalBits % 8 !== 0) {
-    throw new Error("Bits do not sum to byte boundary.");
+    throw new Error(
+      "The bits [" +
+        alignments.join(", ") +
+        "] add up to " +
+        totalBits +
+        " which is not an even number of bytes; the total should be divisible by 8"
+    );
   }
   var bytes = totalBits / 8;
 
@@ -105,8 +124,7 @@ function bitSeq(alignments) {
   }, alignments);
   if (tooBigRange) {
     throw new Error(
-      tooBigRange.toString() +
-        " bit range requested exceeds 48 bit (6 byte) Number max."
+      tooBigRange + " bit range requested exceeds 48 bit (6 byte) Number max."
     );
   }
 
@@ -132,6 +150,7 @@ function bitSeq(alignments) {
 }
 
 function bitSeqObj(namedAlignments) {
+  ensureBuffer();
   var fullAlignments = map(function(pair) {
     return isArray(pair) ? pair : [null, pair];
   }, namedAlignments);
@@ -174,10 +193,9 @@ function isArray(x) {
   return {}.toString.call(x) === "[object Array]";
 }
 
-var hasBuffer = typeof Buffer !== "undefined";
 function isBuffer(x) {
   /* global Buffer */
-  return hasBuffer && Buffer.isBuffer(x);
+  return bufferExists() && Buffer.isBuffer(x);
 }
 
 function makeSuccess(index, value) {
@@ -766,10 +784,15 @@ function string(str) {
 }
 
 function byte(b) {
+  ensureBuffer();
   assertNumber(b);
   if (b > 0xff) {
     throw new Error(
-      "Value specified to byte constructor is larger in value than a single byte."
+      "Value specified to byte constructor (" +
+        b +
+        "=0x" +
+        b.toString(16) +
+        ") is larger in value than a single byte."
     );
   }
   var expected = (b > 0xf ? "0x" : "0x0") + b.toString(16);
@@ -1000,21 +1023,10 @@ Parsimmon.whitespace = whitespace;
 Parsimmon["fantasy-land/empty"] = empty;
 Parsimmon["fantasy-land/of"] = succeed;
 
-function ensureBuffer(f) {
-  return function() {
-    if (typeof Buffer === "undefined") {
-      throw new Error(
-        "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
-      );
-    }
-    return f.apply(null, arguments);
-  };
-}
-
 Parsimmon.Binary = {
-  bitSeq: ensureBuffer(bitSeq),
-  bitSeqObj: ensureBuffer(bitSeqObj),
-  byte: ensureBuffer(byte)
+  bitSeq: bitSeq,
+  bitSeqObj: bitSeqObj,
+  byte: byte
 };
 
 module.exports = Parsimmon;

@@ -1,5 +1,4 @@
 "use strict";
-/*global context, before, after*/
 
 describe("byte", function() {
   it("matches a buffer byte", function() {
@@ -23,7 +22,7 @@ describe("byte", function() {
   it("disallows larger values than a byte.", function() {
     assert.throws(function() {
       Parsimmon.Binary.byte(0xfff);
-    }, /larger in value/);
+    }, /4095=0xfff/);
   });
 
   context("Buffer is not present.", function() {

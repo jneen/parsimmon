@@ -10,7 +10,7 @@ describe("bitSeq", function() {
   it("disallows construction of parsers that don't align to byte boundaries", function() {
     assert.throws(function() {
       Parsimmon.Binary.bitSeq([1, 2]);
-    });
+    }, /add up to 3/);
   });
 
   it("fails if requesting too much", function() {
@@ -22,7 +22,7 @@ describe("bitSeq", function() {
   it("throws an exception for too large of a range request", function() {
     assert.throws(function() {
       Parsimmon.Binary.bitSeq([1, 2, 4, 49]);
-    });
+    }, /49 bit range/);
   });
 
   context("Buffer is not present.", function() {
