@@ -27,6 +27,15 @@ describe("bitSeqObj", function() {
     }, /expects at least one/i);
   });
 
+  it("throws when there are duplicate keys", function() {
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([["a", 1], ["a", 7]]);
+    }, /duplicate/i);
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([["a", 1], ["b", 2], ["a", 5]]);
+    }, /duplicate/i);
+  });
+
   it("throws you pass the wrong type of argument", function() {
     assert.throws(function() {
       Parsimmon.Binary.bitSeqObj([[]]);
