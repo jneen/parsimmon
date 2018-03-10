@@ -1,13 +1,10 @@
 {
   "env": {
-    "node": true
+    "node": true,
+    "mocha": true
   },
   "globals":{
     "Parsimmon": true,
-    "assert": true,
-    "suite": true,
-    "setup": true,
-    "teardown": true,
-    "test": true
+    "assert": true
   }
 }

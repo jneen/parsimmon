@@ -9,6 +9,209 @@ function Parsimmon(action) {
 
 var _ = Parsimmon.prototype;
 
+function times(n, f) {
+  var i = 0;
+  for (i; i < n; i++) {
+    f(i);
+  }
+}
+
+function forEach(f, arr) {
+  times(arr.length, function(i) {
+    f(arr[i], i, arr);
+  });
+}
+
+function reduce(f, seed, arr) {
+  forEach(function(elem, i, arr) {
+    seed = f(seed, elem, i, arr);
+  }, arr);
+  return seed;
+}
+
+function map(f, arr) {
+  return reduce(
+    function(acc, elem, i, a) {
+      return acc.concat([f(elem, i, a)]);
+    },
+    [],
+    arr
+  );
+}
+
+function lshiftBuffer(input) {
+  var asTwoBytes = reduce(
+    function(a, v, i, b) {
+      return a.concat(
+        i === b.length - 1
+          ? Buffer.from([v, 0]).readUInt16BE(0)
+          : b.readUInt16BE(i)
+      );
+    },
+    [],
+    input
+  );
+  return Buffer.from(
+    map(function(x) {
+      return ((x << 1) & 0xffff) >> 8;
+    }, asTwoBytes)
+  );
+}
+
+function consumeBitsFromBuffer(n, input) {
+  var state = { v: 0, buf: input };
+  times(n, function() {
+    state = {
+      v: (state.v << 1) | bitPeekBuffer(state.buf),
+      buf: lshiftBuffer(state.buf)
+    };
+  });
+  return state;
+}
+
+function bitPeekBuffer(input) {
+  return input[0] >> 7;
+}
+
+function sum(numArr) {
+  return reduce(
+    function(x, y) {
+      return x + y;
+    },
+    0,
+    numArr
+  );
+}
+
+function find(pred, arr) {
+  return reduce(
+    function(found, elem) {
+      return found || (pred(elem) ? elem : found);
+    },
+    null,
+    arr
+  );
+}
+
+function bufferExists() {
+  return typeof Buffer !== "undefined";
+}
+
+function ensureBuffer() {
+  if (!bufferExists()) {
+    throw new Error(
+      "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
+    );
+  }
+}
+
+function bitSeq(alignments) {
+  ensureBuffer();
+  var totalBits = sum(alignments);
+  if (totalBits % 8 !== 0) {
+    throw new Error(
+      "The bits [" +
+        alignments.join(", ") +
+        "] add up to " +
+        totalBits +
+        " which is not an even number of bytes; the total should be divisible by 8"
+    );
+  }
+  var bytes = totalBits / 8;
+
+  var tooBigRange = find(function(x) {
+    return x > 48;
+  }, alignments);
+  if (tooBigRange) {
+    throw new Error(
+      tooBigRange + " bit range requested exceeds 48 bit (6 byte) Number max."
+    );
+  }
+
+  return new Parsimmon(function(input, i) {
+    if (bytes + i > input.length) {
+      return makeFailure(i, bytes.toString() + " bytes");
+    }
+    return makeSuccess(
+      i + bytes,
+      reduce(
+        function(acc, bits) {
+          var state = consumeBitsFromBuffer(bits, acc.buf);
+          return {
+            coll: acc.coll.concat(state.v),
+            buf: state.buf
+          };
+        },
+        { coll: [], buf: input },
+        alignments
+      ).coll
+    );
+  });
+}
+
+function bitSeqObj(namedAlignments) {
+  ensureBuffer();
+  var seenKeys = {};
+  var totalKeys = 0;
+  var fullAlignments = map(function(item) {
+    if (isArray(item)) {
+      var pair = item;
+      if (pair.length !== 2) {
+        throw new Error(
+          "[" +
+            pair.join(", ") +
+            "] should be length 2, got length " +
+            pair.length
+        );
+      }
+      assertString(pair[0]);
+      assertNumber(pair[1]);
+      if (seenKeys[pair[0]]) {
+        throw new Error("duplicate key in bitSeqObj: " + pair[0]);
+      }
+      seenKeys[pair[0]] = true;
+      totalKeys++;
+      return pair;
+    } else {
+      assertNumber(item);
+      return [null, item];
+    }
+  }, namedAlignments);
+  if (totalKeys < 1) {
+    throw new Error(
+      "bitSeqObj expects at least one named pair, got [" +
+        namedAlignments.join(", ") +
+        "]"
+    );
+  }
+  var namesOnly = map(function(pair) {
+    return pair[0];
+  }, fullAlignments);
+  var alignmentsOnly = map(function(pair) {
+    return pair[1];
+  }, fullAlignments);
+
+  return bitSeq(alignmentsOnly).map(function(parsed) {
+    var namedParsed = map(function(name, i) {
+      return [name, parsed[i]];
+    }, namesOnly);
+
+    return reduce(
+      function(obj, kv) {
+        if (kv[0] !== null) {
+          obj[kv[0]] = kv[1];
+        }
+        return obj;
+      },
+      {},
+      namedParsed
+    );
+  });
+}
+
+function toArray(arrLike) {
+  return Array.prototype.slice.call(arrLike);
+}
 // -*- Helpers -*-
 
 function isParser(obj) {
@@ -17,6 +220,11 @@ function isParser(obj) {
 
 function isArray(x) {
   return {}.toString.call(x) === "[object Array]";
+}
+
+function isBuffer(x) {
+  /* global Buffer */
+  return bufferExists() && Buffer.isBuffer(x);
 }
 
 function makeSuccess(index, value) {
@@ -60,6 +268,13 @@ function mergeReplies(result, last) {
 }
 
 function makeLineColumnIndex(input, i) {
+  if (isBuffer(input)) {
+    return {
+      offset: i,
+      line: -1,
+      column: -1
+    };
+  }
   var lines = input.slice(0, i).split("\n");
   // Note that unlike the character offset, the line and column offsets are
   // 1-based.
@@ -108,6 +323,13 @@ function assertParser(p) {
   if (!isParser(p)) {
     throw new Error("not a parser: " + p);
   }
+}
+
+function get(input, i) {
+  if (typeof input === "string") {
+    return input.charAt(i);
+  }
+  return input[i];
 }
 
 // TODO[ES5]: Switch to Array.isArray eventually.
@@ -164,6 +386,9 @@ function formatGot(input, error) {
   if (i === input.length) {
     return ", got the end of the input";
   }
+  if (isBuffer(input)) {
+    return " at byte " + index.offset;
+  }
   var prefix = i > 0 ? "'..." : "'";
   var suffix = input.length - i > 12 ? "...'" : "'";
   return (
@@ -217,7 +442,7 @@ function seq() {
 function seqObj() {
   var seenKeys = {};
   var totalKeys = 0;
-  var parsers = [].slice.call(arguments);
+  var parsers = toArray(arguments);
   var numParsers = parsers.length;
   for (var j = 0; j < numParsers; j += 1) {
     var p = parsers[j];
@@ -336,8 +561,10 @@ function sepBy1(parser, separator) {
 // -*- Core Parsing Methods -*-
 
 _.parse = function(input) {
-  if (typeof input !== "string") {
-    throw new Error(".parse must be called with a string as its argument");
+  if (typeof input !== "string" && !isBuffer(input)) {
+    throw new Error(
+      ".parse must be called with a string or Buffer as its argument"
+    );
   }
   var result = this.skip(eof)._(input, 0);
   if (result.status) {
@@ -585,6 +812,29 @@ function string(str) {
   });
 }
 
+function byte(b) {
+  ensureBuffer();
+  assertNumber(b);
+  if (b > 0xff) {
+    throw new Error(
+      "Value specified to byte constructor (" +
+        b +
+        "=0x" +
+        b.toString(16) +
+        ") is larger in value than a single byte."
+    );
+  }
+  var expected = (b > 0xf ? "0x" : "0x0") + b.toString(16);
+  return Parsimmon(function(input, i) {
+    var head = get(input, i);
+    if (head === b) {
+      return makeSuccess(i + 1, head);
+    } else {
+      return makeFailure(i, expected);
+    }
+  });
+}
+
 function regexp(re, group) {
   assertRegexp(re);
   if (arguments.length >= 2) {
@@ -652,11 +902,11 @@ function notFollowedBy(parser) {
 function test(predicate) {
   assertFunction(predicate);
   return Parsimmon(function(input, i) {
-    var char = input.charAt(i);
+    var char = get(input, i);
     if (i < input.length && predicate(char)) {
       return makeSuccess(i + 1, char);
     } else {
-      return makeFailure(i, "a character matching " + predicate);
+      return makeFailure(i, "a character/byte matching " + predicate);
     }
   });
 }
@@ -689,7 +939,7 @@ function takeWhile(predicate) {
 
   return Parsimmon(function(input, i) {
     var j = i;
-    while (j < input.length && predicate(input.charAt(j))) {
+    while (j < input.length && predicate(get(input, j))) {
       j++;
     }
     return makeSuccess(j, input.slice(i, j));
@@ -738,9 +988,9 @@ var index = Parsimmon(function(input, i) {
 
 var any = Parsimmon(function(input, i) {
   if (i >= input.length) {
-    return makeFailure(i, "any character");
+    return makeFailure(i, "any character/byte");
   }
-  return makeSuccess(i + 1, input.charAt(i));
+  return makeSuccess(i + 1, get(input, i));
 });
 
 var all = Parsimmon(function(input, i) {
@@ -801,5 +1051,11 @@ Parsimmon.test = test;
 Parsimmon.whitespace = whitespace;
 Parsimmon["fantasy-land/empty"] = empty;
 Parsimmon["fantasy-land/of"] = succeed;
+
+Parsimmon.Binary = {
+  bitSeq: bitSeq,
+  bitSeqObj: bitSeqObj,
+  byte: byte
+};
 
 module.exports = Parsimmon;

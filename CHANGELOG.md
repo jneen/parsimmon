@@ -1,3 +1,10 @@
+## version 1.7.0 (2018-03-10)
+
+* Adds support for binary parsing using Node.js Buffers
+* Adds `Parsimmon.Binary.bitSeq`
+* Adds `Parsimmon.Binary.bitSeqObj`
+* Adds `Parsimmon.Binary.byte`
+
 ## version 1.6.4 (2018-01-01)
 
 * Fixes `parser.many()` to throw an error if it detects an infinite parse loop.

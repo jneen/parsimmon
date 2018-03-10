@@ -421,7 +421,46 @@ var parser =
     notChar('b').times(5)
   );
 parser.parse('accccc');
-//=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
+// => { status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']] }
+```
+
+# Binary constructors
+
+The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as `Parsimmon.seq`, `Parsimmon.seqObj`, and still have all the same methods as text-based parsers (e.g. `.map`, `.node`, etc.).
+
+## Parsimmon.byte(int)
+
+Returns a parser that yields a byte (as a number) that matches the given input; similar to `Parsimmon.digit` and `Parsimmon.letter`.
+
+```javascript
+var parser = Parsimmon.Binary.byte(0x3f);
+parser.parse(Buffer.from([0x3f]));
+// => { status: true, value: 63 }
+```
+
+## Parsimmon.bitSeq(alignments)
+
+Parse a series of bits that do not have to be byte-aligned and consume them from a Buffer. The maximum number is 48 since more than 48 bits won't fit safely into a JavaScript number without losing precision. Also, the total of all bits in the sequence must be a multiple of 8 since parsing is still done at the byte level.
+
+```javascript
+var parser = Parsimmon.Binary.bitSeq([3, 5, 5, 3]);
+parser.parse(Buffer.from([0x04, 0xff]));
+//=> { status: true, value: [0, 4, 31, 7] }
+```
+
+## Parsimmon.bitSeqObj(namedAlignments)
+
+Works like `Parsimmon.bitSeq` except each item in the array is either a number of bits or pair (array with length = 2) of name and bits. The bits are parsed in order and put into an object based on the name supplied. If there's no name for the bits, it will be parsed but discarded from the returned value.
+
+```javascript
+var parser = Parsimmon.Binary.bitSeqObj([
+    ["a", 3],
+    5,
+    ["b", 5],
+    ["c", 3]
+]);
+parser.parse(Buffer.from([0x04, 0xFF]));
+//=> { status: true, value: { a: 0, b: 31, c: 7 } }
 ```
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
