@@ -9,6 +9,180 @@ function Parsimmon(action) {
 
 var _ = Parsimmon.prototype;
 
+function times(n, f) {
+  var i = 0;
+  for (i; i < n; i++) {
+    f(i);
+  }
+}
+
+function forEach(f, arr) {
+  times(arr.length, function(i) {
+    f(arr[i], i, arr);
+  });
+}
+
+function reduce(f, seed, arr) {
+  forEach(function(elem, i, arr) {
+    seed = f(seed, elem, i, arr);
+  }, arr);
+  return seed;
+}
+
+function map(f, arr) {
+  return reduce(
+    function(acc, elem, i, a) {
+      return acc.concat([f(elem, i, a)]);
+    },
+    [],
+    arr
+  );
+}
+
+function lshiftBuffer(input) {
+  var asTwoBytes = reduce(
+    function(a, v, i, b) {
+      return a.concat(
+        i === b.length - 1
+          ? Buffer.from([v, 0]).readUInt16BE(0)
+          : b.readUInt16BE(i)
+      );
+    },
+    [],
+    input
+  );
+  return Buffer.from(
+    map(function(x) {
+      return ((x << 1) & 0xffff) >> 8;
+    }, asTwoBytes)
+  );
+}
+
+function consumeBitsFromBuffer(n, input) {
+  var state = { v: 0, buf: input };
+  times(n, function() {
+    state = {
+      v: (state.v << 1) | bitPeekBuffer(state.buf),
+      buf: lshiftBuffer(state.buf)
+    };
+  });
+  return state;
+}
+
+function bitPeekBuffer(input) {
+  return input[0] >> 7;
+}
+
+function sum(numArr) {
+  return reduce(
+    function(x, y) {
+      return x + y;
+    },
+    0,
+    numArr
+  );
+}
+
+function find(pred, arr) {
+  return reduce(
+    function(found, elem) {
+      return found || (pred(elem) ? elem : found);
+    },
+    null,
+    arr
+  );
+}
+
+function bufferExists() {
+  return typeof Buffer !== "undefined";
+}
+
+function ensureBuffer() {
+  if (!bufferExists()) {
+    throw new Error(
+      "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
+    );
+  }
+}
+
+function bitSeq(alignments) {
+  ensureBuffer();
+  var totalBits = sum(alignments);
+  if (totalBits % 8 !== 0) {
+    throw new Error(
+      "The bits [" +
+        alignments.join(", ") +
+        "] add up to " +
+        totalBits +
+        " which is not an even number of bytes; the total should be divisible by 8"
+    );
+  }
+  var bytes = totalBits / 8;
+
+  var tooBigRange = find(function(x) {
+    return x > 48;
+  }, alignments);
+  if (tooBigRange) {
+    throw new Error(
+      tooBigRange + " bit range requested exceeds 48 bit (6 byte) Number max."
+    );
+  }
+
+  return new Parsimmon(function(input, i) {
+    if (bytes + i > input.length) {
+      return makeFailure(i, bytes.toString() + " bytes");
+    }
+    return makeSuccess(
+      i + bytes,
+      reduce(
+        function(acc, bits) {
+          var state = consumeBitsFromBuffer(bits, acc.buf);
+          return {
+            coll: acc.coll.concat(state.v),
+            buf: state.buf
+          };
+        },
+        { coll: [], buf: input },
+        alignments
+      ).coll
+    );
+  });
+}
+
+function bitSeqObj(namedAlignments) {
+  ensureBuffer();
+  var fullAlignments = map(function(pair) {
+    return isArray(pair) ? pair : [null, pair];
+  }, namedAlignments);
+
+  var namesOnly = map(function(pair) {
+    return pair[0];
+  }, fullAlignments);
+  var alignmentsOnly = map(function(pair) {
+    return pair[1];
+  }, fullAlignments);
+
+  return bitSeq(alignmentsOnly).map(function(parsed) {
+    var namedParsed = map(function(name, i) {
+      return [name, parsed[i]];
+    }, namesOnly);
+
+    return reduce(
+      function(obj, kv) {
+        if (kv[0] !== null) {
+          obj[kv[0]] = kv[1];
+        }
+        return obj;
+      },
+      {},
+      namedParsed
+    );
+  });
+}
+
+function toArray(arrLike) {
+  return Array.prototype.slice.call(arrLike);
+}
 // -*- Helpers -*-
 
 function isParser(obj) {
@@ -19,10 +193,9 @@ function isArray(x) {
   return {}.toString.call(x) === "[object Array]";
 }
 
-var hasBuffer = typeof Buffer !== "undefined";
 function isBuffer(x) {
   /* global Buffer */
-  return hasBuffer && Buffer.isBuffer(x);
+  return bufferExists() && Buffer.isBuffer(x);
 }
 
 function makeSuccess(index, value) {
@@ -240,7 +413,7 @@ function seq() {
 function seqObj() {
   var seenKeys = {};
   var totalKeys = 0;
-  var parsers = [].slice.call(arguments);
+  var parsers = toArray(arguments);
   var numParsers = parsers.length;
   for (var j = 0; j < numParsers; j += 1) {
     var p = parsers[j];
@@ -611,7 +784,17 @@ function string(str) {
 }
 
 function byte(b) {
+  ensureBuffer();
   assertNumber(b);
+  if (b > 0xff) {
+    throw new Error(
+      "Value specified to byte constructor (" +
+        b +
+        "=0x" +
+        b.toString(16) +
+        ") is larger in value than a single byte."
+    );
+  }
   var expected = (b > 0xf ? "0x" : "0x0") + b.toString(16);
   return Parsimmon(function(input, i) {
     var head = get(input, i);
@@ -802,7 +985,6 @@ var whitespace = regexp(/\s+/).desc("whitespace");
 Parsimmon.all = all;
 Parsimmon.alt = alt;
 Parsimmon.any = any;
-Parsimmon.byte = byte;
 Parsimmon.createLanguage = createLanguage;
 Parsimmon.custom = custom;
 Parsimmon.digit = digit;
@@ -840,5 +1022,11 @@ Parsimmon.test = test;
 Parsimmon.whitespace = whitespace;
 Parsimmon["fantasy-land/empty"] = empty;
 Parsimmon["fantasy-land/of"] = succeed;
+
+Parsimmon.Binary = {
+  bitSeq: bitSeq,
+  bitSeqObj: bitSeqObj,
+  byte: byte
+};
 
 module.exports = Parsimmon;

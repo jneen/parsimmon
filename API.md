@@ -424,6 +424,49 @@ parser.parse('accccc');
 //=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
 ```
 
+# Binary constructors.
+
+The purpose of the following constructors is to allow the consumption of Buffer types in node to allow for attoparsec style consumption of binary input.
+As these constructors yield regular values within parsers, they can then be combined in the same fashion as the above string-based constructors to produce
+robust binary parsers.  These constructors live in the Parsimmon.Binary namespace.
+
+## Parsimmon.byte(int)
+
+Returns a parser that yields a byte that matches the given input.  Similar to digit/letter.
+
+```javascript
+var parser = Parsimmon.Binary.byte(0xFF);
+parser.parse(Buffer.from([0xFF]));
+//=> { status: true, value: 255 }
+```
+
+## Parsimmon.bitSeq(alignments)
+
+Specify a series of bit alignments that do not have to be byte aligned and consume them from a buffer.  The bits must
+sum to a byte boundary.
+
+```javascript
+var parser = Parsimmon.Binary.bitSeq([3, 5, 5, 3]);
+parser.parse(Buffer.from([0x04, 0xFF]));
+//=> {status: true, value: [ 0, 4, 31, 7 ]}
+```
+
+## Parsimmon.bitSeqObj(namedAlignments)
+
+Specify a series of bit alignments with names that will output an object with those alignments.  Very similar to seqObj,
+however, but only accepts numeric values.  Will discard unnamed alignments.
+
+```javascript
+var parser = Parsimmon.Binary.bitSeqObj([
+    ["a", 3],
+    5,
+    ["b", 5],
+    ["c", 3]
+]);
+parser.parse(Buffer.from([0x04, 0xFF]));
+//=> { status: true, value: { a: 0, b: 31, c: 7 } }
+```
+
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 # Parser methods
