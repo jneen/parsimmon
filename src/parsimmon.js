@@ -151,10 +151,39 @@ function bitSeq(alignments) {
 
 function bitSeqObj(namedAlignments) {
   ensureBuffer();
-  var fullAlignments = map(function(pair) {
-    return isArray(pair) ? pair : [null, pair];
+  var seenKeys = {};
+  var totalKeys = 0;
+  var fullAlignments = map(function(item) {
+    if (isArray(item)) {
+      var pair = item;
+      if (pair.length !== 2) {
+        throw new Error(
+          "[" +
+            pair.join(", ") +
+            "] should be length 2, got length " +
+            pair.length
+        );
+      }
+      assertString(pair[0]);
+      assertNumber(pair[1]);
+      if (seenKeys[pair[0]]) {
+        throw new Error("duplicate key in bitSeqObj: " + pair[0]);
+      }
+      seenKeys[pair[0]] = true;
+      totalKeys++;
+      return pair;
+    } else {
+      assertNumber(item);
+      return [null, item];
+    }
   }, namedAlignments);
-
+  if (totalKeys < 1) {
+    throw new Error(
+      "bitSeqObj expects at least one named pair, got [" +
+        namedAlignments.join(", ") +
+        "]"
+    );
+  }
   var namesOnly = map(function(pair) {
     return pair[0];
   }, fullAlignments);

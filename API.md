@@ -421,40 +421,36 @@ var parser =
     notChar('b').times(5)
   );
 parser.parse('accccc');
-//=> {status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']]}
+// => { status: true, value: ['a', ['c', 'c', 'c', 'c', 'c']] }
 ```
 
-# Binary constructors.
+# Binary constructors
 
-The purpose of the following constructors is to allow the consumption of Buffer types in node to allow for attoparsec style consumption of binary input.
-As these constructors yield regular values within parsers, they can then be combined in the same fashion as the above string-based constructors to produce
-robust binary parsers.  These constructors live in the Parsimmon.Binary namespace.
+The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as `Parsimmon.seq`, `Parsimmon.seqObj`, and still have all the same methods as text-based parsers (e.g. `.map`, `.node`, etc.).
 
 ## Parsimmon.byte(int)
 
-Returns a parser that yields a byte that matches the given input.  Similar to digit/letter.
+Returns a parser that yields a byte (as a number) that matches the given input; similar to `Parsimmon.digit` and `Parsimmon.letter`.
 
 ```javascript
-var parser = Parsimmon.Binary.byte(0xFF);
-parser.parse(Buffer.from([0xFF]));
-//=> { status: true, value: 255 }
+var parser = Parsimmon.Binary.byte(0x3f);
+parser.parse(Buffer.from([0x3f]));
+// => { status: true, value: 63 }
 ```
 
 ## Parsimmon.bitSeq(alignments)
 
-Specify a series of bit alignments that do not have to be byte aligned and consume them from a buffer.  The bits must
-sum to a byte boundary.
+Parse a series of bits that do not have to be byte-aligned and consume them from a Buffer. The maximum number is 48 since more than 48 bits won't fit safely into a JavaScript number without losing precision. Also, the total of all bits in the sequence must be a multiple of 8 since parsing is still done at the byte level.
 
 ```javascript
 var parser = Parsimmon.Binary.bitSeq([3, 5, 5, 3]);
-parser.parse(Buffer.from([0x04, 0xFF]));
-//=> {status: true, value: [ 0, 4, 31, 7 ]}
+parser.parse(Buffer.from([0x04, 0xff]));
+//=> { status: true, value: [0, 4, 31, 7] }
 ```
 
 ## Parsimmon.bitSeqObj(namedAlignments)
 
-Specify a series of bit alignments with names that will output an object with those alignments.  Very similar to seqObj,
-however, but only accepts numeric values.  Will discard unnamed alignments.
+Works like `Parsimmon.bitSeq` except each item in the array is either a number of bits or pair (array with length = 2) of name and bits. The bits are parsed in order and put into an object based on the name supplied. If there's no name for the bits, it will be parsed but discarded from the returned value.
 
 ```javascript
 var parser = Parsimmon.Binary.bitSeqObj([

@@ -18,6 +18,30 @@ describe("bitSeqObj", function() {
     });
   });
 
+  it("throws when there are zero keys", function() {
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([1, 7]);
+    }, /expects at least one/i);
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([1, 3, 2, 2]);
+    }, /expects at least one/i);
+  });
+
+  it("throws you pass the wrong type of argument", function() {
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([[]]);
+    }, /should be length 2/i);
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([[1, 2, 3]]);
+    }, /should be length 2/i);
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([[1, 1]]);
+    }, /not a string/i);
+    assert.throws(function() {
+      Parsimmon.Binary.bitSeqObj([["a", "a"]]);
+    }, /not a number/i);
+  });
+
   it("fails if requesting too much", function() {
     var b = Buffer.from([]);
     var p = Parsimmon.Binary.bitSeqObj([
