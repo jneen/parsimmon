@@ -129,11 +129,12 @@ function bitSeq(alignments) {
   }
 
   return new Parsimmon(function(input, i) {
-    if (bytes + i > input.length) {
+    var newPos = bytes + i;
+    if (newPos > input.length) {
       return makeFailure(i, bytes.toString() + " bytes");
     }
     return makeSuccess(
-      i + bytes,
+      newPos,
       reduce(
         function(acc, bits) {
           var state = consumeBitsFromBuffer(bits, acc.buf);
@@ -142,7 +143,7 @@ function bitSeq(alignments) {
             buf: state.buf
           };
         },
-        { coll: [], buf: input },
+        { coll: [], buf: input.slice(i, newPos) },
         alignments
       ).coll
     );
