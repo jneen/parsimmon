@@ -1,3 +1,7 @@
+## version 1.7.1 (2018-03-22)
+
+* Fixes a bug where `bitSeq` consumed the wrong input
+
 ## version 1.7.0 (2018-03-10)
 
 * Adds support for binary parsing using Node.js Buffers
