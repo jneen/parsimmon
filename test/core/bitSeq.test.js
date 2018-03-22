@@ -42,4 +42,15 @@ describe("bitSeq", function() {
       }, /buffer global/i);
     });
   });
+
+  context("We are bitSeq'ing not at the beginning.", function() {
+    it("Should still work.", function() {
+      var b = Buffer.from([0x10, 0xff, 0xff]);
+      var p = Parsimmon.seqObj(Parsimmon.any, [
+        "data",
+        Parsimmon.Binary.bitSeq([3, 5, 5, 3])
+      ]);
+      assert.deepEqual(p.parse(b).value.data, [7, 31, 31, 7]);
+    });
+  });
 });
