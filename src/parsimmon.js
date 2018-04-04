@@ -455,10 +455,10 @@ function seqObj() {
         p.length === 2 && typeof p[0] === "string" && isParser(p[1]);
       if (isWellFormed) {
         var key = p[0];
-        if (seenKeys[key]) {
+        if (seenKeys["$" + key]) {
           throw new Error("seqObj: duplicate key " + key);
         }
-        seenKeys[key] = true;
+        seenKeys["$" + key] = true;
         totalKeys++;
         continue;
       }
