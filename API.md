@@ -716,6 +716,7 @@ Parsimmon.seq(
       return x.slice(1);
     })
 ).tie().parse('abcd') // => {status: true, value: 'acd'}
+```
 
 ## parser.promap(fn)
 
