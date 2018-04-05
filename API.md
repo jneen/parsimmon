@@ -58,6 +58,8 @@
   * [parser.chain(newParserFunc)](#parserchainnewparserfunc)
   * [parser.then(anotherParser)](#parserthenanotherparser)
   * [parser.map(fn)](#parsermapfn)
+  * [parser.contramap(fn)](#parsercontramapfn)
+  * [parser.promap(fn)](#parserpromapfn)
   * [parser.result(value)](#parserresultvalue)
   * [parser.fallback(value)](#parserfallbackvalue)
   * [parser.skip(otherParser)](#parserskipotherparser)
