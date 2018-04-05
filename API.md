@@ -682,6 +682,57 @@ pNum.parse('123'); // => {status: true, value: 124}
 pNum.parse('3.1'); // => {status: true, value: 4.1}
 ```
 
+## parser.contramap(fn)
+
+Transforms the input of `parser` with the given function. Example:
+
+```javascript
+var pNum =
+  Parsimmon.string('A')
+    .contramap(function(x) {
+        return x.toUpperCase();
+    });
+
+pNum.parse('a');   // => {status: true, value: 'A'}
+pNum.parse('A'); // => {status: true, value: 'A'}
+```
+An important caveat of contramap is that it transforms the remaining input.  This means that you cannot expect values after a contramap in general, like the following.
+```javascript
+Parsimmon.seq(
+  Parsimmon.string('a'),
+  Parsimmon.string('c').contramap(function(x) {
+    return x.slice(1);
+  }),
+  Parsimmon.string('d')
+).tie().parse('abcd') //this will fail
+
+Parsimmon.seq(
+  Parsimmon.string("a"),
+  Parsimmon.seq(Parsimmon.string("c"), Parsimmon.string("d"))
+    .tie()
+    .contramap(function(x) {
+      return x.slice(1);
+    })
+).tie().parse('abcd') // => {status: true, value: 'abcd'}
+
+## parser.promap(fn)
+
+Transforms the input and output of `parser` with the given functions. Example:
+
+```javascript
+var pNum =
+  Parsimmon.string('A')
+    .promap(function(x) {
+        return x.toUpperCase();
+    }, function(x) {
+        return x.charCodeAt(0);
+    });
+
+pNum.parse('a');   // => {status: true, value: 65}
+pNum.parse('A'); // => {status: true, value: 65}
+```
+The same caveat for contramap above applies to promap.
+
 ## parser.result(value)
 
 Returns a new parser with the same behavior, but which yields `value`. Equivalent to `parser.map(function(x) { return x; }.bind(value))`.

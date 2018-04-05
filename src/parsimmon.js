@@ -724,12 +724,12 @@ _.map = function(fn) {
 _.contramap = function(fn) {
   assertFunction(fn);
   var self = this;
-  return Parsimmon(function(input) {
-    var result = self.parse(fn(input));
+  return Parsimmon(function(input, i) {
+    var result = self.parse(fn(input.slice(i)));
     if (!result.status) {
       return result;
     }
-    return makeSuccess(input.length, result.value);
+    return makeSuccess(i + input.length, result.value);
   });
 };
 
