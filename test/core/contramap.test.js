@@ -1,6 +1,6 @@
 "use strict";
 
-suite("map", function() {
+suite("contramap", function() {
   test("with a function, transforms the input and parses that", function() {
     var parser = Parsimmon.string("x").contramap(function(x) {
       return x.toLowerCase();

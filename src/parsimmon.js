@@ -729,6 +729,12 @@ _.contramap = function(fn) {
   });
 };
 
+_.promap = function(f, g) {
+  assertFunction(f);
+  assertFunction(g);
+  return this.contramap(f).map(g);
+};
+
 _.skip = function(next) {
   return seq(this, next).map(function(results) {
     return results[0];
