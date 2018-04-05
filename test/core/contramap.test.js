@@ -46,4 +46,19 @@ suite("contramap", function() {
 
     assert.deepEqual(parser.parse("abcd"), { status: true, value: "acd" });
   });
+
+  test("backtracking with contramaps works", function() {
+    var parser = Parsimmon.seq(
+      Parsimmon.string("a"),
+      Parsimmon.seq(Parsimmon.string("c"), Parsimmon.string("d"))
+        .tie()
+        .contramap(function(x) {
+          return x.slice(1);
+        })
+    )
+      .tie()
+      .or(Parsimmon.all);
+
+    assert.deepEqual(parser.parse("abcde"), { status: true, value: "abcde" });
+  });
 });
