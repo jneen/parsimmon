@@ -713,7 +713,7 @@ Parsimmon.seq(
     .contramap(function(x) {
       return x.slice(1);
     })
-).tie().parse('abcd') // => {status: true, value: 'abcd'}
+).tie().parse('abcd') // => {status: true, value: 'acd'}
 
 ## parser.promap(fn)
 
