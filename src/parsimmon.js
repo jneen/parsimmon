@@ -167,7 +167,7 @@ function bitSeqObj(namedAlignments) {
       }
       assertString(pair[0]);
       assertNumber(pair[1]);
-      if (seenKeys[pair[0]]) {
+      if (Object.prototype.hasOwnProperty.call(seenKeys, pair[0])) {
         throw new Error("duplicate key in bitSeqObj: " + pair[0]);
       }
       seenKeys[pair[0]] = true;
