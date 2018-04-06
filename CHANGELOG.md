@@ -1,3 +1,7 @@
+## version 1.7.2 (2018-04-05)
+
+* Fixes a bug where `seqObj` and `bitSeqObj` wouldn't work with keys that were already part of `Object.prototype`
+
 ## version 1.7.1 (2018-03-22)
 
 * Fixes a bug where `bitSeq` consumed the wrong input
