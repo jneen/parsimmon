@@ -7,7 +7,12 @@ suite("formatError", function() {
       Parsimmon.fail("b"),
       Parsimmon.fail("c")
     );
-    var expectation = "expected one of a, b, c, got the end of the input";
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n\n" +
+      "Got the end of the input\n\n" +
+      "Expected one of the following: \n\n" +
+      "a, b, c\n";
     var input = "";
     var answer = Parsimmon.formatError(input, parser.parse(input));
     assert.deepEqual(answer, expectation);
@@ -23,7 +28,12 @@ suite("formatError", function() {
       )
     );
     var expectation =
-      "expected one of a, b, c at line 1 column 2, got '...x11111111111...'";
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n\n" +
+      "> 1 | 1x1111111111111111111111111111\n" +
+      "    |  ^\n\n" +
+      "Expected one of the following: \n\n" +
+      "a, b, c\n";
     var input = "1x1111111111111111111111111111";
     var answer = Parsimmon.formatError(input, parser.parse(input));
     assert.deepEqual(answer, expectation);
