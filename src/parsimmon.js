@@ -167,7 +167,7 @@ function bitSeqObj(namedAlignments) {
       }
       assertString(pair[0]);
       assertNumber(pair[1]);
-      if (seenKeys[pair[0]]) {
+      if (Object.prototype.hasOwnProperty.call(seenKeys, pair[0])) {
         throw new Error("duplicate key in bitSeqObj: " + pair[0]);
       }
       seenKeys[pair[0]] = true;
@@ -455,7 +455,7 @@ function seqObj() {
         p.length === 2 && typeof p[0] === "string" && isParser(p[1]);
       if (isWellFormed) {
         var key = p[0];
-        if (seenKeys[key]) {
+        if (Object.prototype.hasOwnProperty.call(seenKeys, key)) {
           throw new Error("seqObj: duplicate key " + key);
         }
         seenKeys[key] = true;

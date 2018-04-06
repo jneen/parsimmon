@@ -85,4 +85,10 @@ describe("bitSeqObj", function() {
       }, /buffer global/i);
     });
   });
+
+  test("accepts 'constructor' as a key", function() {
+    var b = Buffer.from([0xff]);
+    var p = Parsimmon.Binary.bitSeqObj([["constructor", 8]]);
+    assert.deepEqual(p.parse(b).value, { constructor: 255 });
+  });
 });

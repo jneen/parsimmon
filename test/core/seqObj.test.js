@@ -73,4 +73,12 @@ suite("Parsimmon.seqObj", function() {
       Parsimmon.seqObj(0);
     });
   });
+
+  test("accepts 'constructor' as a key", function() {
+    var parser = Parsimmon.seqObj(["constructor", Parsimmon.of(1)]);
+    var result = parser.tryParse("");
+    assert.deepStrictEqual(result, {
+      constructor: 1
+    });
+  });
 });
