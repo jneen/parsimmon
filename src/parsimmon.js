@@ -364,38 +364,81 @@ function assertString(x) {
   }
 }
 
+var newLine = "\n";
+
+function repeat(string, amount) {
+  return new Array(amount + 1).join(string);
+}
+
 function formatExpected(expected) {
   if (expected.length === 1) {
-    return expected[0];
+    return "Expected:" + repeat(newLine, 2) + expected[0];
   }
-  return "one of " + expected.join(", ");
+  return (
+    "Expected one of the following: " + repeat(newLine, 2) + expected.join(", ")
+  );
 }
 
 function formatGot(input, error) {
   var index = error.index;
   var i = index.offset;
   if (i === input.length) {
-    return ", got the end of the input";
+    return "Got the end of the input";
   }
   if (isBuffer(input)) {
-    return " at byte " + index.offset;
+    return "At byte " + index.offset;
   }
-  var prefix = i > 0 ? "'..." : "'";
-  var suffix = input.length - i > 12 ? "...'" : "'";
-  return (
-    " at line " +
-    index.line +
-    " column " +
-    index.column +
-    ", got " +
-    prefix +
-    input.slice(i, i + 12) +
-    suffix
+  var NEWLINE_REGEX = /\r\n|[\n\r\u2028\u2029]/;
+
+  var arrowUp = "^";
+  var arrowRight = ">";
+
+  var line = error.index.line;
+  var column = error.index.column;
+  var lines = input.split(NEWLINE_REGEX).map(function(lineSource, lineNumber) {
+    return {
+      lineNumber: lineNumber + 1,
+      lineSource: lineSource
+    };
+  });
+  var lineNumberLabelLength = lines.length.toString().length;
+  var errorHighlight = {
+    lineNumber: repeat(" ", lineNumberLabelLength),
+    lineSource: repeat(" ", column - 1) + arrowUp
+  };
+  var linesWithErrorHighLight = [].concat(
+    lines.slice(0, line),
+    [errorHighlight],
+    lines.slice(line)
   );
+
+  var linesWithError =
+    lines.length === 1
+      ? linesWithErrorHighLight
+      : linesWithErrorHighLight.slice(line - 2, line + 3);
+
+  return linesWithError
+    .map(function(lineWithError) {
+      var lineNumber = lineWithError.lineNumber;
+      var lineSource = lineWithError.lineSource;
+      var prefix = lineNumber === line ? arrowRight + " " : "  ";
+      return prefix + lineNumber + " | " + lineSource;
+    })
+    .join(newLine);
 }
 
 function formatError(input, error) {
-  return "expected " + formatExpected(error.expected) + formatGot(input, error);
+  return [
+    newLine,
+    "-- PARSING FAILED " + repeat("-", 50),
+    newLine,
+    newLine,
+    formatGot(input, error),
+    newLine,
+    newLine,
+    formatExpected(error.expected),
+    newLine
+  ].join("");
 }
 
 function flags(re) {
