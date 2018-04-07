@@ -408,10 +408,13 @@ function formatGot(input, error) {
     lines.slice(line)
   );
 
+  var fromLine = line - 2 < 0 ? 0 : line - 2;
+  var toLine = line + 3;
+
   var linesWithError =
     lines.length === 1
       ? linesWithErrorHighLight
-      : linesWithErrorHighLight.slice(line - 2, line + 3);
+      : linesWithErrorHighLight.slice(fromLine, toLine);
 
   return map(function(lineWithError) {
     var lineNumber = lineWithError.lineNumber;

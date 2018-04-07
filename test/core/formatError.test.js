@@ -38,4 +38,26 @@ suite("formatError", function() {
     var answer = Parsimmon.formatError(input, parser.parse(input));
     assert.deepEqual(answer, expectation);
   });
+
+  test("milti-line input", function() {
+    var parser = Parsimmon.seq(
+      Parsimmon.string("\n")
+        .many()
+        .then(Parsimmon.string("a"))
+    );
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n\n" +
+      "  2 | \n" +
+      "> 3 | b\n" +
+      "    | ^\n" +
+      "  4 | \n" +
+      "  5 | \n" +
+      "\n" +
+      "Expected one of the following: \n\n" +
+      "'\n', 'a'\n";
+    var input = "\n\nb\n\n\n";
+    var answer = Parsimmon.formatError(input, parser.parse(input));
+    assert.deepEqual(answer, expectation);
+  });
 });
