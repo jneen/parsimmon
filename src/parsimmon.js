@@ -364,19 +364,15 @@ function assertString(x) {
   }
 }
 
-var newLine = "\n";
-
 function repeat(string, amount) {
   return new Array(amount + 1).join(string);
 }
 
 function formatExpected(expected) {
   if (expected.length === 1) {
-    return "Expected:" + repeat(newLine, 2) + expected[0];
+    return "Expected:\n\n" + expected[0];
   }
-  return (
-    "Expected one of the following: " + repeat(newLine, 2) + expected.join(", ")
-  );
+  return "Expected one of the following: \n\n" + expected.join(", ");
 }
 
 function formatGot(input, error) {
@@ -395,12 +391,12 @@ function formatGot(input, error) {
 
   var line = error.index.line;
   var column = error.index.column;
-  var lines = input.split(NEWLINE_REGEX).map(function(lineSource, lineNumber) {
+  var lines = map(function(lineSource, lineNumber) {
     return {
       lineNumber: lineNumber + 1,
       lineSource: lineSource
     };
-  });
+  }, input.split(NEWLINE_REGEX));
   var lineNumberLabelLength = lines.length.toString().length;
   var errorHighlight = {
     lineNumber: repeat(" ", lineNumberLabelLength),
@@ -417,27 +413,23 @@ function formatGot(input, error) {
       ? linesWithErrorHighLight
       : linesWithErrorHighLight.slice(line - 2, line + 3);
 
-  return linesWithError
-    .map(function(lineWithError) {
-      var lineNumber = lineWithError.lineNumber;
-      var lineSource = lineWithError.lineSource;
-      var prefix = lineNumber === line ? arrowRight + " " : "  ";
-      return prefix + lineNumber + " | " + lineSource;
-    })
-    .join(newLine);
+  return map(function(lineWithError) {
+    var lineNumber = lineWithError.lineNumber;
+    var lineSource = lineWithError.lineSource;
+    var prefix = lineNumber === line ? arrowRight + " " : "  ";
+    return prefix + lineNumber + " | " + lineSource;
+  }, linesWithError).join("\n");
 }
 
 function formatError(input, error) {
   return [
-    newLine,
+    "\n",
     "-- PARSING FAILED " + repeat("-", 50),
-    newLine,
-    newLine,
+    "\n\n",
     formatGot(input, error),
-    newLine,
-    newLine,
+    "\n\n",
     formatExpected(error.expected),
-    newLine
+    "\n"
   ].join("");
 }
 
