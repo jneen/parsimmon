@@ -1,10 +1,11 @@
-"use strict";
+declare var Buffer: any;
 
-function Parsimmon(action) {
-  if (!(this instanceof Parsimmon)) {
-    return new Parsimmon(action);
+class Parsimmon {
+  _: any;
+
+  constructor(action) {
+    this._ = action;
   }
-  this._ = action;
 }
 
 var _ = Parsimmon.prototype;
@@ -419,8 +420,7 @@ function anchoredRegexp(re) {
 
 // -*- Combinators -*-
 
-function seq() {
-  var parsers = [].slice.call(arguments);
+function seq(...parsers) {
   var numParsers = parsers.length;
   for (var j = 0; j < numParsers; j += 1) {
     assertParser(parsers[j]);
@@ -496,8 +496,7 @@ function seqObj() {
   });
 }
 
-function seqMap() {
-  var args = [].slice.call(arguments);
+function seqMap(...args) {
   if (args.length === 0) {
     throw new Error("seqMap needs at least one argument");
   }
@@ -524,8 +523,7 @@ function createLanguage(parsers) {
   return language;
 }
 
-function alt() {
-  var parsers = [].slice.call(arguments);
+function alt(...parsers) {
   var numParsers = parsers.length;
   if (numParsers === 0) {
     return fail("zero alternates");
@@ -836,12 +834,10 @@ function byte(b) {
   });
 }
 
-function regexp(re, group) {
+function regexp(re, group = 0) {
   assertRegexp(re);
   if (arguments.length >= 2) {
     assertNumber(group);
-  } else {
-    group = 0;
   }
   var anchored = anchoredRegexp(re);
   var expected = "" + re;
@@ -947,7 +943,7 @@ function takeWhile(predicate) {
   });
 }
 
-function lazy(desc, f) {
+function lazy(desc, f = undefined) {
   if (arguments.length < 2) {
     f = desc;
     desc = undefined;
@@ -1059,4 +1055,4 @@ Parsimmon.Binary = {
   byte: byte
 };
 
-module.exports = Parsimmon;
+export = Parsimmon;
