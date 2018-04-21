@@ -4,7 +4,7 @@ suite("Parsimmon()", function() {
   test("should work in general", function() {
     var good = "just a Q";
     var bad = "all I wanted was a Q";
-    var justQ = Parsimmon(function(str, i) {
+    var justQ = new Parsimmon(function(str, i) {
       if (str.charAt(i) === "Q") {
         return Parsimmon.makeSuccess(i + 1, good);
       } else {
@@ -30,7 +30,7 @@ suite("Parsimmon()", function() {
 
   test("unsafeUnion works on poorly formatted custom parser", function() {
     var p1 = Parsimmon.string("a").or(Parsimmon.string("b"));
-    var p2 = Parsimmon(function(str, i) {
+    var p2 = new Parsimmon(function(str, i) {
       return {
         status: false,
         index: -1,

@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "module": "es2015",
+    "module": "commonjs",
     "target": "es5",
+    "rootDir": "src/",
     "allowJs": true,
     "strict": false
   },

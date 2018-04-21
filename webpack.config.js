@@ -15,11 +15,16 @@ const tsRule = {
 module.exports = {
   entry: "./src/parsimmon.ts",
   node: false,
+  devtool: "source-map",
   output: {
     path: path.resolve(__dirname, "build"),
     library: "Parsimmon",
     libraryTarget: "umd",
-    filename: "parsimmon.umd.min.js"
+    globalObject: "typeof self !== 'undefined' ? self : this",
+    filename: "parsimmon.min.js"
+  },
+  resolve: {
+    extensions: [".js", ".ts"]
   },
   module: {
     rules: [tsRule]
