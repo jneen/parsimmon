@@ -31,6 +31,8 @@
   },
   "license": "MIT",
   "scripts": {
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags",
     "prebuild": "rimraf build && mkdirp build",
     "build": "webpack -p",
     "prepublishOnly": "npm run test && npm run build",

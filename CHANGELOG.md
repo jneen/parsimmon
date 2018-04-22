@@ -1,3 +1,7 @@
+## version 1.7.3 (2018-04-22)
+
+* Shrinks UMD build from ~33 kb to ~11 kb
+
 ## version 1.7.2 (2018-04-05)
 
 * Fixes a bug where `seqObj` and `bitSeqObj` wouldn't work with keys that were already part of `Object.prototype`
