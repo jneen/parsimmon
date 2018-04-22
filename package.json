@@ -27,7 +27,7 @@
     "nyc": "^11.0.3",
     "prettier": "1.7.4",
     "rimraf": "^2.5.4",
-    "webpack": "^2.6.1"
+    "webpack": "^4.6.0"
   },
   "license": "MIT",
   "scripts": {
