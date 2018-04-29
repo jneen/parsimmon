@@ -65,7 +65,7 @@ let JSONParser = P.createLanguage({
   colon: () => word(":"),
 
   // `.result` is like `.map` but it takes a value instead of a function, and
-  // `.always returns the same value.
+  // always returns the same value.
   null: () => word("null").result(null),
   true: () => word("true").result(true),
   false: () => word("false").result(false),
