@@ -365,6 +365,9 @@ function assertString(x) {
 }
 
 function repeat(string, amount) {
+  if (amount <= 0) {
+    return string;
+  }
   return new Array(amount + 1).join(string);
 }
 
@@ -373,6 +376,14 @@ function formatExpected(expected) {
     return "Expected:\n\n" + expected[0];
   }
   return "Expected one of the following: \n\n" + expected.join(", ");
+}
+
+function leftPad(str, pad, char) {
+  var length = str.length;
+  if (pad <= 0) {
+    return str;
+  }
+  return repeat(char, pad - length) + str;
 }
 
 function formatGot(input, error) {
@@ -384,44 +395,56 @@ function formatGot(input, error) {
   if (isBuffer(input)) {
     return "At byte " + index.offset;
   }
-  var NEWLINE_REGEX = /\r\n|[\n\r\u2028\u2029]/;
 
-  var arrowUp = "^";
-  var arrowRight = ">";
+  var line = index.line;
+  var column = index.column;
 
-  var line = error.index.line;
-  var column = error.index.column;
-  var lines = map(function(lineSource, lineNumber) {
-    return {
-      lineNumber: lineNumber + 1,
-      lineSource: lineSource
-    };
-  }, input.split(NEWLINE_REGEX));
-  var lineNumberLabelLength = lines.length.toString().length;
-  var errorHighlight = {
-    lineNumber: repeat(" ", lineNumberLabelLength),
-    lineSource: repeat(" ", column - 1) + arrowUp
-  };
-  var linesWithErrorHighLight = [].concat(
-    lines.slice(0, line),
-    [errorHighlight],
-    lines.slice(line)
+  var inputLines = input.split(/\r\n|[\n\r\u2028\u2029]/);
+  var inputLinesLength = inputLines.length;
+  var lineWithErrorIndex = line - 1;
+  // Guard against the negative upper bound for lines included in the output.
+  var showFromLineIndex =
+    lineWithErrorIndex - 2 > 0 ? lineWithErrorIndex - 2 : 0;
+  var showToLineIndex =
+    lineWithErrorIndex + 3 > inputLinesLength
+      ? inputLinesLength
+      : lineWithErrorIndex + 3;
+  var lastLineNumberLabelLength = showToLineIndex.toString().length;
+  var linesToShow = inputLines.slice(showFromLineIndex, showToLineIndex);
+
+  var linesToShowWithLineNumbers = reduce(
+    function(acc, lineSource, i) {
+      var isLineWithError = i + showFromLineIndex === lineWithErrorIndex;
+      var defaultPrefix = "  ";
+      var prefix = isLineWithError ? "> " : defaultPrefix;
+      var lineNumber = (showFromLineIndex + i + 1).toString();
+      var lineNumberLabel =
+        lineNumber.length < lastLineNumberLabelLength
+          ? leftPad(
+              lineNumber,
+              lastLineNumberLabelLength - lineNumber.length,
+              " "
+            )
+          : lineNumber;
+
+      return [].concat(
+        acc,
+        [prefix + lineNumberLabel + " | " + lineSource],
+        isLineWithError
+          ? [
+              defaultPrefix +
+                repeat(" ", lastLineNumberLabelLength) +
+                " | " +
+                leftPad("^", column - 1, " ")
+            ]
+          : []
+      );
+    },
+    [],
+    linesToShow
   );
 
-  var fromLine = line - 2 < 0 ? 0 : line - 2;
-  var toLine = line + 3;
-
-  var linesWithError =
-    lines.length === 1
-      ? linesWithErrorHighLight
-      : linesWithErrorHighLight.slice(fromLine, toLine);
-
-  return map(function(lineWithError) {
-    var lineNumber = lineWithError.lineNumber;
-    var lineSource = lineWithError.lineSource;
-    var prefix = lineNumber === line ? arrowRight + " " : "  ";
-    return prefix + lineNumber + " | " + lineSource;
-  }, linesWithError).join("\n");
+  return linesToShowWithLineNumbers.join("\n");
 }
 
 function formatError(input, error) {

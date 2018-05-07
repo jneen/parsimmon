@@ -48,6 +48,7 @@ suite("formatError", function() {
     var expectation =
       "\n" +
       "-- PARSING FAILED --------------------------------------------------\n\n" +
+      "  1 | \n" +
       "  2 | \n" +
       "> 3 | b\n" +
       "    | ^\n" +
@@ -58,6 +59,28 @@ suite("formatError", function() {
       "'\n', 'a'\n";
     var input = "\n\nb\n\n\n";
     var answer = Parsimmon.formatError(input, parser.parse(input));
+    assert.deepEqual(answer, expectation);
+  });
+
+  test("multi-line line-number padding", function() {
+    var parser = Parsimmon.seq(
+      Parsimmon.string("\n")
+        .many()
+        .then(Parsimmon.string("a"))
+    );
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n\n" +
+      "   8 | \n" +
+      "   9 | \n" +
+      "> 10 | b\n" +
+      "     | ^\n\n" +
+      "Expected one of the following: \n\n" +
+      "'\n', 'a'\n";
+
+    var input = new Array(9).join("\n") + "\nb";
+    var answer = Parsimmon.formatError(input, parser.parse(input));
+
     assert.deepEqual(answer, expectation);
   });
 });
