@@ -983,8 +983,10 @@ Takes `parser` which returns a function and applies it to the parsed value of `o
 
 ```javascript
 Parsimmon.digit
-  .ap(Parsimmon.of(function(x) { return Number(x) + 1; }))
-  .parse('4')
+  .ap(Parsimmon.digit
+    .map(s => t => 
+      Number(s) + Number(t)))
+        .parse("23");
 // => {status: true, value: 5}
 ```
 
