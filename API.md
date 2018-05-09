@@ -40,6 +40,11 @@
   * [Parsimmon.digits](#parsimmondigits)
   * [Parsimmon.whitespace](#parsimmonwhitespace)
   * [Parsimmon.optWhitespace](#parsimmonoptwhitespace)
+  * [Parsimmon.cr](#parsimmoncr)
+  * [Parsimmon.lf](#parsimmonlf)
+  * [Parsimmon.crlf](#parsimmoncrlf)
+  * [Parsimmon.newline](#parsimmonnewline)
+  * [Parsimmon.end](#parsimmonend)
   * [Parsimmon.any](#parsimmonany)
   * [Parsimmon.all](#parsimmonall)
   * [Parsimmon.eof](#parsimmoneof)
@@ -145,7 +150,7 @@ Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
 
 ## Parsimmon(fn)
 
-**NOTE:** You probably will never need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`.
+**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`.
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon(fn)`. This is an example of how to create a parser that matches any character except the one provided:
 
@@ -412,6 +417,44 @@ Equivalent to `Parsimmon.regexp(/\s+/)`.
 ## Parsimmon.optWhitespace
 
 Equivalent to `Parsimmon.regexp(/\s*/)`.
+
+## Parsimmon.cr
+
+Equivalent to `Parsimmon.string("\r")`.
+
+This parser checks for the "carriage return" character, which is used as the line terminator for classic Mac OS 9 text files.
+
+## Parsimmon.lf
+
+Equivalent to `Parsimmon.string("\n")`.
+
+This parser checks for the "line feed" character, which is used as the line terminator for Linux and macOS text files.
+
+## Parsimmon.crlf
+
+Equivalent to `Parsimmon.string("\r\n")`.
+
+This parser checks for the "carriage return" character followed by the "line feed" character, which is used as the line terminator for Windows text files and HTTP headers.
+
+## Parsimmon.newline
+
+Equivalent to:
+
+```js
+Parsimmon.alt(
+  Parsimmon.crlf,
+  Parsimmon.lf,
+  Parsimmon.cr
+).desc("newline")
+```
+
+This flexible parser will match any kind of text file line ending.
+
+## Parsimmon.end
+
+Equivalent to `Parsimmon.alt(Parsimmon.newline, Parsimmon.eof)`.
+
+This is the most general purpose "end of line" parser. It allows the "end of file" in addition to all three text file line endings from `Parsimmon.newline`. This is important because text files frequently do not have line terminators at the end ("trailing newline").
 
 ## Parsimmon.any
 
