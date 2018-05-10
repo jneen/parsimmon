@@ -398,17 +398,18 @@ function formatGot(input, error) {
 
   var line = index.line;
   var column = index.column;
-
+  var linesBefore = 2;
+  var linesAfter = 3;
   var inputLines = input.split(/\r\n|[\n\r\u2028\u2029]/);
   var inputLinesLength = inputLines.length;
   var lineWithErrorIndex = line - 1;
   // Guard against the negative upper bound for lines included in the output.
   var showFromLineIndex =
-    lineWithErrorIndex - 2 > 0 ? lineWithErrorIndex - 2 : 0;
+    lineWithErrorIndex - linesBefore > 0 ? lineWithErrorIndex - linesBefore : 0;
   var showToLineIndex =
-    lineWithErrorIndex + 3 > inputLinesLength
+    lineWithErrorIndex + linesAfter > inputLinesLength
       ? inputLinesLength
-      : lineWithErrorIndex + 3;
+      : lineWithErrorIndex + linesAfter;
   var lastLineNumberLabelLength = showToLineIndex.toString().length;
   var linesToShow = inputLines.slice(showFromLineIndex, showToLineIndex);
 
