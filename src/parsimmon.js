@@ -646,16 +646,26 @@ _.many = function() {
   });
 };
 
-_.tie = function() {
+_.tieWith = function(separator) {
+  assertString(separator);
   return this.map(function(args) {
     assertArray(args);
-    var s = "";
-    for (var i = 0; i < args.length; i++) {
-      assertString(args[i]);
-      s += args[i];
+    if (args.length) {
+      assertString(args[0]);
+      var s = args[0];
+      for (var i = 1; i < args.length; i++) {
+        assertString(args[i]);
+        s += separator + args[i];
+      }
+      return s;
+    } else {
+      return "";
     }
-    return s;
   });
+};
+
+_.tie = function() {
+  return this.tieWith("");
 };
 
 _.times = function(min, max) {
