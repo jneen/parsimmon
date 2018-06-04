@@ -1,6 +1,12 @@
 "use strict";
 
 suite("parser.tieWith()", function() {
+  test("handles empty args", function() {
+    var parser = Parsimmon.of([]).tieWith("");
+    var result = parser.tryParse("");
+    assert.strictEqual(result, "");
+  });
+
   test("concatenates all the results", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("<| "),
