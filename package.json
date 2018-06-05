@@ -1,12 +1,22 @@
 {
   "name": "parsimmon",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "description": "A monadic LL(infinity) parser combinator library",
-  "keywords": ["parsing", "parse", "parsers", "parser combinators"],
+  "keywords": [
+    "parsing",
+    "parse",
+    "parsers",
+    "parser combinators"
+  ],
   "author": "Jeanine Adkisson <jneen at jneen dot net>",
-  "contributors": ["Brian Mock <brian@mockbrian.com>"],
+  "contributors": [
+    "Brian Mock <brian@mockbrian.com>"
+  ],
   "repository": "https://github.com/jneen/parsimmon",
-  "files": ["src", "build"],
+  "files": [
+    "src",
+    "build"
+  ],
   "main": "src/parsimmon.js",
   "browser": "build/parsimmon.umd.min.js",
   "devDependencies": {
