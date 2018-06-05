@@ -77,10 +77,10 @@ Note: If you prefer throwing an error when the parse failed, call [`.tryParse(st
 - [`.seq(p1, p2, ...pn)`](API.md#parsimmonseqp1-p2-pn)
 - [`.sepBy(content, separator)`](API.md#parsimmonsepbycontent)
 - [`.alt(p1, p2, ...pn)`](API.md#parsimmonaltp1-p2-pn)
-- [`.node(name)`](API.md#nodename)
 - [`.whitespace`](API.md#parsimmonwhitespace)
 - [`.index`](API.md#parsimmonindex)
 - [`parser.map(fn)`](API.md#parsermapfn)
+- [`parser.node(name)`](API.md#parsernodename)
 - [`parser.skip(otherParser)`](API.md#parserskipotherparser)
 
 ## Questions
