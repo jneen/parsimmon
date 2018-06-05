@@ -46,15 +46,9 @@ function word(str) {
 let JSONParser = P.createLanguage({
   // This is the main entry point of the parser: a full JSON value.
   value: r =>
-    P.alt(
-      r.object,
-      r.array,
-      r.string,
-      r.number,
-      r.null,
-      r.true,
-      r.false
-    ).thru(parser => whitespace.then(parser)),
+    P.alt(r.object, r.array, r.string, r.number, r.null, r.true, r.false).thru(
+      parser => whitespace.then(parser)
+    ),
 
   // The basic tokens in JSON, with optional whitespace afterward.
   lbrace: () => word("{"),
