@@ -1,3 +1,7 @@
+## version 1.8.0 (2018-06-04)
+
+* Adds `parser.tieWith(separator)`, a generalized version of `parser.tie()`
+
 ## version 1.7.3 (2018-04-22)
 
 * Shrinks UMD build from ~33 kb to ~11 kb
@@ -143,8 +147,8 @@ This release may have been unpublished or something, I'm not exactly sure.
 
 ## version 0.4.0 (2014-04-18)
 
-* **BREAKING:** deprecated use of `.then(function(result) { ... })`.  Use `chain` instead.
-* **BREAKING:** errors are no longer thrown on invalid parses.  Instead, `.parse(str)` returns
+* **BREAKING:** deprecated use of `.then(function(result) { ... })`. Use `chain` instead.
+* **BREAKING:** errors are no longer thrown on invalid parses. Instead, `.parse(str)` returns
   an object with a `status` tag, indicating whether the parse was successful.
 
 ## version 0.3.2 (2014-04-18)
