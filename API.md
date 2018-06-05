@@ -837,9 +837,9 @@ Returns a parser that looks for `string` but does not consume it. Yields the sam
 
 Returns a parser that wants the input to match `regexp`. Yields the same result as `parser`. Equivalent to `parser.skip(Parsimmon.lookahead(regexp))`.
 
-## parser.tie()
+## parser.tieWith(separator)
 
-When called on a parser yielding an array of strings, yields all their strings concatenated. Asserts that its input is actually an array of strings.
+When called on a parser yielding an array of strings, yields all their strings concatenated with the `separator`. Asserts that its input is actually an array of strings.
 
 Example:
 
@@ -848,19 +848,23 @@ var number = Parsimmon.seq(
   Parsimmon.digits,
   Parsimmon.string('.'),
   Parsimmon.digits
-).tie().map(Number);
+).tieWith("").map(Number);
 
 number.tryParse('1.23');
 // => 1.23
 ```
 
-`parser.tie()` is similar to this:
+`parser.tieWith(separator)` is similar to this:
 
 ```js
 parser.map(function(array) {
-  return array.join('');
+  return array.join(separator);
 });
 ```
+
+## parser.tie()
+
+Equivalent to `parser.tieWith("")`.
 
 Note: `parser.tie()` is usually used after `Parsimmon.seq(...parsers)` or `parser.many()`.
 
