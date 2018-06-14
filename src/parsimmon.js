@@ -239,12 +239,15 @@ function makeSuccess(index, value) {
 }
 
 function makeFailure(index, expected) {
+  if (!isArray(expected)) {
+    expected = [expected];
+  }
   return {
     status: false,
     index: -1,
     value: null,
     furthest: index,
-    expected: [expected]
+    expected: expected
   };
 }
 
@@ -775,11 +778,14 @@ _.notFollowedBy = function(x) {
 };
 
 _.desc = function(expected) {
+  if (!isArray(expected)) {
+    expected = [expected];
+  }
   var self = this;
   return Parsimmon(function(input, i) {
     var reply = self._(input, i);
     if (!reply.status) {
-      reply.expected = [expected];
+      reply.expected = expected;
     }
     return reply;
   });
