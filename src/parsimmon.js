@@ -929,9 +929,13 @@ function test(predicate) {
 }
 
 function oneOf(str) {
+  var expected = str.split("");
+  for (var idx = 0; idx < expected.length; idx++) {
+    expected[idx] = "'" + expected[idx] + "'";
+  }
   return test(function(ch) {
     return str.indexOf(ch) >= 0;
-  }).desc(str.split(""));
+  }).desc(expected);
 }
 
 function noneOf(str) {
