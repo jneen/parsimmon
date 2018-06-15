@@ -931,13 +931,13 @@ function test(predicate) {
 function oneOf(str) {
   return test(function(ch) {
     return str.indexOf(ch) >= 0;
-  });
+  }).desc(str.split(""));
 }
 
 function noneOf(str) {
   return test(function(ch) {
     return str.indexOf(ch) < 0;
-  });
+  }).desc("none of '" + str + "'");
 }
 
 function custom(parsingFunction) {
