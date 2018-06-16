@@ -187,7 +187,7 @@ To be used inside of `Parsimmon(fn)`. Generates an object describing how far the
 
 ## Parsimmon.makeFailure(furthest, expectation)
 
-To be used inside of `Parsimmon(fn)`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). See documentation for `Parsimmon(fn)`.
+To be used inside of `Parsimmon(fn)`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). The expected value may also be an array of different values.  See documentation for `Parsimmon(fn)`.
 
 ## Parsimmon.isParser(obj)
 
@@ -961,7 +961,9 @@ Identifier.tryParse('hey');
 ## parser.desc(description)
 
 Returns a new parser whose failure message is `description`. For example, `string('x').desc('the letter x')` will indicate that
-`'the letter x'` was expected.
+`'the letter x'` was expected.  Alternatively, an array of failure messages can be passed, if the parser represents multiple
+options.  For example, `oneOf('abc').desc(['a', 'b', 'c'])` will indicate that any of 'a', 'b', or 'c' would be acceptable in
+this case.
 
 It is important to only add descriptions to "low-level" parsers; things like numbers and strings. If you add a description to *every* parser you write then generated error messages will not be very helpful when simple syntax errors occur.
 

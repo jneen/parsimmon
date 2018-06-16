@@ -239,12 +239,15 @@ function makeSuccess(index, value) {
 }
 
 function makeFailure(index, expected) {
+  if (!isArray(expected)) {
+    expected = [expected];
+  }
   return {
     status: false,
     index: -1,
     value: null,
     furthest: index,
-    expected: [expected]
+    expected: expected
   };
 }
 
@@ -775,11 +778,14 @@ _.notFollowedBy = function(x) {
 };
 
 _.desc = function(expected) {
+  if (!isArray(expected)) {
+    expected = [expected];
+  }
   var self = this;
   return Parsimmon(function(input, i) {
     var reply = self._(input, i);
     if (!reply.status) {
-      reply.expected = [expected];
+      reply.expected = expected;
     }
     return reply;
   });
@@ -923,15 +929,19 @@ function test(predicate) {
 }
 
 function oneOf(str) {
+  var expected = str.split("");
+  for (var idx = 0; idx < expected.length; idx++) {
+    expected[idx] = "'" + expected[idx] + "'";
+  }
   return test(function(ch) {
     return str.indexOf(ch) >= 0;
-  });
+  }).desc(expected);
 }
 
 function noneOf(str) {
   return test(function(ch) {
     return str.indexOf(ch) < 0;
-  });
+  }).desc("none of '" + str + "'");
 }
 
 function custom(parsingFunction) {

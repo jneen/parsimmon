@@ -56,4 +56,33 @@ suite("desc", function() {
       expected: ["the letter y"]
     });
   });
+
+  test("allows multiple descriptions to be passed as an array", function() {
+    var x = Parsimmon.oneOf("xyz")
+      .desc(["x", "y", "z"])
+      .atLeast(1);
+    var y = Parsimmon.oneOf("abc").desc(["a", "b", "c"]);
+
+    var parser = x.then(y);
+
+    assert.deepEqual(parser.parse("~"), {
+      status: false,
+      index: {
+        offset: 0,
+        line: 1,
+        column: 1
+      },
+      expected: ["x", "y", "z"]
+    });
+
+    assert.deepEqual(parser.parse("x"), {
+      status: false,
+      index: {
+        offset: 1,
+        line: 1,
+        column: 2
+      },
+      expected: ["a", "b", "c", "x", "y", "z"]
+    });
+  });
 });
