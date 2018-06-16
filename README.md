@@ -50,15 +50,17 @@ A Parsimmon parser is an object that represents an action on a stream of text, a
 The method `.map` is used to transform the yielded value. For example,
 
 ```javascript
-Parsimmon.string('foo')
-  .map(function(x) { return x + 'bar'; })
+Parsimmon.string("foo").map(function(x) {
+  return x + "bar";
+});
 ```
 
 will yield `'foobar'` if the stream starts with `'foo'`. The parser
 
 ```javascript
-Parsimmon.regexp(/[0-9]+/)
-  .map(function(x) { return Number(x) * 2; })
+Parsimmon.regexp(/[0-9]+/).map(function(x) {
+  return Number(x) * 2;
+});
 ```
 
 will yield the number `24` when it encounters the string `'12'`.
@@ -89,7 +91,7 @@ Feel free to ask a question by filing a GitHub Issue. I'm happy to help point yo
 
 ## Contributing
 
-Contributions are *not* just pull requests.
+Contributions are _not_ just pull requests.
 
 Issues clearly describing bugs or confusing parts of Parsimmon are welcome! Also, documentation enhancements and examples are very desirable.
 
@@ -109,10 +111,8 @@ Parsimmon is also compatible with [fantasyland][]. It implements Semigroup, Appl
 [@laughinghan]: https://github.com/laughinghan
 [@jneen]: https://github.com/jneen
 [@wavebeem]: https://github.com/wavebeem
-
 [api]: https://github.com/jneen/parsimmon/blob/master/API.md
 [examples]: https://github.com/jneen/parsimmon/tree/master/examples
-
 [unpkg homepage]: https://unpkg.com/#/
 [unpkg version]: https://unpkg.com/parsimmon
 [npm]: https://www.npmjs.com/

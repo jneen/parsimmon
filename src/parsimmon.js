@@ -260,7 +260,7 @@ function mergeReplies(result, last) {
   }
   var expected =
     result.furthest === last.furthest
-      ? unsafeUnion(result.expected, last.expected)
+      ? union(result.expected, last.expected)
       : last.expected;
   return {
     status: result.status,
@@ -291,31 +291,18 @@ function makeLineColumnIndex(input, i) {
   };
 }
 
-// Returns the sorted set union of two arrays of strings. Note that if both
-// arrays are empty, it simply returns the first array, and if exactly one
-// array is empty, it returns the other one unsorted. This is safe because
-// expectation arrays always start as [] or [x], so as long as we merge with
-// this function, we know they stay in sorted order.
-function unsafeUnion(xs, ys) {
-  // Exit early if either array is empty (common case)
-  var xn = xs.length;
-  var yn = ys.length;
-  if (xn === 0) {
-    return ys;
-  } else if (yn === 0) {
-    return xs;
-  }
-  // Two non-empty arrays: do the full algorithm
+// Returns the sorted set union of two arrays of strings
+function union(xs, ys) {
   var obj = {};
-  for (var i = 0; i < xn; i++) {
+  for (var i = 0; i < xs.length; i++) {
     obj[xs[i]] = true;
   }
-  for (var j = 0; j < yn; j++) {
+  for (var j = 0; j < ys.length; j++) {
     obj[ys[j]] = true;
   }
   var keys = [];
   for (var k in obj) {
-    if (obj.hasOwnProperty(k)) {
+    if ({}.hasOwnProperty.call(obj, k)) {
       keys.push(k);
     }
   }
