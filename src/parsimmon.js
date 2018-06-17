@@ -721,6 +721,24 @@ _.map = function(fn) {
   });
 };
 
+_.contramap = function(fn) {
+  assertFunction(fn);
+  var self = this;
+  return Parsimmon(function(input, i) {
+    var result = self.parse(fn(input.slice(i)));
+    if (!result.status) {
+      return result;
+    }
+    return makeSuccess(i + input.length, result.value);
+  });
+};
+
+_.promap = function(f, g) {
+  assertFunction(f);
+  assertFunction(g);
+  return this.contramap(f).map(g);
+};
+
 _.skip = function(next) {
   return seq(this, next).map(function(results) {
     return results[0];
