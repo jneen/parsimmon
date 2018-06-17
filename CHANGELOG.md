@@ -1,3 +1,7 @@
+## version 1.10.0 (2018-06-17)
+
+- Adds `parser.contramap(fn)` and `parser.promap(fn)`
+
 ## version 1.9.0 (2018-06-15)
 
 - Adds `parser.desc(array)` signature and `Parsimmon.makeFailure(index, array)`
