@@ -18,10 +18,13 @@ test("Parsimmon.string", function() {
   });
 
   assert.equal(
-    "\n-- PARSING FAILED --------------------------------------------------\n\n" +
+    "\n-- PARSING FAILED --------------------------------------------------\n" +
+      "\n" +
       "> 1 | y\n" +
-      "    | ^\n\n" +
-      "Expected:\n\n" +
+      "    | ^\n" +
+      "\n" +
+      "Expected:\n" +
+      "\n" +
       "'x'\n",
     Parsimmon.formatError("y", res)
   );

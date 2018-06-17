@@ -364,6 +364,16 @@ function assertString(x) {
   }
 }
 
+// -*- Error Formatting -*-
+
+var linesBeforeStringError = 2;
+var linesAfterStringError = 3;
+var bytesPerLine = 10;
+var bytesBefore = bytesPerLine * 5;
+var bytesAfter = bytesPerLine * 4;
+var radix = 16;
+var defaultLinePrefix = "  ";
+
 function repeat(string, amount) {
   if (amount <= 0) {
     return string;
@@ -379,53 +389,170 @@ function formatExpected(expected) {
 }
 
 function leftPad(str, pad, char) {
-  var length = str.length;
-  if (pad <= 0) {
+  var add = pad - str.length;
+  if (add <= 0) {
     return str;
   }
-  return repeat(char, pad - length) + str;
+  return repeat(char, add) + str;
+}
+
+function toChunks(arr, chunkSize) {
+  if (!isArray(arr) || chunkSize === 0) {
+    return [[]];
+  }
+
+  var length = arr.length;
+  var chunks = [];
+  var chunkIndex = 0;
+
+  if (length <= chunkSize) {
+    return [arr.slice()];
+  }
+
+  for (var i = 0; i < length; i++) {
+    if (!chunks[chunkIndex]) {
+      chunks.push([]);
+    }
+
+    chunks[chunkIndex].push(arr[i]);
+
+    if ((i + 1) % chunkSize === 0) {
+      chunkIndex++;
+    }
+  }
+
+  return chunks;
+}
+
+function columnSum(list) {
+  if (!list || list.length === 0) {
+    return [];
+  }
+
+  var length = list.length;
+
+  if (length === 1) {
+    return list[0].slice();
+  }
+
+  var res = list[0].slice();
+  var largest = map(function(l) {
+    return l.length;
+  }, list)
+    .sort()
+    .reverse()[0];
+
+  for (var x = 0; x < largest; x++) {
+    for (var y = 1; y < length; y++) {
+      if (!res[x] || res[x] < list[y][x]) {
+        res[x] = list[y][x];
+      }
+    }
+  }
+
+  return res;
+}
+
+// Get a range of indexes including `i`-th element and `before` and `after` amount of elements from `arr`.
+function rangeFromIndexAndOffsets(i, before, after, length) {
+  // Guard against the negative upper bound for lines included in the output.
+  return {
+    from: i - before > 0 ? i - before : 0,
+    to: i + after > length ? length : i + after
+  };
+}
+
+function byteRangeToRange(byteRange) {
+  // Exception for inputs smaller than `bytesPerLine`
+  if (byteRange.from === 0 && byteRange.to === 1) {
+    return {
+      from: byteRange.from,
+      to: byteRange.to
+    };
+  }
+  return {
+    from: byteRange.from / bytesPerLine,
+    to: byteRange.to / bytesPerLine
+  };
 }
 
 function formatGot(input, error) {
   var index = error.index;
   var i = index.offset;
+
+  var verticalMarkerLength = 1;
+  var column;
+  var lineWithErrorIndex;
+  var lines;
+  var lineRange;
+
   if (i === input.length) {
     return "Got the end of the input";
   }
+
   if (isBuffer(input)) {
-    return "At byte " + index.offset;
+    var byteLineWithErrorIndex = i - i % bytesPerLine;
+    var columnByteIndex = i - byteLineWithErrorIndex;
+    var byteRange = rangeFromIndexAndOffsets(
+      byteLineWithErrorIndex,
+      bytesBefore,
+      bytesAfter + bytesPerLine,
+      input.length
+    );
+    var bytes = input.slice(byteRange.from, byteRange.to);
+    var bytesInChunks = toChunks(bytes.toJSON().data, bytesPerLine);
+    var chunkStringLengths = map(function(line) {
+      return map(function(byte) {
+        return byte.toString(radix).length;
+      }, line);
+    }, bytesInChunks);
+
+    var byteLargestLenghts = columnSum(chunkStringLengths);
+    var lengthsBeforeError = byteLargestLenghts.slice(0, columnByteIndex);
+    var byteLines = map(function(byteRow) {
+      return map(function(byteValue, byteValueIndex) {
+        return leftPad(
+          byteValue.toString(radix),
+          byteLargestLenghts[byteValueIndex],
+          " "
+        );
+      }, byteRow);
+    }, bytesInChunks);
+
+    lineRange = byteRangeToRange(byteRange);
+    lineWithErrorIndex = byteLineWithErrorIndex / bytesPerLine;
+    column = sum(lengthsBeforeError) + lengthsBeforeError.length;
+    verticalMarkerLength =
+      chunkStringLengths[lineWithErrorIndex - lineRange.from][columnByteIndex];
+    lines = map(function(byteLine) {
+      return byteLine.join(" ");
+    }, byteLines);
+  } else {
+    var inputLines = input.split(/\r\n|[\n\r\u2028\u2029]/);
+    column = index.column - 1;
+    lineWithErrorIndex = index.line - 1;
+    lineRange = rangeFromIndexAndOffsets(
+      lineWithErrorIndex,
+      linesBeforeStringError,
+      linesAfterStringError,
+      inputLines.length
+    );
+
+    lines = inputLines.slice(lineRange.from, lineRange.to);
   }
 
-  var line = index.line;
-  var column = index.column;
-  var linesBefore = 2;
-  var linesAfter = 3;
-  var inputLines = input.split(/\r\n|[\n\r\u2028\u2029]/);
-  var inputLinesLength = inputLines.length;
-  var lineWithErrorIndex = line - 1;
-  // Guard against the negative upper bound for lines included in the output.
-  var showFromLineIndex =
-    lineWithErrorIndex - linesBefore > 0 ? lineWithErrorIndex - linesBefore : 0;
-  var showToLineIndex =
-    lineWithErrorIndex + linesAfter > inputLinesLength
-      ? inputLinesLength
-      : lineWithErrorIndex + linesAfter;
-  var lastLineNumberLabelLength = showToLineIndex.toString().length;
-  var linesToShow = inputLines.slice(showFromLineIndex, showToLineIndex);
-
-  var linesToShowWithLineNumbers = reduce(
-    function(acc, lineSource, i) {
-      var isLineWithError = i + showFromLineIndex === lineWithErrorIndex;
-      var defaultPrefix = "  ";
-      var prefix = isLineWithError ? "> " : defaultPrefix;
-      var lineNumber = (showFromLineIndex + i + 1).toString();
+  var lineWithErrorCurrentIndex = lineWithErrorIndex - lineRange.from;
+  var lastLineNumberLabelLength = lineRange.to.toString().length;
+  var linesWithLineNumbers = reduce(
+    function(acc, lineSource, index) {
+      var isLineWithError = index === lineWithErrorCurrentIndex;
+      var prefix = isLineWithError ? "> " : defaultLinePrefix;
+      var lineNumber = isBuffer(input)
+        ? (lineRange.from + index).toString()
+        : (lineRange.from + index + 1).toString();
       var lineNumberLabel =
         lineNumber.length < lastLineNumberLabelLength
-          ? leftPad(
-              lineNumber,
-              lastLineNumberLabelLength - lineNumber.length,
-              " "
-            )
+          ? leftPad(lineNumber, lastLineNumberLabelLength, " ")
           : lineNumber;
 
       return [].concat(
@@ -433,19 +560,20 @@ function formatGot(input, error) {
         [prefix + lineNumberLabel + " | " + lineSource],
         isLineWithError
           ? [
-              defaultPrefix +
+              defaultLinePrefix +
                 repeat(" ", lastLineNumberLabelLength) +
                 " | " +
-                leftPad("^", column - 1, " ")
+                leftPad("", column, " ") +
+                repeat("^", verticalMarkerLength)
             ]
           : []
       );
     },
     [],
-    linesToShow
+    lines
   );
 
-  return linesToShowWithLineNumbers.join("\n");
+  return linesWithLineNumbers.join("\n");
 }
 
 function formatError(input, error) {
