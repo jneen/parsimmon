@@ -470,9 +470,11 @@ function byteRangeToRange(byteRange) {
       to: byteRange.to
     };
   }
+
   return {
     from: byteRange.from / bytesPerLine,
-    to: byteRange.to / bytesPerLine
+    // Round `to`, so we don't get float if the amount of bytes is not divisible by `bytesPerLine`
+    to: Math.floor(byteRange.to / bytesPerLine)
   };
 }
 
