@@ -420,10 +420,10 @@ function toChunks(arr, chunkSize) {
 
 // Get a range of indexes including `i`-th element and `before` and `after` amount of elements from `arr`.
 function rangeFromIndexAndOffsets(i, before, after, length) {
-  // Guard against the negative upper bound for lines included in the output.
   return {
+    // Guard against the negative upper bound for lines included in the output.
     from: i - before > 0 ? i - before : 0,
-    to: i + after > length ? length : i + after
+    to: (i + after > length) ? length : i + after
   };
 }
 
@@ -499,11 +499,14 @@ function formatGot(input, error) {
 
   var lineWithErrorCurrentIndex = lineWithErrorIndex - lineRange.from;
   var lastLineNumberLabelLength = lineRange.to.toString().length;
+
+  if (isBuffer(input)) {
+    lastLineNumberLabelLength = (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to).toString().length;
+  }
   var linesWithLineNumbers = reduce(
     function(acc, lineSource, index) {
       var isLineWithError = index === lineWithErrorCurrentIndex;
       var prefix = isLineWithError ? "> " : defaultLinePrefix;
-
       var lineNumber = isBuffer(input)
         ? (lineRange.from + index).toString()
         : (lineRange.from + index + 1).toString();
@@ -535,7 +538,6 @@ function formatGot(input, error) {
     [],
     lines
   );
-
   return linesWithLineNumbers.join("\n");
 }
 
