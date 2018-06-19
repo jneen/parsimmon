@@ -372,12 +372,10 @@ var bytesPerLine = 10;
 var bytesBefore = bytesPerLine * 5;
 var bytesAfter = bytesPerLine * 4;
 var radix = 16;
+var byteLength = 2;
 var defaultLinePrefix = "  ";
 
 function repeat(string, amount) {
-  if (amount <= 0) {
-    return string;
-  }
   return new Array(amount + 1).join(string);
 }
 
@@ -397,10 +395,6 @@ function leftPad(str, pad, char) {
 }
 
 function toChunks(arr, chunkSize) {
-  if (!isArray(arr) || chunkSize === 0) {
-    return [[]];
-  }
-
   var length = arr.length;
   var chunks = [];
   var chunkIndex = 0;
@@ -422,35 +416,6 @@ function toChunks(arr, chunkSize) {
   }
 
   return chunks;
-}
-
-function columnSum(list) {
-  if (!list || list.length === 0) {
-    return [];
-  }
-
-  var length = list.length;
-
-  if (length === 1) {
-    return list[0].slice();
-  }
-
-  var res = list[0].slice();
-  var largest = map(function(l) {
-    return l.length;
-  }, list)
-    .sort()
-    .reverse()[0];
-
-  for (var x = 0; x < largest; x++) {
-    for (var y = 1; y < length; y++) {
-      if (!res[x] || res[x] < list[y][x]) {
-        res[x] = list[y][x];
-      }
-    }
-  }
-
-  return res;
 }
 
 // Get a range of indexes including `i`-th element and `before` and `after` amount of elements from `arr`.
@@ -503,31 +468,18 @@ function formatGot(input, error) {
     );
     var bytes = input.slice(byteRange.from, byteRange.to);
     var bytesInChunks = toChunks(bytes.toJSON().data, bytesPerLine);
-    var chunkStringLengths = map(function(line) {
-      return map(function(byte) {
-        var length = byte.toString(radix).length;
-        // Byte value length should be divisible by 2 to improve the readability.
-        return length % 2 === 0 ? length : length + 1;
-      }, line);
-    }, bytesInChunks);
 
-    var byteLargestLenghts = columnSum(chunkStringLengths);
-    var lengthsBeforeError = byteLargestLenghts.slice(0, columnByteIndex);
     var byteLines = map(function(byteRow) {
-      return map(function(byteValue, byteValueIndex) {
-        return leftPad(
-          byteValue.toString(radix),
-          byteLargestLenghts[byteValueIndex],
-          "0" // Prefix byte values with a `0`
-        );
+      return map(function(byteValue) {
+        // Prefix byte values with a `0`
+        return leftPad(byteValue.toString(radix), byteLength, "0");
       }, byteRow);
     }, bytesInChunks);
 
     lineRange = byteRangeToRange(byteRange);
     lineWithErrorIndex = byteLineWithErrorIndex / bytesPerLine;
-    column = sum(lengthsBeforeError) + lengthsBeforeError.length;
-    verticalMarkerLength =
-      chunkStringLengths[lineWithErrorIndex - lineRange.from][columnByteIndex];
+    column = columnByteIndex * 3;
+    verticalMarkerLength = byteLength;
     lines = map(function(byteLine) {
       return byteLine.join(" ");
     }, byteLines);
