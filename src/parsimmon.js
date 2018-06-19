@@ -505,7 +505,9 @@ function formatGot(input, error) {
     var bytesInChunks = toChunks(bytes.toJSON().data, bytesPerLine);
     var chunkStringLengths = map(function(line) {
       return map(function(byte) {
-        return byte.toString(radix).length;
+        var length = byte.toString(radix).length;
+        // Byte value length should be divisible by 2 to improve the readability.
+        return length % 2 === 0 ? length : length + 1;
       }, line);
     }, bytesInChunks);
 
@@ -516,7 +518,7 @@ function formatGot(input, error) {
         return leftPad(
           byteValue.toString(radix),
           byteLargestLenghts[byteValueIndex],
-          " "
+          "0" // Prefix byte values with a `0`
         );
       }, byteRow);
     }, bytesInChunks);
@@ -549,6 +551,7 @@ function formatGot(input, error) {
     function(acc, lineSource, index) {
       var isLineWithError = index === lineWithErrorCurrentIndex;
       var prefix = isLineWithError ? "> " : defaultLinePrefix;
+
       var lineNumber = isBuffer(input)
         ? (lineRange.from + index).toString()
         : (lineRange.from + index + 1).toString();
@@ -557,12 +560,18 @@ function formatGot(input, error) {
           ? leftPad(lineNumber, lastLineNumberLabelLength, " ")
           : lineNumber;
 
+      // Add a trailing `0` to byte offsets.
+      if (isBuffer(input)) {
+        lineNumberLabel += "0";
+      }
+
       return [].concat(
         acc,
         [prefix + lineNumberLabel + " | " + lineSource],
         isLineWithError
           ? [
-              defaultLinePrefix +
+              (isBuffer(input) ? " " : "") + // Add an extra-space to account for an extra `0` in the label.
+                defaultLinePrefix +
                 repeat(" ", lastLineNumberLabelLength) +
                 " | " +
                 leftPad("", column, " ") +

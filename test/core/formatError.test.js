@@ -158,17 +158,17 @@ suite("formatError", function() {
       "\n" +
       "-- PARSING FAILED --------------------------------------------------\n" +
       "\n" +
-      "   2 | 0 0  0 0 0 0 0 0 0 0\n" +
-      "   3 | 0 0  0 0 0 0 0 0 0 0\n" +
-      "   4 | 0 0  0 0 0 0 0 0 0 0\n" +
-      "   5 | 0 0  0 0 0 0 0 0 0 0\n" +
-      "   6 | 0 0  0 0 0 0 0 0 0 0\n" +
-      ">  7 | 0 0 ff 0 0 0 0 0 0 0\n" +
-      "     |     ^^\n" +
-      "   8 | 0 0  0 0 0 0 0 0 0 0\n" +
-      "   9 | 0 0  0 0 0 0 0 0 0 0\n" +
-      "  10 | 0 0  0 0 0 0 0 0 0 0\n" +
-      "  11 | 0 0  0 0 0 0 0 0 0 0\n" +
+      "   20 | 00 00 00 00 00 00 00 00 00 00\n" +
+      "   30 | 00 00 00 00 00 00 00 00 00 00\n" +
+      "   40 | 00 00 00 00 00 00 00 00 00 00\n" +
+      "   50 | 00 00 00 00 00 00 00 00 00 00\n" +
+      "   60 | 00 00 00 00 00 00 00 00 00 00\n" +
+      ">  70 | 00 00 ff 00 00 00 00 00 00 00\n" +
+      "      |       ^^\n" +
+      "   80 | 00 00 00 00 00 00 00 00 00 00\n" +
+      "   90 | 00 00 00 00 00 00 00 00 00 00\n" +
+      "  100 | 00 00 00 00 00 00 00 00 00 00\n" +
+      "  110 | 00 00 00 00 00 00 00 00 00 00\n" +
       "\n" +
       "Expected one of the following: \n" +
       "\n" +
@@ -195,6 +195,84 @@ suite("formatError", function() {
       )
     );
 
+    var answer = Parsimmon.formatError(input, parser.parse(input));
+
+    assert.deepEqual(answer, expectation);
+  });
+
+  test("byte buffer error at the first line of the input", function() {
+    var parser = Parsimmon.seq(
+      Parsimmon.Binary.byte(0x00).many(),
+      Parsimmon.Binary.byte(0x01),
+      Parsimmon.Binary.byte(0x00).many()
+    );
+
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n" +
+      "\n" +
+      "> 00 | 00 00 ff 00 00 00 00 00 00 00\n" +
+      "     |       ^^\n" +
+      "  10 | 00 00 00 00 00\n" +
+      "\n" +
+      "Expected one of the following: \n" +
+      "\n" +
+      "0x00, 0x01" +
+      "\n";
+
+    var input = Buffer.from(
+      [].concat(
+        [0x0, 0x0, 0xffff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0],
+        [0x0, 0x0, 0x0, 0x0, 0x0]
+      )
+    );
+
+    var answer = Parsimmon.formatError(input, parser.parse(input));
+
+    assert.deepEqual(answer, expectation);
+  });
+
+  test("byte buffer error at the end of the input", function() {
+    var parser = Parsimmon.seq(
+      Parsimmon.Binary.byte(0x00).many(),
+      Parsimmon.Binary.byte(0x01)
+    );
+
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n" +
+      "\n" +
+      "> 00 | 00 ff\n" +
+      "     |    ^^\n" +
+      "\n" +
+      "Expected one of the following: \n" +
+      "\n" +
+      "0x00, 0x01" +
+      "\n";
+
+    var input = Buffer.from([0x0, 0xffff]);
+
+    var answer = Parsimmon.formatError(input, parser.parse(input));
+
+    assert.deepEqual(answer, expectation);
+  });
+
+  test("byte buffer error with a value one character long", function() {
+    var parser = Parsimmon.seq(Parsimmon.Binary.byte(0x1));
+
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n" +
+      "\n" +
+      "> 00 | 02\n" +
+      "     | ^^\n" +
+      "\n" +
+      "Expected:\n" +
+      "\n" +
+      "0x01" +
+      "\n";
+
+    var input = Buffer.from([0x2]);
     var answer = Parsimmon.formatError(input, parser.parse(input));
 
     assert.deepEqual(answer, expectation);
