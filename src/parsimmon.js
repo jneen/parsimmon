@@ -458,7 +458,7 @@ function formatGot(input, error) {
   }
 
   if (isBuffer(input)) {
-    var byteLineWithErrorIndex = i - i % bytesPerLine;
+    var byteLineWithErrorIndex = i - (i % bytesPerLine);
     var columnByteIndex = i - byteLineWithErrorIndex;
     var byteRange = rangeFromIndexAndOffsets(
       byteLineWithErrorIndex,
