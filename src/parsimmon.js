@@ -368,7 +368,7 @@ function assertString(x) {
 
 var linesBeforeStringError = 2;
 var linesAfterStringError = 3;
-var bytesPerLine = 10;
+var bytesPerLine = 8;
 var bytesBefore = bytesPerLine * 5;
 var bytesAfter = bytesPerLine * 4;
 var radix = 16;
@@ -423,7 +423,7 @@ function rangeFromIndexAndOffsets(i, before, after, length) {
   return {
     // Guard against the negative upper bound for lines included in the output.
     from: i - before > 0 ? i - before : 0,
-    to: (i + after > length) ? length : i + after
+    to: i + after > length ? length : i + after
   };
 }
 
@@ -479,9 +479,16 @@ function formatGot(input, error) {
     lineRange = byteRangeToRange(byteRange);
     lineWithErrorIndex = byteLineWithErrorIndex / bytesPerLine;
     column = columnByteIndex * 3;
+
+    // Account for an extra space.
+    if (columnByteIndex > 4) {
+      column += 1;
+    }
     verticalMarkerLength = byteLength;
     lines = map(function(byteLine) {
-      return byteLine.join(" ");
+      return byteLine.length <= 4
+        ? byteLine.join(" ")
+        : byteLine.slice(0, 4).join(" ") + "  " + byteLine.slice(4).join(" ");
     }, byteLines);
   } else {
     var inputLines = input.split(/\r\n|[\n\r\u2028\u2029]/);
@@ -501,32 +508,39 @@ function formatGot(input, error) {
   var lastLineNumberLabelLength = lineRange.to.toString().length;
 
   if (isBuffer(input)) {
-    lastLineNumberLabelLength = (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to).toString().length;
+    lastLineNumberLabelLength = (lineRange.to > 0
+      ? lineRange.to - 1
+      : lineRange.to
+    ).toString().length;
+    if (lastLineNumberLabelLength < 2) {
+      lastLineNumberLabelLength = 2;
+    }
   }
+
   var linesWithLineNumbers = reduce(
     function(acc, lineSource, index) {
       var isLineWithError = index === lineWithErrorCurrentIndex;
       var prefix = isLineWithError ? "> " : defaultLinePrefix;
       var lineNumber = isBuffer(input)
-        ? (lineRange.from + index).toString()
+        ? ((lineRange.from + index) * 8).toString(16)
         : (lineRange.from + index + 1).toString();
+      if (isBuffer(input)) {
+        if (lineNumber.length < 2) {
+          lineNumber = leftPad(lineNumber, 2, "0");
+        }
+      }
       var lineNumberLabel =
         lineNumber.length < lastLineNumberLabelLength
           ? leftPad(lineNumber, lastLineNumberLabelLength, " ")
           : lineNumber;
-
-      // Add a trailing `0` to byte offsets.
-      if (isBuffer(input)) {
-        lineNumberLabel += "0";
-      }
 
       return [].concat(
         acc,
         [prefix + lineNumberLabel + " | " + lineSource],
         isLineWithError
           ? [
-              (isBuffer(input) ? " " : "") + // Add an extra-space to account for an extra `0` in the label.
-                defaultLinePrefix +
+              // (isBuffer(input) ? " " : "") +
+              defaultLinePrefix +
                 repeat(" ", lastLineNumberLabelLength) +
                 " | " +
                 leftPad("", column, " ") +
@@ -538,6 +552,7 @@ function formatGot(input, error) {
     [],
     lines
   );
+
   return linesWithLineNumbers.join("\n");
 }
 
