@@ -29,7 +29,7 @@ suite(".parse", function() {
       var parser = Parsimmon.Binary.byte(0);
       assert.throws(function() {
         parser.tryParse(Buffer.from([0xf]));
-      }, /at byte/);
+      }, /0x00/);
     });
   });
 });

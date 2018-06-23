@@ -364,38 +364,212 @@ function assertString(x) {
   }
 }
 
+// -*- Error Formatting -*-
+
+var linesBeforeStringError = 2;
+var linesAfterStringError = 3;
+var bytesPerLine = 8;
+var bytesBefore = bytesPerLine * 5;
+var bytesAfter = bytesPerLine * 4;
+var radix = 16;
+var byteLength = 2;
+var defaultLinePrefix = "  ";
+
+function repeat(string, amount) {
+  return new Array(amount + 1).join(string);
+}
+
 function formatExpected(expected) {
   if (expected.length === 1) {
-    return expected[0];
+    return "Expected:\n\n" + expected[0];
   }
-  return "one of " + expected.join(", ");
+  return "Expected one of the following: \n\n" + expected.join(", ");
+}
+
+function leftPad(str, pad, char) {
+  var add = pad - str.length;
+  if (add <= 0) {
+    return str;
+  }
+  return repeat(char, add) + str;
+}
+
+function toChunks(arr, chunkSize) {
+  var length = arr.length;
+  var chunks = [];
+  var chunkIndex = 0;
+
+  if (length <= chunkSize) {
+    return [arr.slice()];
+  }
+
+  for (var i = 0; i < length; i++) {
+    if (!chunks[chunkIndex]) {
+      chunks.push([]);
+    }
+
+    chunks[chunkIndex].push(arr[i]);
+
+    if ((i + 1) % chunkSize === 0) {
+      chunkIndex++;
+    }
+  }
+
+  return chunks;
+}
+
+// Get a range of indexes including `i`-th element and `before` and `after` amount of elements from `arr`.
+function rangeFromIndexAndOffsets(i, before, after, length) {
+  return {
+    // Guard against the negative upper bound for lines included in the output.
+    from: i - before > 0 ? i - before : 0,
+    to: i + after > length ? length : i + after
+  };
+}
+
+function byteRangeToRange(byteRange) {
+  // Exception for inputs smaller than `bytesPerLine`
+  if (byteRange.from === 0 && byteRange.to === 1) {
+    return {
+      from: byteRange.from,
+      to: byteRange.to
+    };
+  }
+
+  return {
+    from: byteRange.from / bytesPerLine,
+    // Round `to`, so we don't get float if the amount of bytes is not divisible by `bytesPerLine`
+    to: Math.floor(byteRange.to / bytesPerLine)
+  };
 }
 
 function formatGot(input, error) {
   var index = error.index;
   var i = index.offset;
+
+  var verticalMarkerLength = 1;
+  var column;
+  var lineWithErrorIndex;
+  var lines;
+  var lineRange;
+
   if (i === input.length) {
-    return ", got the end of the input";
+    return "Got the end of the input";
   }
+
   if (isBuffer(input)) {
-    return " at byte " + index.offset;
+    var byteLineWithErrorIndex = i - (i % bytesPerLine);
+    var columnByteIndex = i - byteLineWithErrorIndex;
+    var byteRange = rangeFromIndexAndOffsets(
+      byteLineWithErrorIndex,
+      bytesBefore,
+      bytesAfter + bytesPerLine,
+      input.length
+    );
+    var bytes = input.slice(byteRange.from, byteRange.to);
+    var bytesInChunks = toChunks(bytes.toJSON().data, bytesPerLine);
+
+    var byteLines = map(function(byteRow) {
+      return map(function(byteValue) {
+        // Prefix byte values with a `0`
+        return leftPad(byteValue.toString(radix), byteLength, "0");
+      }, byteRow);
+    }, bytesInChunks);
+
+    lineRange = byteRangeToRange(byteRange);
+    lineWithErrorIndex = byteLineWithErrorIndex / bytesPerLine;
+    column = columnByteIndex * 3;
+
+    // Account for an extra space.
+    if (columnByteIndex > 4) {
+      column += 1;
+    }
+    verticalMarkerLength = byteLength;
+    lines = map(function(byteLine) {
+      return byteLine.length <= 4
+        ? byteLine.join(" ")
+        : byteLine.slice(0, 4).join(" ") + "  " + byteLine.slice(4).join(" ");
+    }, byteLines);
+  } else {
+    var inputLines = input.split(/\r\n|[\n\r\u2028\u2029]/);
+    column = index.column - 1;
+    lineWithErrorIndex = index.line - 1;
+    lineRange = rangeFromIndexAndOffsets(
+      lineWithErrorIndex,
+      linesBeforeStringError,
+      linesAfterStringError,
+      inputLines.length
+    );
+
+    lines = inputLines.slice(lineRange.from, lineRange.to);
   }
-  var prefix = i > 0 ? "'..." : "'";
-  var suffix = input.length - i > 12 ? "...'" : "'";
-  return (
-    " at line " +
-    index.line +
-    " column " +
-    index.column +
-    ", got " +
-    prefix +
-    input.slice(i, i + 12) +
-    suffix
+
+  var lineWithErrorCurrentIndex = lineWithErrorIndex - lineRange.from;
+  var lastLineNumberLabelLength = lineRange.to.toString().length;
+
+  if (isBuffer(input)) {
+    lastLineNumberLabelLength = (
+      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
+    ).toString(16).length;
+
+    if (lastLineNumberLabelLength < 2) {
+      lastLineNumberLabelLength = 2;
+    }
+  }
+
+  var linesWithLineNumbers = reduce(
+    function(acc, lineSource, index) {
+      var isLineWithError = index === lineWithErrorCurrentIndex;
+      var prefix = isLineWithError ? "> " : defaultLinePrefix;
+      var lineNumber = isBuffer(input)
+        ? ((lineRange.from + index) * 8).toString(16)
+        : (lineRange.from + index + 1).toString();
+      if (isBuffer(input)) {
+        if (lineNumber.length < 2) {
+          lineNumber = leftPad(lineNumber, 2, "0");
+        }
+      }
+      var lineNumberLabel =
+        lineNumber.length < lastLineNumberLabelLength
+          ? leftPad(
+              lineNumber,
+              lastLineNumberLabelLength,
+              isBuffer(input) ? "0" : " "
+            )
+          : lineNumber;
+
+      return [].concat(
+        acc,
+        [prefix + lineNumberLabel + " | " + lineSource],
+        isLineWithError
+          ? [
+              // (isBuffer(input) ? " " : "") +
+              defaultLinePrefix +
+                repeat(" ", lastLineNumberLabelLength) +
+                " | " +
+                leftPad("", column, " ") +
+                repeat("^", verticalMarkerLength)
+            ]
+          : []
+      );
+    },
+    [],
+    lines
   );
+
+  return linesWithLineNumbers.join("\n");
 }
 
 function formatError(input, error) {
-  return "expected " + formatExpected(error.expected) + formatGot(input, error);
+  return [
+    "\n",
+    "-- PARSING FAILED " + repeat("-", 50),
+    "\n\n",
+    formatGot(input, error),
+    "\n\n",
+    formatExpected(error.expected),
+    "\n"
+  ].join("");
 }
 
 function flags(re) {
