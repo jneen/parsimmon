@@ -508,10 +508,10 @@ function formatGot(input, error) {
   var lastLineNumberLabelLength = lineRange.to.toString().length;
 
   if (isBuffer(input)) {
-    lastLineNumberLabelLength = (lineRange.to > 0
-      ? lineRange.to - 1
-      : lineRange.to
-    ).toString().length;
+    lastLineNumberLabelLength = (
+      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
+    ).toString(16).length;
+
     if (lastLineNumberLabelLength < 2) {
       lastLineNumberLabelLength = 2;
     }
@@ -531,7 +531,11 @@ function formatGot(input, error) {
       }
       var lineNumberLabel =
         lineNumber.length < lastLineNumberLabelLength
-          ? leftPad(lineNumber, lastLineNumberLabelLength, " ")
+          ? leftPad(
+              lineNumber,
+              lastLineNumberLabelLength,
+              isBuffer(input) ? "0" : " "
+            )
           : lineNumber;
 
       return [].concat(
