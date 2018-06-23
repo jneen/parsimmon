@@ -1,5 +1,13 @@
 "use strict";
 
+function fill(length, filler) {
+  var res = [];
+  for (var i = 0; i < length; i++) {
+    res.push(filler);
+  }
+  return res;
+}
+
 suite("formatError", function() {
   test("end of input", function() {
     var parser = Parsimmon.alt(
@@ -308,6 +316,52 @@ suite("formatError", function() {
         [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00],
         [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00],
         [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xff] // <- Error
+      )
+    );
+
+    var answer = Parsimmon.formatError(input, parser.parse(input));
+
+    assert.deepEqual(answer, expectation);
+  });
+
+  test("parsing error in a large byte buffer", function() {
+    var parser = Parsimmon.seq(
+      Parsimmon.Binary.byte(0x00).many(),
+      Parsimmon.Binary.byte(0x01)
+    );
+
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n" +
+      "\n" +
+      "  0fd0 | 00 00 00 00  00 00 00 00\n" +
+      "  0fd8 | 00 00 00 00  00 00 00 00\n" +
+      "  0fe0 | 00 00 00 00  00 00 00 00\n" +
+      "  0fe8 | 00 00 00 00  00 00 00 00\n" +
+      "  0ff0 | 00 00 00 00  00 00 00 00\n" +
+      "> 0ff8 | 00 00 00 00  00 00 00 ff\n" +
+      "       |                       ^^\n" +
+      "  1000 | 00 00 00 00  00 00 00 00\n" +
+      "  1008 | 00 00 00 00  00 00 00 00\n" +
+      "  1010 | 00 00 00 00  00 00 00 00\n" +
+      "  1018 | 00 00 00 00  00 00 00 00\n" +
+      "\n" +
+      "Expected one of the following: \n" +
+      "\n" +
+      "0x00, 0x01" +
+      "\n";
+
+    var list = fill(8 * 511, 0x0);
+
+    var input = Buffer.from(
+      [].concat(
+        list,
+        [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xff], // <- Error
+        [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00],
+        [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00],
+        [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00],
+        [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00],
+        [0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00]
       )
     );
 
