@@ -1,3 +1,10 @@
+## version 1.11.0 (2018-06-23)
+
+- Drastically improves error message formatting for `.tryParse` and
+  `.formatError` by showing a full preview of the input with surrounding
+  context, pointing directly at the error (works for both string and Buffer
+  parsers)
+
 ## version 1.10.0 (2018-06-17)
 
 - Adds `parser.contramap(fn)` and `parser.promap(fn)`
