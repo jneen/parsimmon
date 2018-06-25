@@ -371,7 +371,6 @@ var linesAfterStringError = 3;
 var bytesPerLine = 8;
 var bytesBefore = bytesPerLine * 5;
 var bytesAfter = bytesPerLine * 4;
-var radix = 16;
 var byteLength = 2;
 var defaultLinePrefix = "  ";
 
@@ -452,6 +451,7 @@ function formatGot(input, error) {
   var lineWithErrorIndex;
   var lines;
   var lineRange;
+  var lastLineNumberLabelLength;
 
   if (i === input.length) {
     return "Got the end of the input";
@@ -471,8 +471,8 @@ function formatGot(input, error) {
 
     var byteLines = map(function(byteRow) {
       return map(function(byteValue) {
-        // Prefix byte values with a `0`
-        return leftPad(byteValue.toString(radix), byteLength, "0");
+        // Prefix byte values with a `0` if they are shorter than 2 characters.
+        return leftPad(byteValue.toString(16), 2, "0");
       }, byteRow);
     }, bytesInChunks);
 
@@ -481,15 +481,23 @@ function formatGot(input, error) {
     column = columnByteIndex * 3;
 
     // Account for an extra space.
-    if (columnByteIndex > 4) {
+    if (columnByteIndex >= 4) {
       column += 1;
     }
-    verticalMarkerLength = byteLength;
+
+    verticalMarkerLength = 2;
     lines = map(function(byteLine) {
       return byteLine.length <= 4
         ? byteLine.join(" ")
         : byteLine.slice(0, 4).join(" ") + "  " + byteLine.slice(4).join(" ");
     }, byteLines);
+    lastLineNumberLabelLength = (
+      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
+    ).toString(16).length;
+
+    if (lastLineNumberLabelLength < 2) {
+      lastLineNumberLabelLength = 2;
+    }
   } else {
     var inputLines = input.split(/\r\n|[\n\r\u2028\u2029]/);
     column = index.column - 1;
@@ -502,48 +510,35 @@ function formatGot(input, error) {
     );
 
     lines = inputLines.slice(lineRange.from, lineRange.to);
+    lastLineNumberLabelLength = lineRange.to.toString().length;
   }
 
   var lineWithErrorCurrentIndex = lineWithErrorIndex - lineRange.from;
-  var lastLineNumberLabelLength = lineRange.to.toString().length;
-
-  if (isBuffer(input)) {
-    lastLineNumberLabelLength = (
-      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
-    ).toString(16).length;
-
-    if (lastLineNumberLabelLength < 2) {
-      lastLineNumberLabelLength = 2;
-    }
-  }
-
   var linesWithLineNumbers = reduce(
     function(acc, lineSource, index) {
       var isLineWithError = index === lineWithErrorCurrentIndex;
       var prefix = isLineWithError ? "> " : defaultLinePrefix;
-      var lineNumber = isBuffer(input)
-        ? ((lineRange.from + index) * 8).toString(16)
-        : (lineRange.from + index + 1).toString();
+      var lineNumberLabel;
+
       if (isBuffer(input)) {
-        if (lineNumber.length < 2) {
-          lineNumber = leftPad(lineNumber, 2, "0");
-        }
+        lineNumberLabel = leftPad(
+          ((lineRange.from + index) * 8).toString(16),
+          lastLineNumberLabelLength,
+          "0"
+        );
+      } else {
+        lineNumberLabel = leftPad(
+          (lineRange.from + index + 1).toString(),
+          lastLineNumberLabelLength,
+          " "
+        );
       }
-      var lineNumberLabel =
-        lineNumber.length < lastLineNumberLabelLength
-          ? leftPad(
-              lineNumber,
-              lastLineNumberLabelLength,
-              isBuffer(input) ? "0" : " "
-            )
-          : lineNumber;
 
       return [].concat(
         acc,
         [prefix + lineNumberLabel + " | " + lineSource],
         isLineWithError
           ? [
-              // (isBuffer(input) ? " " : "") +
               defaultLinePrefix +
                 repeat(" ", lastLineNumberLabelLength) +
                 " | " +

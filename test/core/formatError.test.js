@@ -370,6 +370,34 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
+  test("error marker is padded with correctly in an error on a fourth byte", function() {
+    var parser = Parsimmon.seq(
+      Parsimmon.Binary.byte(0x01),
+      Parsimmon.Binary.byte(0x00),
+      Parsimmon.Binary.byte(0x00),
+      Parsimmon.Binary.byte(0x02),
+      Parsimmon.Binary.byte(0x01)
+    );
+
+    var expectation =
+      "\n" +
+      "-- PARSING FAILED --------------------------------------------------\n" +
+      "\n" +
+      "> 00 | 01 00 00 03  00\n" +
+      "     |          ^^\n" +
+      "\n" +
+      "Expected:\n" +
+      "\n" +
+      "0x02" +
+      "\n";
+
+    var input = Buffer.from([0x01, 0x00, 0x00, 0x03, 0x00]);
+
+    var answer = Parsimmon.formatError(input, parser.parse(input));
+
+    assert.deepEqual(answer, expectation);
+  });
+
   test("error marker is padded with correctly in an error on a fifth byte", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x01),
