@@ -371,7 +371,6 @@ var linesAfterStringError = 3;
 var bytesPerLine = 8;
 var bytesBefore = bytesPerLine * 5;
 var bytesAfter = bytesPerLine * 4;
-var byteLength = 2;
 var defaultLinePrefix = "  ";
 
 function repeat(string, amount) {
