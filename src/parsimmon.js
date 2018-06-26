@@ -599,7 +599,6 @@ function formatGot(input, error) {
   }
 
   var lineWithErrorCurrentIndex = lineWithErrorIndex - lineRange.from;
-  var lastLineNumberLabelLength = lineRange.to.toString().length;
 
   if (isBuffer(input)) {
     lastLineNumberLabelLength = ((lineRange.to > 0
