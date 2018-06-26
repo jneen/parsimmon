@@ -232,9 +232,13 @@ function encodedString(encoding, length) {
   });
 }
 
+function isInteger(value) {
+  return typeof value === "number" && Math.floor(value) === value;
+}
+
 function uintBE(length) {
-  if (length < 0 || length > 6) {
-    throw new Error("uintBE requires length in range [0, 6].");
+  if ((isInteger(length) && length < 0) || length > 6) {
+    throw new Error("uintBE requires integer length in range [0, 6].");
   }
 
   return parseBufferFor("uintBE(" + length + ")", length).map(function(buff) {
@@ -243,8 +247,8 @@ function uintBE(length) {
 }
 
 function uintLE(length) {
-  if (length < 0 || length > 6) {
-    throw new Error("uintLE requires length in range [0, 6].");
+  if ((isInteger(length) && length < 0) || length > 6) {
+    throw new Error("uintLE requires integer length in range [0, 6].");
   }
 
   return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
@@ -253,8 +257,8 @@ function uintLE(length) {
 }
 
 function intBE(length) {
-  if (length < 0 || length > 6) {
-    throw new Error("intBE requires length in range [0, 6].");
+  if ((isInteger(length) && length < 0) || length > 6) {
+    throw new Error("intBE requires integer length in range [0, 6].");
   }
 
   return parseBufferFor("intBE(" + length + ")", length).map(function(buff) {
@@ -263,8 +267,8 @@ function intBE(length) {
 }
 
 function intLE(length) {
-  if (length < 0 || length > 6) {
-    throw new Error("intLE requires length in range [0, 6].");
+  if ((isInteger(length) && length < 0) || length > 6) {
+    throw new Error("intLE requires integer length in range [0, 6].");
   }
 
   return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
@@ -272,29 +276,21 @@ function intLE(length) {
   });
 }
 
-function floatBE() {
-  return parseBufferFor("floatBE", 4).map(function(buff) {
-    return buff.readFloatBE(0);
-  });
-}
+var floatBE = parseBufferFor("floatBE", 4).map(function(buff) {
+  return buff.readFloatBE(0);
+});
 
-function floatLE() {
-  return parseBufferFor("floatLE", 4).map(function(buff) {
-    return buff.readFloatLE(0);
-  });
-}
+var floatLE = parseBufferFor("floatLE", 4).map(function(buff) {
+  return buff.readFloatLE(0);
+});
 
-function doubleBE() {
-  return parseBufferFor("doubleBE", 8).map(function(buff) {
-    return buff.readDoubleBE(0);
-  });
-}
+var doubleBE = parseBufferFor("doubleBE", 8).map(function(buff) {
+  return buff.readDoubleBE(0);
+});
 
-function doubleLE() {
-  return parseBufferFor("doubleLE", 8).map(function(buff) {
-    return buff.readDoubleLE(0);
-  });
-}
+var doubleLE = parseBufferFor("doubleLE", 8).map(function(buff) {
+  return buff.readDoubleLE(0);
+});
 
 function toArray(arrLike) {
   return Array.prototype.slice.call(arrLike);
@@ -1377,10 +1373,10 @@ Parsimmon.Binary = {
   int8LE: intLE(1),
   int16LE: intLE(2),
   int32LE: intLE(4),
-  floatBE: floatBE(),
-  floatLE: floatLE(),
-  doubleBE: doubleBE(),
-  doubleLE: doubleLE()
+  floatBE: floatBE,
+  floatLE: floatLE,
+  doubleBE: doubleBE,
+  doubleLE: doubleLE
 };
 
 module.exports = Parsimmon;
