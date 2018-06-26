@@ -1,3 +1,8 @@
+## version 1.11.1 (2018-06-27)
+
+- Fixes a bug where the error indicator (`^^`) was misaligned on the fifth byte
+  in a given visual line for a binary parse error message
+
 ## version 1.11.0 (2018-06-23)
 
 - Drastically improves error message formatting for `.tryParse` and
