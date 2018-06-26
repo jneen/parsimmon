@@ -1,6 +1,6 @@
 {
   "name": "parsimmon",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "A monadic LL(infinity) parser combinator library",
   "keywords": [
     "parsing",
