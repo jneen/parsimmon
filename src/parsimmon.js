@@ -576,8 +576,9 @@ function formatGot(input, error) {
         ? byteLine.join(" ")
         : byteLine.slice(0, 4).join(" ") + "  " + byteLine.slice(4).join(" ");
     }, byteLines);
-    lastLineNumberLabelLength = (
-      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
+    lastLineNumberLabelLength = ((lineRange.to > 0
+      ? lineRange.to - 1
+      : lineRange.to) * 8
     ).toString(16).length;
 
     if (lastLineNumberLabelLength < 2) {
