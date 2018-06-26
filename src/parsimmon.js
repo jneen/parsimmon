@@ -276,21 +276,29 @@ function intLE(length) {
   });
 }
 
-var floatBE = parseBufferFor("floatBE", 4).map(function(buff) {
-  return buff.readFloatBE(0);
-});
+function floatBE() {
+  return parseBufferFor("floatBE", 4).map(function(buff) {
+    return buff.readFloatBE(0);
+  });
+}
 
-var floatLE = parseBufferFor("floatLE", 4).map(function(buff) {
-  return buff.readFloatLE(0);
-});
+function floatLE() {
+  return parseBufferFor("floatLE", 4).map(function(buff) {
+    return buff.readFloatLE(0);
+  });
+}
 
-var doubleBE = parseBufferFor("doubleBE", 8).map(function(buff) {
-  return buff.readDoubleBE(0);
-});
+function doubleBE() {
+  return parseBufferFor("doubleBE", 8).map(function(buff) {
+    return buff.readDoubleBE(0);
+  });
+}
 
-var doubleLE = parseBufferFor("doubleLE", 8).map(function(buff) {
-  return buff.readDoubleLE(0);
-});
+function doubleLE() {
+  return parseBufferFor("doubleLE", 8).map(function(buff) {
+    return buff.readDoubleLE(0);
+  });
+}
 
 function toArray(arrLike) {
   return Array.prototype.slice.call(arrLike);
@@ -1373,10 +1381,10 @@ Parsimmon.Binary = {
   int8LE: intLE(1),
   int16LE: intLE(2),
   int32LE: intLE(4),
-  floatBE: floatBE,
-  floatLE: floatLE,
-  doubleBE: doubleBE,
-  doubleLE: doubleLE
+  floatBE: floatBE(),
+  floatLE: floatLE(),
+  doubleBE: doubleBE(),
+  doubleLE: doubleLE()
 };
 
 module.exports = Parsimmon;
