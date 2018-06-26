@@ -210,6 +210,92 @@ function bitSeqObj(namedAlignments) {
   });
 }
 
+function parseBufferFor(other, length) {
+  ensureBuffer();
+  return new Parsimmon(function(input, i) {
+    if (i + length > input.length) {
+      return makeFailure(i, length + " bytes for " + other);
+    }
+    return makeSuccess(i + length, input.slice(i, i + length));
+  });
+}
+
+function parseBuffer(length) {
+  return parseBufferFor("buffer", length).map(function(unsafe) {
+    return Buffer.from(unsafe);
+  });
+}
+
+function encodedString(encoding, length) {
+  return parseBufferFor("string", length).map(function(buff) {
+    return buff.toString(encoding);
+  });
+}
+
+function uintBE(length) {
+  if (length < 0 || length > 6) {
+    throw new Error("uintBE requires length in range [0, 6].");
+  }
+
+  return parseBufferFor("uintBE(" + length + ")", length).map(function(buff) {
+    return buff.readUIntBE(0, length);
+  });
+}
+
+function uintLE(length) {
+  if (length < 0 || length > 6) {
+    throw new Error("uintLE requires length in range [0, 6].");
+  }
+
+  return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
+    return buff.readUIntLE(0, length);
+  });
+}
+
+function intBE(length) {
+  if (length < 0 || length > 6) {
+    throw new Error("intBE requires length in range [0, 6].");
+  }
+
+  return parseBufferFor("intBE(" + length + ")", length).map(function(buff) {
+    return buff.readIntBE(0, length);
+  });
+}
+
+function intLE(length) {
+  if (length < 0 || length > 6) {
+    throw new Error("intLE requires length in range [0, 6].");
+  }
+
+  return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
+    return buff.readIntLE(0, length);
+  });
+}
+
+function floatBE() {
+  return parseBufferFor("floatBE", 4).map(function(buff) {
+    return buff.readFloatBE(0);
+  });
+}
+
+function floatLE() {
+  return parseBufferFor("floatLE", 4).map(function(buff) {
+    return buff.readFloatLE(0);
+  });
+}
+
+function doubleBE() {
+  return parseBufferFor("doubleBE", 8).map(function(buff) {
+    return buff.readDoubleBE(0);
+  });
+}
+
+function doubleLE() {
+  return parseBufferFor("doubleLE", 8).map(function(buff) {
+    return buff.readDoubleLE(0);
+  });
+}
+
 function toArray(arrLike) {
   return Array.prototype.slice.call(arrLike);
 }
@@ -458,7 +544,7 @@ function formatGot(input, error) {
   }
 
   if (isBuffer(input)) {
-    var byteLineWithErrorIndex = i - (i % bytesPerLine);
+    var byteLineWithErrorIndex = i - i % bytesPerLine;
     var columnByteIndex = i - byteLineWithErrorIndex;
     var byteRange = rangeFromIndexAndOffsets(
       byteLineWithErrorIndex,
@@ -508,8 +594,9 @@ function formatGot(input, error) {
   var lastLineNumberLabelLength = lineRange.to.toString().length;
 
   if (isBuffer(input)) {
-    lastLineNumberLabelLength = (
-      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
+    lastLineNumberLabelLength = ((lineRange.to > 0
+      ? lineRange.to - 1
+      : lineRange.to) * 8
     ).toString(16).length;
 
     if (lastLineNumberLabelLength < 2) {
@@ -1265,7 +1352,29 @@ Parsimmon["fantasy-land/of"] = succeed;
 Parsimmon.Binary = {
   bitSeq: bitSeq,
   bitSeqObj: bitSeqObj,
-  byte: byte
+  byte: byte,
+  buffer: parseBuffer,
+  encodedString: encodedString,
+  uintBE: uintBE,
+  uint8BE: uintBE(1),
+  uint16BE: uintBE(2),
+  uint32BE: uintBE(4),
+  uintLE: uintLE,
+  uint8LE: uintLE(1),
+  uint16LE: uintLE(2),
+  uint32LE: uintLE(4),
+  intBE: intBE,
+  int8BE: intBE(1),
+  int16BE: intBE(2),
+  int32BE: intBE(4),
+  intLE: intLE,
+  int8LE: intLE(1),
+  int16LE: intLE(2),
+  int32LE: intLE(4),
+  floatBE: floatBE(),
+  floatLE: floatLE(),
+  doubleBE: doubleBE(),
+  doubleLE: doubleLE()
 };
 
 module.exports = Parsimmon;

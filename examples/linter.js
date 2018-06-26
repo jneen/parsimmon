@@ -20,7 +20,8 @@ let Lang = P.createLanguage({
   _: r => r.Comment.sepBy(r.Whitespace).trim(r.Whitespace),
 
   Program: r =>
-    r.Statement.many()
+    r.Statement
+      .many()
       .trim(r._)
       .node("Program"),
 
