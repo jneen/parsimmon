@@ -236,10 +236,14 @@ function isInteger(value) {
   return typeof value === "number" && Math.floor(value) === value;
 }
 
-function uintBE(length) {
-  if ((isInteger(length) && length < 0) || length > 6) {
-    throw new Error("uintBE requires integer length in range [0, 6].");
+function assertValidIntegerByteLengthFor(who, length) {
+  if (!isInteger(length) || length < 0 || length > 6) {
+    throw new Error(who + " requires integer length in range [0, 6].");
   }
+}
+
+function uintBE(length) {
+  assertValidIntegerByteLengthFor("uintBE", length);
 
   return parseBufferFor("uintBE(" + length + ")", length).map(function(buff) {
     return buff.readUIntBE(0, length);
@@ -247,9 +251,7 @@ function uintBE(length) {
 }
 
 function uintLE(length) {
-  if ((isInteger(length) && length < 0) || length > 6) {
-    throw new Error("uintLE requires integer length in range [0, 6].");
-  }
+  assertValidIntegerByteLengthFor("uintLE", length);
 
   return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
     return buff.readUIntLE(0, length);
@@ -257,9 +259,7 @@ function uintLE(length) {
 }
 
 function intBE(length) {
-  if ((isInteger(length) && length < 0) || length > 6) {
-    throw new Error("intBE requires integer length in range [0, 6].");
-  }
+  assertValidIntegerByteLengthFor("intBE", length);
 
   return parseBufferFor("intBE(" + length + ")", length).map(function(buff) {
     return buff.readIntBE(0, length);
@@ -267,9 +267,7 @@ function intBE(length) {
 }
 
 function intLE(length) {
-  if ((isInteger(length) && length < 0) || length > 6) {
-    throw new Error("intLE requires integer length in range [0, 6].");
-  }
+  assertValidIntegerByteLengthFor("intLE", length);
 
   return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
     return buff.readIntLE(0, length);
