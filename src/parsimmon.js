@@ -545,7 +545,7 @@ function formatGot(input, error) {
   }
 
   if (isBuffer(input)) {
-    var byteLineWithErrorIndex = i - i % bytesPerLine;
+    var byteLineWithErrorIndex = i - (i % bytesPerLine);
     var columnByteIndex = i - byteLineWithErrorIndex;
     var byteRange = rangeFromIndexAndOffsets(
       byteLineWithErrorIndex,
@@ -578,9 +578,8 @@ function formatGot(input, error) {
         ? byteLine.join(" ")
         : byteLine.slice(0, 4).join(" ") + "  " + byteLine.slice(4).join(" ");
     }, byteLines);
-    lastLineNumberLabelLength = ((lineRange.to > 0
-      ? lineRange.to - 1
-      : lineRange.to) * 8
+    lastLineNumberLabelLength = (
+      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
     ).toString(16).length;
 
     if (lastLineNumberLabelLength < 2) {
@@ -604,9 +603,8 @@ function formatGot(input, error) {
   var lineWithErrorCurrentIndex = lineWithErrorIndex - lineRange.from;
 
   if (isBuffer(input)) {
-    lastLineNumberLabelLength = ((lineRange.to > 0
-      ? lineRange.to - 1
-      : lineRange.to) * 8
+    lastLineNumberLabelLength = (
+      (lineRange.to > 0 ? lineRange.to - 1 : lineRange.to) * 8
     ).toString(16).length;
 
     if (lastLineNumberLabelLength < 2) {

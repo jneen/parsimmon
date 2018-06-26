@@ -33,8 +33,7 @@ let Lisp = P.createLanguage({
   // repeats the expression zero or more times. Finally, `.wrap(...)` removes
   // the '(' and ')' from both sides of the list.
   List: function(r) {
-    return r.Expression
-      .trim(P.optWhitespace)
+    return r.Expression.trim(P.optWhitespace)
       .many()
       .wrap(P.string("("), P.string(")"));
   },
