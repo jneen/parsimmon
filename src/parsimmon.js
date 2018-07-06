@@ -987,16 +987,8 @@ _.chain = function(f) {
 };
 
 _.assert = function(f, err) {
-  var self = this;
-  return Parsimmon(function(input, i) {
-    var a = self._(input, i);
-    if (!a.status) {
-      return a;
-    }
-    if (!f(a.value)) {
-      return Parsimmon.makeFailure(i, err);
-    }
-    return a;
+  return this.chain(function(value) {
+    return f(value) ? Parsimmon.succeed(value) : Parsimmon.fail(err);
   });
 };
 
