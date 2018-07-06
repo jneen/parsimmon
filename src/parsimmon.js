@@ -986,6 +986,20 @@ _.chain = function(f) {
   });
 };
 
+_.assert = function(f, err) {
+  var self = this;
+  return Parsimmon(function(input, i) {
+    var a = self._(input, i);
+    if (!a.status) {
+      return a;
+    }
+    if (!f(a.value)) {
+      return Parsimmon.makeFailure(i, err);
+    }
+    return a;
+  });
+};
+
 // -*- Constructors -*-
 
 function string(str) {

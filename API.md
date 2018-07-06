@@ -84,6 +84,7 @@
   * [parser.mark()](#parsermark)
   * [parser.thru(wrapper)](#parserthruwrapper)
   * [parser.desc(description)](#parserdescdescription)
+  * [parser.assert(fn)](#parserassertfn)
 - [FantasyLand support](#fantasyland-support)
   * [Parsimmon.empty()](#parsimmonempty)
   * [parser.empty()](#parserempty)
@@ -1064,6 +1065,10 @@ pPairNorm | Expected ','
 pPairDesc | Expected a pair
 ```
 
+## parser.assert(fn, [error_description])
+
+Returns a new parser which fails if `fn(yielded value)` returns false.
+
 # FantasyLand support
 
 Parsimmon parsers are Semigroups, Applicative Functors, and Monads. Both the old-style (`concat`) and new-style (`fantasy-land/concat`) method names are supported.
@@ -1087,7 +1092,7 @@ Takes `parser` which returns a function and applies it to the parsed value of `o
 ```javascript
 Parsimmon.digit
   .ap(Parsimmon.digit
-    .map(s => t => 
+    .map(s => t =>
       Number(s) + Number(t)))
         .parse("23");
 // => {status: true, value: 5}
