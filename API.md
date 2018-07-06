@@ -1069,6 +1069,16 @@ pPairDesc | Expected a pair
 
 Returns a new parser which fails if `fn(yielded value)` returns false.
 
+Example:
+
+```js
+const octet = P.digits.map(Number).assert(n => n < 256, "too large")
+const ipv4 = octet.sepBy(P.string('.')).assert(octets => octets.length === 4)
+console.log(ipv4.parse("1.2.3.4").value) // [1, 2, 3, 4]
+console.log(ipv4.parse("1.300.3.4").status) // false
+console.log(ipv4.parse("1.2.3.4.5").status) // false
+```
+
 # FantasyLand support
 
 Parsimmon parsers are Semigroups, Applicative Functors, and Monads. Both the old-style (`concat`) and new-style (`fantasy-land/concat`) method names are supported.
