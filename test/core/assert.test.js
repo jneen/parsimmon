@@ -27,4 +27,31 @@ suite("parser.assert", function() {
       .parse("1");
     assert(value.status);
   });
+
+  test("should accept an error description string", function() {
+    var value = Parsimmon.digit
+      .assert(function() {
+        return true;
+      }, "error description string")
+      .parse("1");
+    assert(value.status);
+  });
+
+  test("should report error description string on assertion failure", function() {
+    var value = Parsimmon.digit
+      .assert(function() {
+        return false;
+      }, "error description string")
+      .parse("1");
+    assert(value.expected.includes("error description string"));
+  });
+
+  test("should report failure with offset at end of parsed value", function() {
+    var value = Parsimmon.digits
+      .assert(function() {
+        return false;
+      })
+      .parse("11a");
+    assert(value.index.offset === 2);
+  });
 });
