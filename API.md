@@ -575,6 +575,206 @@ parser.parse(Buffer.from([0x3f]));
 // => { status: true, value: 63 }
 ```
 
+## Parsimmon.buffer(length)
+
+Returns a parser that will consume some of a buffer and present it as a raw buffer for further transformation.  This buffer is cloned, so in case you use a destructive method, it will not corrupt the original input buffer.
+
+```javaScript
+var parser = Parsimmon.Binary.buffer(2).skip(Parsimmon.any);
+parser.parse(Buffer.from([1, 2, 3]));
+// => { status: true, value: <Buffer 01 02> }
+```
+
+## Parsimmon.encodedString(encoding, length)
+
+Parse `length` bytes, and then decode with a particular `encoding`.
+
+```javascript
+var parser = Parsimmon.Binary.encodedString('utf8', 17);
+parser.parse(Buffer.from([0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x74, 0x68, 0x65, 0x72, 0x65, 0x21, 0x20, 0xf0, 0x9f, 0x98, 0x84]));
+// => { status: true, value: 'hello there! 😄' }
+```
+
+## Parsimmon.uint8
+
+Parse an unsigned integer of 1 byte.
+
+```javascript
+var parser = Parsimmon.Binary.uint8;
+parser.parse(Buffer.from([0xFF]));
+// => { status: true, value: 255 }
+```
+
+## Parsimmon.int8
+
+Parse a signed integer of 1 byte.
+
+```javascript
+var parser = Parsimmon.Binary.int8;
+parser.parse(Buffer.from([0xFF]));
+// => { status: true, value: -1 }
+```
+
+## Parsimmon.uintBE(length)
+
+Parse an unsigned integer (big-endian) of length bytes.  Length cannot exceed 6.
+
+```javascript
+var parser = Parsimmon.Binary.uintBE(4);
+parser.parse(Buffer.from([1, 2, 3, 4]));
+// => { status: true, value: 16909060 }
+```
+
+## Parsimmon.intBE(length)
+
+Parse a signed integer (big-endian) of length bytes.  Length cannot exceed 6.
+
+```javascript
+var parser = Parsimmon.Binary.intBE(4);
+parser.parse(Buffer.from([0xff, 2, 3, 4]));
+// => { status: true, value: -16645372 }
+```
+
+## Parsimmon.uintLE(length)
+
+Parse an unsigned integer (little-endian) of length bytes.  Length cannot exceed 6.
+
+```javascript
+var parser = Parsimmon.Binary.uintLE(4);
+parser.parse(Buffer.from([1, 2, 3, 4]));
+// => { status: true, value: 67305985 }
+```
+
+## Parsimmon.intLE(length)
+
+Parse a signed integer (little-endian) of length bytes.  Length cannot exceed 6.
+
+```javascript
+var parser = Parsimmon.Binary.intLE(4);
+parser.parse(Buffer.from([1, 2, 3, 0xff]));
+// => { status: true, value: -16580095 }
+```
+
+## Parsimmon.uint16BE
+
+Parse an unsigned integer (big-endian) of 2 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.uint16BE;
+parser.parse(Buffer.from([0xFF, 0xFE]));
+// => { status: true, value: 65534 }
+```
+
+## Parsimmon.int16BE
+
+Parse a signed integer (big-endian) of 2 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.int16BE;
+parser.parse(Buffer.from([0xFF, 0xFE]));
+// => { status: true, value: -2 }
+```
+
+## Parsimmon.uint16LE
+
+Parse an unsigned integer (little-endian) of 2 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.uint16LE;
+parser.parse(Buffer.from([0xFE, 0xFF]));
+// => { status: true, value: 65534 }
+```
+
+## Parsimmon.int16LE
+
+Parse a signed integer (little-endian) of 2 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.int16LE;
+parser.parse(Buffer.from([0xFE, 0xFF]));
+// => { status: true, value: -2 }
+```
+
+## Parsimmon.uint32BE
+
+Parse an unsigned integer (big-endian) of 4 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.uint32BE;
+parser.parse(Buffer.from([0x00, 0x00, 0x00, 0xFF]));
+// => { status: true, value: 255 }
+```
+
+## Parsimmon.int32BE
+
+Parse an signed integer (big-endian) of 4 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.int32BE;
+parser.parse(Buffer.from([0xFF, 0xFF, 0xFF, 0xFE]));
+// => { status: true, value: -2 }
+```
+
+## Parsimmon.uint32LE
+
+Parse an unsigned integer (little-endian) of 4 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.uint32LE;
+parser.parse(Buffer.from([0xFF, 0x00, 0x00, 0x00]));
+// => { status: true, value: 255 }
+```
+
+## Parsimmon.int32LE
+
+Parse an signed integer (little-endian) of 4 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.int32LE;
+parser.parse(Buffer.from([0xFE, 0xFF, 0xFF, 0xFF]));
+// => { status: true, value: -2 }
+```
+
+## Parsimmon.floatBE
+
+Parse a float (big-endian) of 4 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.floatBE;
+parser.parse(Buffer.from([1, 2, 3, 4]));
+// => { status: true, value: 2.387939260590663e-38 }
+```
+
+## Parsimmon.floatLE
+
+Parse a float (little-endian) of 4 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.floatLE;
+parser.parse(Buffer.from([1, 2, 3, 4]));
+// => { status: true, value: 1.539989614439558e-36 }
+```
+
+## Parsimmon.doubleBE
+
+Parse a double (big-endian) of 8 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.doubleBE;
+parser.parse(Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]));
+// => { status: true, value: 8.20788039913184e-304 }
+```
+
+## Parsimmon.doubleLE
+
+Parse a double (little-endian) of 8 bytes.
+
+```javascript
+var parser = Parsimmon.Binary.doubleLE;
+parser.parse(Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]));
+// => { status: true, value: 5.447603722011605e-270 }
+```
+
 ## Parsimmon.bitSeq(alignments)
 
 Parse a series of bits that do not have to be byte-aligned and consume them from a Buffer. The maximum number is 48 since more than 48 bits won't fit safely into a JavaScript number without losing precision. Also, the total of all bits in the sequence must be a multiple of 8 since parsing is still done at the byte level.
@@ -1087,7 +1287,7 @@ Takes `parser` which returns a function and applies it to the parsed value of `o
 ```javascript
 Parsimmon.digit
   .ap(Parsimmon.digit
-    .map(s => t => 
+    .map(s => t =>
       Number(s) + Number(t)))
         .parse("23");
 // => {status: true, value: 5}
