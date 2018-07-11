@@ -1,3 +1,26 @@
+## version 1.12.0 (????-??-??)
+
+- Adds `Parsimmon.Binary.buffer(length)`
+- Adds `Parsimmon.Binary.encodedString(encoding, length)`
+- Adds `Parsimmon.Binary.uintBE(length)`
+- Adds `Parsimmon.Binary.intBE(length)`
+- Adds `Parsimmon.Binary.uintLE(length)`
+- Adds `Parsimmon.Binary.intLE(length)`
+- Adds `Parsimmon.Binary.uint8`
+- Adds `Parsimmon.Binary.int8`
+- Adds `Parsimmon.Binary.uint16BE`
+- Adds `Parsimmon.Binary.uint16LE`
+- Adds `Parsimmon.Binary.int16LE`
+- Adds `Parsimmon.Binary.int16BE`
+- Adds `Parsimmon.Binary.uint32BE`
+- Adds `Parsimmon.Binary.uint32LE`
+- Adds `Parsimmon.Binary.int32LE`
+- Adds `Parsimmon.Binary.int32BE`
+- Adds `Parsimmon.Binary.floatBE`
+- Adds `Parsimmon.Binary.floatLE`
+- Adds `Parsimmon.Binary.doubleBE`
+- Adds `Parsimmon.Binary.doubleLE`
+
 ## version 1.11.1 (2018-06-27)
 
 - Fixes a bug where the error indicator (`^^`) was misaligned on the fifth byte
