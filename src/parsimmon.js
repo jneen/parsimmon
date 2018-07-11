@@ -244,7 +244,6 @@ function assertValidIntegerByteLengthFor(who, length) {
 
 function uintBE(length) {
   assertValidIntegerByteLengthFor("uintBE", length);
-
   return parseBufferFor("uintBE(" + length + ")", length).map(function(buff) {
     return buff.readUIntBE(0, length);
   });
@@ -252,7 +251,6 @@ function uintBE(length) {
 
 function uintLE(length) {
   assertValidIntegerByteLengthFor("uintLE", length);
-
   return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
     return buff.readUIntLE(0, length);
   });
@@ -260,7 +258,6 @@ function uintLE(length) {
 
 function intBE(length) {
   assertValidIntegerByteLengthFor("intBE", length);
-
   return parseBufferFor("intBE(" + length + ")", length).map(function(buff) {
     return buff.readIntBE(0, length);
   });
@@ -268,8 +265,7 @@ function intBE(length) {
 
 function intLE(length) {
   assertValidIntegerByteLengthFor("intLE", length);
-
-  return parseBufferFor("uintLE(" + length + ")", length).map(function(buff) {
+  return parseBufferFor("intLE(" + length + ")", length).map(function(buff) {
     return buff.readIntLE(0, length);
   });
 }
