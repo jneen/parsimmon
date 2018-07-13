@@ -1,4 +1,4 @@
-## version 1.12.0 (????-??-??)
+## version 1.12.0 (2018-07-12)
 
 - Adds `Parsimmon.Binary.buffer(length)`
 - Adds `Parsimmon.Binary.encodedString(encoding, length)`
