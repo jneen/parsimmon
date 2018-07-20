@@ -75,15 +75,21 @@ const JS = Parsimmon.createLanguage({
   Identifier: () => Parsimmon.regexp(/[a-z]+/),
   Definition: r =>
     Parsimmon.seqObj(
-      Parsimmon.seq(r.Var, r.__),
+      r.Var,
+      r.__,
       ["name", r.Identifier],
-      Parsimmon.seq(r._, r["="], r._),
+      r._,
+      r["="],
+      r._,
       ["value", r.Expression],
-      Parsimmon.seq(r._, r[";"])
+      r._,
+      r[";"]
     ),
   Expression: () => Parsimmon.fail("TODO: Implement expressions")
 });
 ```
+
+Also this let's you easily see where whitespace goes in your language instead of pretending it doesn't exist.
 
 You could make a helper function to wrap `r._` around everything... but then you have other scenarios where you need mandatory whitespace. And you can't have mandatory whitespace following optional whitespace because the optional whitespace will consume it and then the mandatory whitespace will fail to find any whitespace.
 
