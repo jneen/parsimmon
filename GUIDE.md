@@ -31,7 +31,9 @@ The general idea is to take context in at the top level and construct new langua
 
 ## TODO: Performance tips
 
-Some performance tips. Which constructions should be considered dangerous performance-wise?
+> Some performance tips. Which constructions should be considered dangerous performance-wise?
+
+I want to answer this one, but honestly don't even really know where to start. It's not something I look at much.
 
 ## Negative constructions
 
@@ -58,7 +60,7 @@ So if you want avoid parsing things you can use `Parsimmon.notFollowedBy` or `.n
 
 As a note: `notChar` and `.notFollowedBy(Parsimmong.regexp(...))` are not bad style necessarily. But there is a balance on negative features and Parsimmon strives to have a sensible API, so they often don't find their way in.
 
-## TODO: Where should whitespace be consumed in parsers
+## Where should whitespace be consumed in parsers
 
 In general, putting off whitespace parsing until the highest point in your parser is @wavebeem's preferred strategy. It allows you the most flexiblity overall, and often makes more sense.
 
