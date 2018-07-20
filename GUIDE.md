@@ -33,7 +33,7 @@ The general idea is to take context in at the top level and construct new langua
 
 Some performance tips. Which constructions should be considered dangerous performance-wise?
 
-## TODO: Negative constructions
+## Negative constructions
 
 Many users have request a parser combinator like `Parsimmon.not` which would "invert" the success/failure of a parser.
 
@@ -60,26 +60,36 @@ As a note: `notChar` and `.notFollowedBy(Parsimmong.regexp(...))` are not bad st
 
 ## TODO: Where should whitespace be consumed in parsers
 
-Separator position. Should you try to stick them to the low-level or high-level parser by default.
-For example:
+In general, putting off whitespace parsing until the highest point in your parser is @wavebeem's preferred strategy. It allows you the most flexiblity overall, and often makes more sense.
+
+Consider this example that pushes whitespace parsing up to the level of variable definition:
 
 ```js
-let line = P.noneOf("\n\r")
-  .atLeast(1)
-  .tie()
-  .skip(P.end);
-// vs
-let line = P.noneOf("\n\r")
-  .atLeast(1)
-  .tie();
-// vs
-let line = P.noneOf("\n\r")
-  .atLeast(1)
-  .tie()
-  .lookahead(P.end);
+const JS = Parsimmon.createLanguage({
+  // Normally whitespace also includes comments, but a parser for JSDoc for
+  // example will choose not to ignore comments so it can use the comments.
+  _: () => Parsimmon.regexp(/[ \t]*/),
+  __: () => Parsimmon.regexp(/[ \t]+/),
+  Var: () => Parsimmon.string("var"),
+  "=": () => Parsimmon.string("="),
+  Identifier: () => Parsimmon.regexp(/[a-z]+/),
+  Definition: r =>
+    Parsimmon.seqObj(
+      Parsimmon.seq(r.Var, r.__),
+      ["name", r.Identifier],
+      Parsimmon.seq(r._, r["="], r._),
+      ["value", r.Expression],
+      Parsimmon.seq(r._, r[";"])
+    ),
+  Expression: () => Parsimmon.fail("TODO: Implement expressions")
+});
 ```
 
-My experiments suggests that the first version leads to design problems but maybe other people have different opinion.
+You could make a helper function to wrap `r._` around everything... but then you have other scenarios where you need mandatory whitespace. And you can't have mandatory whitespace following optional whitespace because the optional whitespace will consume it and then the mandatory whitespace will fail to find any whitespace.
+
+The same sort of situation can easily apply to parsing leading whitespace and newlines to separate lines of code, especially when comments get in the mix.
+
+Overall, I would suggest making each parser parse the smallest thing possible that makes sense for its name.
 
 ## TODO
 
