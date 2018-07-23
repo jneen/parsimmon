@@ -152,7 +152,7 @@ Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
 
 ## Parsimmon(fn)
 
-**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`.
+**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using [`Parsimmon.regexp`]((#parsimmonregexpregexp)) and combination with `Parsimmon.seq` and `Parsimmon.alt`.
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon(fn)`. This is an example of how to create a parser that matches any character except the one provided:
 
@@ -247,11 +247,11 @@ Returns a parser that looks for a match to the regexp and yields the entire text
 
 ## Parsimmon.regexp(regexp, group)
 
-Like `Parsimmon.regexp(regexp)`, but yields only the text in the specific regexp match `group`, rather than the match of the entire regexp.
+Like [`Parsimmon.regexp(regexp)`](#parsimmonregexpregexp), but yields only the text in the specific regexp match `group`, rather than the match of the entire regexp.
 
 ## Parsimmon.regex
 
-This is an alias for `Parsimmon.regexp`.
+This is an alias for [`Parsimmon.regexp`](#parsimmonregexpregexp).
 
 ## Parsimmon.notFollowedBy(parser)
 
@@ -398,27 +398,27 @@ Returns a failing parser with the given message.
 
 ## Parsimmon.letter
 
-Equivalent to `Parsimmon.regexp(/[a-z]/i)`.
+Equivalent to [`Parsimmon.regexp(/[a-z]/i)`](#parsimmonregexpregexp).
 
 ## Parsimmon.letters
 
-Equivalent to `Parsimmon.regexp(/[a-z]*/i)`.
+Equivalent to [`Parsimmon.regexp(/[a-z]*/i)`](#parsimmonregexpregexp).
 
 ## Parsimmon.digit
 
-Equivalent to `Parsimmon.regexp(/[0-9]/)`.
+Equivalent to [`Parsimmon.regexp(/[0-9]/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.digits
 
-Equivalent to `Parsimmon.regexp(/[0-9]*/)`.
+Equivalent to [`Parsimmon.regexp(/[0-9]*/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.whitespace
 
-Equivalent to `Parsimmon.regexp(/\s+/)`.
+Equivalent to [`Parsimmon.regexp(/\s+/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.optWhitespace
 
-Equivalent to `Parsimmon.regexp(/\s*/)`.
+Equivalent to [`Parsimmon.regexp(/\s*/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.cr
 
