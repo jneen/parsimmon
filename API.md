@@ -154,7 +154,7 @@ Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
 
 **NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using [`Parsimmon.regexp`]((#parsimmonregexpregexp)) and combination with [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and [`Parsimmon.alt`](#parsimmonaltp1-p2-pn).
 
-You can add a primitive parser (similar to the included ones) by using `Parsimmon(fn)`. This is an example of how to create a parser that matches any character except the one provided:
+You can add a primitive parser (similar to the included ones) by using [`Parsimmon(fn)`](#parsimmonfn). This is an example of how to create a parser that matches any character except the one provided:
 
 ```javascript
 function notChar(char) {
@@ -181,15 +181,15 @@ parser.parse('accccc');
 
 ## Parsimmon.Parser(fn)
 
-Alias of `Parsimmon(fn)` for backward compatibility.
+Alias of [`Parsimmon(fn)`](#parsimmonfn) for backward compatibility.
 
 ## Parsimmon.makeSuccess(index, value)
 
-To be used inside of `Parsimmon(fn)`. Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for `Parsimmon(fn)`.
+To be used inside of [`Parsimmon(fn)`](#parsimmonfn). Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for [`Parsimmon(fn)`](#parsimmonfn).
 
 ## Parsimmon.makeFailure(furthest, expectation)
 
-To be used inside of `Parsimmon(fn)`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). The expected value may also be an array of different values.  See documentation for `Parsimmon(fn)`.
+To be used inside of [`Parsimmon(fn)`](#parsimmonfn). Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). The expected value may also be an array of different values.  See documentation for [`Parsimmon(fn)`](#parsimmonfn).
 
 ## Parsimmon.isParser(obj)
 
@@ -361,11 +361,11 @@ In the second case, [`Parsimmon.alt`](#parsimmonaltp1-p2-pn) matches on the firs
 
 ## Parsimmon.sepBy(content, separator)
 
-See `parser.sepBy(separator)`.
+See [`parser.sepBy(separator)`](#parsersepbyseparator).
 
 ## Parsimmon.sepBy1(content, separator)
 
-See `parser.sepBy1(separator)`.
+See [`parser.sepBy1(separator)`](#parsersepby1separator).
 
 ## Parsimmon.lazy(fn)
 
@@ -532,7 +532,7 @@ CustomString.parse('%<a string>'); // => {status: true, value: 'a string'}
 
 ## Parsimmon.custom(fn)
 
-**Deprecated:** Please use `Parsimmon(fn)` going forward.
+**Deprecated:** Please use [`Parsimmon(fn)`](#parsimmonfn) going forward.
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon.custom`. This is an example of how to create a parser that matches any character except the one provided:
 
@@ -1274,7 +1274,7 @@ Returns `Parsimmon.fail("fantasy-land/empty")`.
 
 ## parser.empty()
 
-See `Parsimmon.empty()`.
+See [`Parsimmon.empty()`](#parsimmonempty).
 
 ## parser.concat(otherParser)
 
@@ -1319,7 +1319,7 @@ This is the same as `Parsimmon.sepBy`, but matches the `content` parser **at lea
 
 ## parser.chain(newParserFunc)
 
-See `parser.chain(newParserFunc)` defined earlier.
+See [`parser.chain(newParserFunc)`](#parserchainnewparserfunc) defined earlier.
 
 ## parser.of(result)
 
