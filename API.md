@@ -101,11 +101,11 @@
 
 ## Yields
 
-When the documentation says a function *yields an array of strings*, it means the function returns a parser that when called with `.parse` will return an object containing the array of strings.
+When the documentation says a function *yields an array of strings*, it means the function returns a parser that when called with [`.parse`](#parserparseinput) will return an object containing the array of strings.
 
 ## Input
 
-The string passed to `.parse` is called the *input*.
+The string passed to [`.parse`](#parserparseinput) is called the *input*.
 
 ## Consumes
 
