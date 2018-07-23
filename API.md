@@ -181,7 +181,7 @@ parser.parse('accccc');
 
 ## Parsimmon.Parser(fn)
 
-Alias of `Parsimmon(fn)` for backwards compatibility.
+Alias of `Parsimmon(fn)` for backward compatibility.
 
 ## Parsimmon.makeSuccess(index, value)
 
@@ -205,11 +205,11 @@ Returns a parser that looks for exactly one character from `string`, and yields 
 
 ## Parsimmon.noneOf(string)
 
-Returns a parser that looks for exactly one character *NOT* from `string`, and yields that character.
+Returns a parser that looks for precisely one character *NOT* from `string`, and yields that character.
 
 ## Parsimmon.range(begin, end)
 
-Parsers a single character in from `begin` to `end`, inclusive.
+Parses a single character from `begin` to `end`, inclusive.
 
 Example:
 
@@ -255,7 +255,7 @@ This is an alias for [`Parsimmon.regexp`](#parsimmonregexpregexp).
 
 ## Parsimmon.notFollowedBy(parser)
 
-Parses using `parser`, but does not consume what it parses. Yields `null` if the parser *does not match* the input. Otherwise it fails.
+Parses using `parser`, but does not consume what it parses. Yields `null` if the parser *does not match* the input. Otherwise, it fails.
 
 ## Parsimmon.lookahead(parser)
 
@@ -271,7 +271,7 @@ Returns a parser that wants the input to match `regexp`. Yields an empty string.
 
 ## Parsimmon.succeed(result)
 
-Returns a parser that doesn't consume any input, and yields `result`.
+Returns a parser that doesn't consume any input and yields `result`.
 
 ## Parsimmon.of(result)
 
@@ -279,7 +279,7 @@ This is an alias for `Parsimmon.succeed(result)`.
 
 ## Parsimmon.formatError(string, error)
 
-Takes the `string` passed to `parser.parse(string)` and the `error` returned from `parser.parse(string)` and turns it into a human readable error message string. Note that there are certainly better ways to format errors, so feel free to write your own.
+Takes the `string` passed to `parser.parse(string)` and the `error` returned from `parser.parse(string)` and turns it into a human-readable error message string. Note that there are certainly better ways to format errors, so feel free to write your own.
 
 ## Parsimmon.seq(p1, p2, ...pn)
 
@@ -1006,7 +1006,7 @@ var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x1; });
 
 ## parser.trim(anotherParser)
 
-Expects `anotherParser` before and after `parser`, yielding the result of parser. Useful for trimming comments/whitespace around other parsers.
+Expects `anotherParser` before and after `parser`, yielding the result of the parser. Useful for trimming comments/whitespace around other parsers.
 
 Example:
 
