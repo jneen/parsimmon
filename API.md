@@ -152,7 +152,7 @@ Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
 
 ## Parsimmon(fn)
 
-**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using [`Parsimmon.regexp`]((#parsimmonregexpregexp)) and combination with `Parsimmon.seq` and `Parsimmon.alt`.
+**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using [`Parsimmon.regexp`]((#parsimmonregexpregexp)) and combination with [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and [`Parsimmon.alt`](#parsimmonaltp1-p2-pn).
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon(fn)`. This is an example of how to create a parser that matches any character except the one provided:
 
@@ -288,7 +288,7 @@ Accepts any number of parsers and returns a new parser that expects them to matc
 
 ## Parsimmon.seqMap(p1, p2, ...pn, function(r1, r2, ...rn))
 
-Matches all parsers sequentially, and passes their results as the arguments to a function, yielding the return value of that function. Similar to calling `Parsimmon.seq` and then `.map`, but the values are not put in an array. Example:
+Matches all parsers sequentially, and passes their results as the arguments to a function, yielding the return value of that function. Similar to calling [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and then `.map`, but the values are not put in an array. Example:
 
 ```javascript
 Parsimmon.seqMap(
@@ -357,7 +357,7 @@ Parsimmon.alt(
 // => {status: false, ...}
 ```
 
-In the second case, `Parsimmon.alt` matches on the first parser, then there are extra characters left over (`'b'`), so Parsimmon returns a failure.
+In the second case, [`Parsimmon.alt`](#parsimmonaltp1-p2-pn) matches on the first parser, then there are extra characters left over (`'b'`), so Parsimmon returns a failure.
 
 ## Parsimmon.sepBy(content, separator)
 
@@ -563,7 +563,7 @@ parser.parse('accccc');
 
 # Binary constructors
 
-The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as `Parsimmon.seq`, `Parsimmon.seqObj`, and still have all the same methods as text-based parsers (e.g. `.map`, `.node`, etc.).
+The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as [`Parsimmon.seq`](#parsimmonseqp1-p2-pn), `Parsimmon.seqObj`, and still have all the same methods as text-based parsers (e.g. `.map`, `.node`, etc.).
 
 ## Parsimmon.byte(int)
 
@@ -1359,7 +1359,7 @@ Side effects include pushing to an array, modifying an object, `console.log`, re
 
 Parsimmon expects that parsers and all `.map` statements do not perform side effects (i.e. they are *pure*).
 
-In this example, the parser `pVariable` is called twice on the same text because of `Parsimmon.alt` backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
+In this example, the parser `pVariable` is called twice on the same text because of [`Parsimmon.alt`](#parsimmonaltp1-p2-pn) backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
 
 ```js
 var x = 0;
