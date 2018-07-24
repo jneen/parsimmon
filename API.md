@@ -306,7 +306,7 @@ Parsimmon.seqMap(
 
 ## Parsimmon.seqObj(...args)
 
-Similar to `Parsimmon.seq(...parsers)`, but yields an object of results named based on arguments.
+Similar to [`Parsimmon.seq(...parsers)`](#parsimmonseqp1-p2-pn), but yields an object of results named based on arguments.
 
 Takes one or more arguments, where each argument is either a parser or a named parser pair (`[stringKey, parser]`).
 
@@ -1120,13 +1120,13 @@ parser.map(function(array) {
 
 Equivalent to `parser.tieWith("")`.
 
-Note: `parser.tie()` is usually used after `Parsimmon.seq(...parsers)` or `parser.many()`.
+Note: `parser.tie()` is usually used after [`Parsimmon.seq(...parsers)`]((#parsimmonseqp1-p2-pn)) or [`parser.many()`]((#parsermany)).
 
 ## parser.many()
 
 Expects `parser` zero or more times, and yields an array of the results.
 
-**NOTE:** If `parser`  is capable of parsing an empty string (i.e. `parser.parse("")` succeeds) then `parser.many()` will throw an error. Otherwise `parser.many()` would get stuck in an infinite loop.
+**NOTE:** If `parser`  is capable of parsing an empty string (i.e. `parser.parse("")` succeeds) then [`parser.many()`]((#parsermany)) will throw an error. Otherwise [`parser.many()`]((#parsermany)) would get stuck in an infinite loop.
 
 ## parser.times(n)
 
