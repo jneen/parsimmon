@@ -152,7 +152,7 @@ Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
 
 ## Parsimmon(fn)
 
-**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using [`Parsimmon.regexp`]((#parsimmonregexpregexp)) and combination with [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and [`Parsimmon.alt`](#parsimmonaltp1-p2-pn).
+**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using [`Parsimmon.regexp`](#parsimmonregexpregexp) and combination with [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and [`Parsimmon.alt`](#parsimmonaltp1-p2-pn).
 
 You can add a primitive parser (similar to the included ones) by using [`Parsimmon(fn)`](#parsimmonfn). This is an example of how to create a parser that matches any character except the one provided:
 
@@ -1120,13 +1120,13 @@ parser.map(function(array) {
 
 Equivalent to [`parser.tieWith("")`](#parsertiewithseparator).
 
-Note: `parser.tie()` is usually used after [`Parsimmon.seq(...parsers)`]((#parsimmonseqp1-p2-pn)) or [`parser.many()`]((#parsermany)).
+Note: `parser.tie()` is usually used after [`Parsimmon.seq(...parsers)`](#parsimmonseqp1-p2-pn) or [`parser.many()`](#parsermany).
 
 ## parser.many()
 
 Expects `parser` zero or more times, and yields an array of the results.
 
-**NOTE:** If `parser`  is capable of parsing an empty string (i.e. `parser.parse("")` succeeds) then [`parser.many()`]((#parsermany)) will throw an error. Otherwise [`parser.many()`]((#parsermany)) would get stuck in an infinite loop.
+**NOTE:** If `parser`  is capable of parsing an empty string (i.e. `parser.parse("")` succeeds) then [`parser.many()`](#parsermany) will throw an error. Otherwise [`parser.many()`](#parsermany) would get stuck in an infinite loop.
 
 ## parser.times(n)
 
