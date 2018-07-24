@@ -101,11 +101,11 @@
 
 ## Yields
 
-When the documentation says a function *yields an array of strings*, it means the function returns a parser that when called with `.parse` will return an object containing the array of strings.
+When the documentation says a function *yields an array of strings*, it means the function returns a parser that when called with [`.parse`](#parserparseinput) will return an object containing the array of strings.
 
 ## Input
 
-The string passed to `.parse` is called the *input*.
+The string passed to [`.parse`](#parserparseinput) is called the *input*.
 
 ## Consumes
 
@@ -152,9 +152,9 @@ Lang.Value.tryParse('(list 1 2 foo (list nice 3 56 989 asdasdas))');
 
 ## Parsimmon(fn)
 
-**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using `Parsimmon.regexp` and combination with `Parsimmon.seq` and `Parsimmon.alt`.
+**NOTE:** You probably will _never_ need to use this function. Most parsing can be accomplished using [`Parsimmon.regexp`]((#parsimmonregexpregexp)) and combination with [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and [`Parsimmon.alt`](#parsimmonaltp1-p2-pn).
 
-You can add a primitive parser (similar to the included ones) by using `Parsimmon(fn)`. This is an example of how to create a parser that matches any character except the one provided:
+You can add a primitive parser (similar to the included ones) by using [`Parsimmon(fn)`](#parsimmonfn). This is an example of how to create a parser that matches any character except the one provided:
 
 ```javascript
 function notChar(char) {
@@ -181,15 +181,15 @@ parser.parse('accccc');
 
 ## Parsimmon.Parser(fn)
 
-Alias of `Parsimmon(fn)` for backwards compatibility.
+Alias of [`Parsimmon(fn)`](#parsimmonfn) for backward compatibility.
 
 ## Parsimmon.makeSuccess(index, value)
 
-To be used inside of `Parsimmon(fn)`. Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for `Parsimmon(fn)`.
+To be used inside of [`Parsimmon(fn)`](#parsimmonfn). Generates an object describing how far the successful parse went (`index`), and what `value` it created doing so. See documentation for [`Parsimmon(fn)`](#parsimmonfn).
 
 ## Parsimmon.makeFailure(furthest, expectation)
 
-To be used inside of `Parsimmon(fn)`. Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). The expected value may also be an array of different values.  See documentation for `Parsimmon(fn)`.
+To be used inside of [`Parsimmon(fn)`](#parsimmonfn). Generates an object describing how far the unsuccessful parse went (`index`), and what kind of syntax it expected to see (`expectation`). The expected value may also be an array of different values.  See documentation for [`Parsimmon(fn)`](#parsimmonfn).
 
 ## Parsimmon.isParser(obj)
 
@@ -205,11 +205,11 @@ Returns a parser that looks for exactly one character from `string`, and yields 
 
 ## Parsimmon.noneOf(string)
 
-Returns a parser that looks for exactly one character *NOT* from `string`, and yields that character.
+Returns a parser that looks for precisely one character *NOT* from `string`, and yields that character.
 
 ## Parsimmon.range(begin, end)
 
-Parsers a single character in from `begin` to `end`, inclusive.
+Parses a single character from `begin` to `end`, inclusive.
 
 Example:
 
@@ -247,15 +247,15 @@ Returns a parser that looks for a match to the regexp and yields the entire text
 
 ## Parsimmon.regexp(regexp, group)
 
-Like `Parsimmon.regexp(regexp)`, but yields only the text in the specific regexp match `group`, rather than the match of the entire regexp.
+Like [`Parsimmon.regexp(regexp)`](#parsimmonregexpregexp), but yields only the text in the specific regexp match `group`, rather than the match of the entire regexp.
 
 ## Parsimmon.regex
 
-This is an alias for `Parsimmon.regexp`.
+This is an alias for [`Parsimmon.regexp`](#parsimmonregexpregexp).
 
 ## Parsimmon.notFollowedBy(parser)
 
-Parses using `parser`, but does not consume what it parses. Yields `null` if the parser *does not match* the input. Otherwise it fails.
+Parses using `parser`, but does not consume what it parses. Yields `null` if the parser *does not match* the input. Otherwise, it fails.
 
 ## Parsimmon.lookahead(parser)
 
@@ -271,7 +271,7 @@ Returns a parser that wants the input to match `regexp`. Yields an empty string.
 
 ## Parsimmon.succeed(result)
 
-Returns a parser that doesn't consume any input, and yields `result`.
+Returns a parser that doesn't consume any input and yields `result`.
 
 ## Parsimmon.of(result)
 
@@ -279,7 +279,7 @@ This is an alias for `Parsimmon.succeed(result)`.
 
 ## Parsimmon.formatError(string, error)
 
-Takes the `string` passed to `parser.parse(string)` and the `error` returned from `parser.parse(string)` and turns it into a human readable error message string. Note that there are certainly better ways to format errors, so feel free to write your own.
+Takes the `string` passed to `parser.parse(string)` and the `error` returned from `parser.parse(string)` and turns it into a human-readable error message string. Note that there are certainly better ways to format errors, so feel free to write your own.
 
 ## Parsimmon.seq(p1, p2, ...pn)
 
@@ -288,7 +288,7 @@ Accepts any number of parsers and returns a new parser that expects them to matc
 
 ## Parsimmon.seqMap(p1, p2, ...pn, function(r1, r2, ...rn))
 
-Matches all parsers sequentially, and passes their results as the arguments to a function, yielding the return value of that function. Similar to calling `Parsimmon.seq` and then `.map`, but the values are not put in an array. Example:
+Matches all parsers sequentially, and passes their results as the arguments to a function, yielding the return value of that function. Similar to calling [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and then `.map`, but the values are not put in an array. Example:
 
 ```javascript
 Parsimmon.seqMap(
@@ -357,15 +357,15 @@ Parsimmon.alt(
 // => {status: false, ...}
 ```
 
-In the second case, `Parsimmon.alt` matches on the first parser, then there are extra characters left over (`'b'`), so Parsimmon returns a failure.
+In the second case, [`Parsimmon.alt`](#parsimmonaltp1-p2-pn) matches on the first parser, then there are extra characters left over (`'b'`), so Parsimmon returns a failure.
 
 ## Parsimmon.sepBy(content, separator)
 
-See `parser.sepBy(separator)`.
+See [`parser.sepBy(separator)`](#parsersepbyseparator).
 
 ## Parsimmon.sepBy1(content, separator)
 
-See `parser.sepBy1(separator)`.
+See [`parser.sepBy1(separator)`](#parsersepby1separator).
 
 ## Parsimmon.lazy(fn)
 
@@ -398,27 +398,27 @@ Returns a failing parser with the given message.
 
 ## Parsimmon.letter
 
-Equivalent to `Parsimmon.regexp(/[a-z]/i)`.
+Equivalent to [`Parsimmon.regexp(/[a-z]/i)`](#parsimmonregexpregexp).
 
 ## Parsimmon.letters
 
-Equivalent to `Parsimmon.regexp(/[a-z]*/i)`.
+Equivalent to [`Parsimmon.regexp(/[a-z]*/i)`](#parsimmonregexpregexp).
 
 ## Parsimmon.digit
 
-Equivalent to `Parsimmon.regexp(/[0-9]/)`.
+Equivalent to [`Parsimmon.regexp(/[0-9]/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.digits
 
-Equivalent to `Parsimmon.regexp(/[0-9]*/)`.
+Equivalent to [`Parsimmon.regexp(/[0-9]*/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.whitespace
 
-Equivalent to `Parsimmon.regexp(/\s+/)`.
+Equivalent to [`Parsimmon.regexp(/\s+/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.optWhitespace
 
-Equivalent to `Parsimmon.regexp(/\s*/)`.
+Equivalent to [`Parsimmon.regexp(/\s*/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.cr
 
@@ -532,7 +532,7 @@ CustomString.parse('%<a string>'); // => {status: true, value: 'a string'}
 
 ## Parsimmon.custom(fn)
 
-**Deprecated:** Please use `Parsimmon(fn)` going forward.
+**Deprecated:** Please use [`Parsimmon(fn)`](#parsimmonfn) going forward.
 
 You can add a primitive parser (similar to the included ones) by using `Parsimmon.custom`. This is an example of how to create a parser that matches any character except the one provided:
 
@@ -563,7 +563,7 @@ parser.parse('accccc');
 
 # Binary constructors
 
-The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as `Parsimmon.seq`, `Parsimmon.seqObj`, and still have all the same methods as text-based parsers (e.g. `.map`, `.node`, etc.).
+The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as [`Parsimmon.seq`](#parsimmonseqp1-p2-pn), `Parsimmon.seqObj`, and still have all the same methods as text-based parsers (e.g. `.map`, `.node`, etc.).
 
 ## Parsimmon.byte(int)
 
@@ -1006,7 +1006,7 @@ var parserB = Parsimmon.seqMap(p1, p2, function(x1, x2) { return x1; });
 
 ## parser.trim(anotherParser)
 
-Expects `anotherParser` before and after `parser`, yielding the result of parser. Useful for trimming comments/whitespace around other parsers.
+Expects `anotherParser` before and after `parser`, yielding the result of the parser. Useful for trimming comments/whitespace around other parsers.
 
 Example:
 
@@ -1274,7 +1274,7 @@ Returns `Parsimmon.fail("fantasy-land/empty")`.
 
 ## parser.empty()
 
-See `Parsimmon.empty()`.
+See [`Parsimmon.empty()`](#parsimmonempty).
 
 ## parser.concat(otherParser)
 
@@ -1319,7 +1319,7 @@ This is the same as `Parsimmon.sepBy`, but matches the `content` parser **at lea
 
 ## parser.chain(newParserFunc)
 
-See `parser.chain(newParserFunc)` defined earlier.
+See [`parser.chain(newParserFunc)`](#parserchainnewparserfunc) defined earlier.
 
 ## parser.of(result)
 
@@ -1359,7 +1359,7 @@ Side effects include pushing to an array, modifying an object, `console.log`, re
 
 Parsimmon expects that parsers and all `.map` statements do not perform side effects (i.e. they are *pure*).
 
-In this example, the parser `pVariable` is called twice on the same text because of `Parsimmon.alt` backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
+In this example, the parser `pVariable` is called twice on the same text because of [`Parsimmon.alt`](#parsimmonaltp1-p2-pn) backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
 
 ```js
 var x = 0;
