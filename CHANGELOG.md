@@ -1,3 +1,7 @@
+## version ?.?.? (????-??-??)
+
+- Adds links to within documentation
+
 ## version 1.12.0 (2018-07-12)
 
 - Adds `Parsimmon.Binary.buffer(length)`
