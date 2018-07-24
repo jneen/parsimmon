@@ -275,7 +275,7 @@ Returns a parser that doesn't consume any input and yields `result`.
 
 ## Parsimmon.of(result)
 
-This is an alias for `Parsimmon.succeed(result)`.
+This is an alias for [`Parsimmon.succeed(result)`](#parsimmonsucceedresult).
 
 ## Parsimmon.formatError(string, error)
 
@@ -288,7 +288,7 @@ Accepts any number of parsers and returns a new parser that expects them to matc
 
 ## Parsimmon.seqMap(p1, p2, ...pn, function(r1, r2, ...rn))
 
-Matches all parsers sequentially, and passes their results as the arguments to a function, yielding the return value of that function. Similar to calling [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and then `.map`, but the values are not put in an array. Example:
+Matches all parsers sequentially, and passes their results as the arguments to a function, yielding the return value of that function. Similar to calling [`Parsimmon.seq`](#parsimmonseqp1-p2-pn) and then [`.map`](#parsermapfn), but the values are not put in an array. Example:
 
 ```javascript
 Parsimmon.seqMap(
@@ -306,7 +306,7 @@ Parsimmon.seqMap(
 
 ## Parsimmon.seqObj(...args)
 
-Similar to `Parsimmon.seq(...parsers)`, but yields an object of results named based on arguments.
+Similar to [`Parsimmon.seq(...parsers)`](#parsimmonseqp1-p2-pn), but yields an object of results named based on arguments.
 
 Takes one or more arguments, where each argument is either a parser or a named parser pair (`[stringKey, parser]`).
 
@@ -422,19 +422,19 @@ Equivalent to [`Parsimmon.regexp(/\s*/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.cr
 
-Equivalent to `Parsimmon.string("\r")`.
+Equivalent to [`Parsimmon.string("\r")`](#parsimmonstringstring).
 
 This parser checks for the "carriage return" character, which is used as the line terminator for classic Mac OS 9 text files.
 
 ## Parsimmon.lf
 
-Equivalent to `Parsimmon.string("\n")`.
+Equivalent to [`Parsimmon.string("\n")`](#parsimmonstringstring).
 
 This parser checks for the "line feed" character, which is used as the line terminator for Linux and macOS text files.
 
 ## Parsimmon.crlf
 
-Equivalent to `Parsimmon.string("\r\n")`.
+Equivalent to [`Parsimmon.string("\r\n")`](#parsimmonstringstring).
 
 This parser checks for the "carriage return" character followed by the "line feed" character, which is used as the line terminator for Windows text files and HTTP headers.
 
@@ -456,7 +456,7 @@ This flexible parser will match any kind of text file line ending.
 
 Equivalent to `Parsimmon.alt(Parsimmon.newline, Parsimmon.eof)`.
 
-This is the most general purpose "end of line" parser. It allows the "end of file" in addition to all three text file line endings from `Parsimmon.newline`. This is important because text files frequently do not have line terminators at the end ("trailing newline").
+This is the most general purpose "end of line" parser. It allows the "end of file" in addition to all three text file line endings from [`Parsimmon.newline`](#parsimmonnewline). This is important because text files frequently do not have line terminators at the end ("trailing newline").
 
 ## Parsimmon.any
 
@@ -563,7 +563,7 @@ parser.parse('accccc');
 
 # Binary constructors
 
-The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as [`Parsimmon.seq`](#parsimmonseqp1-p2-pn), `Parsimmon.seqObj`, and still have all the same methods as text-based parsers (e.g. `.map`, `.node`, etc.).
+The `Parsimmon.Binary` constructors parse binary content using Node.js Buffers. These constructors can be combined with the normal parser combinators such as [`Parsimmon.seq`](#parsimmonseqp1-p2-pn), [`Parsimmon.seqObj`](#parsimmonseqobjargs), and still have all the same methods as text-based parsers (e.g. [`.map`](#parsermapfn), `.node`, etc.).
 
 ## Parsimmon.byte(int)
 
@@ -1118,15 +1118,15 @@ parser.map(function(array) {
 
 ## parser.tie()
 
-Equivalent to `parser.tieWith("")`.
+Equivalent to [`parser.tieWith("")`](#parsertiewithseparator).
 
-Note: `parser.tie()` is usually used after `Parsimmon.seq(...parsers)` or `parser.many()`.
+Note: `parser.tie()` is usually used after [`Parsimmon.seq(...parsers)`]((#parsimmonseqp1-p2-pn)) or [`parser.many()`]((#parsermany)).
 
 ## parser.many()
 
 Expects `parser` zero or more times, and yields an array of the results.
 
-**NOTE:** If `parser`  is capable of parsing an empty string (i.e. `parser.parse("")` succeeds) then `parser.many()` will throw an error. Otherwise `parser.many()` would get stuck in an infinite loop.
+**NOTE:** If `parser`  is capable of parsing an empty string (i.e. `parser.parse("")` succeeds) then [`parser.many()`]((#parsermany)) will throw an error. Otherwise [`parser.many()`]((#parsermany)) would get stuck in an infinite loop.
 
 ## parser.times(n)
 
@@ -1278,7 +1278,7 @@ See [`Parsimmon.empty()`](#parsimmonempty).
 
 ## parser.concat(otherParser)
 
-Equivalent to `parser.or(otherParser)`.
+Equivalent to [`parser.or(otherParser)`](#parserorotherparser).
 
 ## parser.ap(otherParser)
 
@@ -1323,7 +1323,7 @@ See [`parser.chain(newParserFunc)`](#parserchainnewparserfunc) defined earlier.
 
 ## parser.of(result)
 
-Equivalent to `Parsimmon.of(result)`.
+Equivalent to [`Parsimmon.of(result)`](#parsimmonofresult).
 
 # Tips
 
@@ -1357,9 +1357,9 @@ Do not perform [side effects](https://en.wikipedia.org/wiki/Side_effect_(compute
 
 Side effects include pushing to an array, modifying an object, `console.log`, reading data from outside sources (an array or object used to track things during parsing), or any random numbers.
 
-Parsimmon expects that parsers and all `.map` statements do not perform side effects (i.e. they are *pure*).
+Parsimmon expects that parsers and all [`.map`](#parsermapfn) statements do not perform side effects (i.e. they are *pure*).
 
-In this example, the parser `pVariable` is called twice on the same text because of [`Parsimmon.alt`](#parsimmonaltp1-p2-pn) backtracking, and has a side effect (pushing to an array) inside its `.map` method, so we get two items in the array instead of just one.
+In this example, the parser `pVariable` is called twice on the same text because of [`Parsimmon.alt`](#parsimmonaltp1-p2-pn) backtracking, and has a side effect (pushing to an array) inside its [`.map`](#parsermapfn) method, so we get two items in the array instead of just one.
 
 ```js
 var x = 0;
