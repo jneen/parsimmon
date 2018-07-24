@@ -422,19 +422,19 @@ Equivalent to [`Parsimmon.regexp(/\s*/)`](#parsimmonregexpregexp).
 
 ## Parsimmon.cr
 
-Equivalent to `Parsimmon.string("\r")`.
+Equivalent to [`Parsimmon.string("\r")`](#parsimmonstringstring).
 
 This parser checks for the "carriage return" character, which is used as the line terminator for classic Mac OS 9 text files.
 
 ## Parsimmon.lf
 
-Equivalent to `Parsimmon.string("\n")`.
+Equivalent to [`Parsimmon.string("\n")`](#parsimmonstringstring).
 
 This parser checks for the "line feed" character, which is used as the line terminator for Linux and macOS text files.
 
 ## Parsimmon.crlf
 
-Equivalent to `Parsimmon.string("\r\n")`.
+Equivalent to [`Parsimmon.string("\r\n")`](#parsimmonstringstring).
 
 This parser checks for the "carriage return" character followed by the "line feed" character, which is used as the line terminator for Windows text files and HTTP headers.
 
