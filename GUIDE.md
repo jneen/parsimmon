@@ -1,5 +1,33 @@
 # Parsimmon Guide
 
+## Basics
+
+A Parsimmon parser is an object that represents an action on a stream of text, and the promise of either an object yielded by that action on success or a message in case of failure. For example, `Parsimmon.string('foo')` yields the string `'foo'` if the beginning of the stream is `'foo'`, and otherwise fails.
+
+The method `.map` is used to transform the yielded value. For example,
+
+```javascript
+Parsimmon.string("foo").map(function(x) {
+  return x + "bar";
+});
+```
+
+will yield `'foobar'` if the stream starts with `'foo'`. The parser
+
+```javascript
+Parsimmon.regexp(/[0-9]+/).map(function(x) {
+  return Number(x) * 2;
+});
+```
+
+will yield the number `24` when it encounters the string `'12'`.
+
+Calling `.parse(string)` on a parser parses the string and returns an object with a boolean `status` flag, indicating whether the parse succeeded. If it succeeded, the `value` attribute will contain the yielded value. Otherwise, the `index` and `expected` attributes will contain the index of the parse error (with `offset`, `line` and `column` properties), and a sorted, unique array of messages indicating what was expected.
+
+The error object can be passed along with the original source to `Parsimmon.formatError(source, error)` to obtain a human-readable error string.
+
+Note: If you prefer throwing an error when the parse failed, call [`.tryParse(string)`](API.md#parsertryparseinput) instead. The returned value will be the parsing result itself when succeeded.
+
 ## Parsing indentation sensitive languages
 
 Parsing languages with context like Python or Markdown which use indentation to keep track of nesting structure works best with creating a constructor function around your call to `Parsimmon.createLanguage`:
