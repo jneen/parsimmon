@@ -29,11 +29,25 @@ console.log(ast);
 
 The general idea is to take context in at the top level and construct new languages inside of your language each time you nest indentation. For a complete example, [please read](examples/python-ish.js).
 
-## TODO: Performance tips
+## Handling Bad Input
 
-> Some performance tips. Which constructions should be considered dangerous performance-wise?
+It's always a good idea to get line number information when parsing so that if there's a problem later on you can tell users which line of input caused the problem.
 
-I want to answer this one, but honestly don't even really know where to start. It's not something I look at much.
+In general, you should keep parsing everything and label everything with line information, then have a separate phase where error checking is performed.
+
+Only fail a parse if the rest of the document couldn't possibly make sense.
+
+## RegExp Matching
+
+`Parsimmon.regexp` is fast. If you need to match a large chunk of characters like whitespace, use it instead of character-oriented parsers:
+
+```js
+// Fast! Capture as much text using a RegExp as possible
+const fastWhitespace = Parsimmon.regexp(/[ \t\r\n]*/);
+
+// Slow! Have to examine one character at a time and make an array
+const slowWhitespace = Parsimmon.oneOf(" \t\r\n").many().tie();
+```
 
 ## Negative constructions
 
@@ -98,7 +112,3 @@ You could make a helper function to wrap `r._` around everything... but then you
 The same sort of situation can easily apply to parsing leading whitespace and newlines to separate lines of code, especially when comments get in the mix.
 
 Overall, I would suggest making each parser parse the smallest thing possible that makes sense for its name.
-
-## TODO
-
-??? Anything else
