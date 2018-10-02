@@ -37,7 +37,8 @@ npm install --save parsimmon
 
 ## API Documentation
 
-[Full API documentation in `API.md`.][api]
+- [Full API documentation in `API.md`.](API.md)
+- [Guide with additional questions](GUIDE.md)
 
 ## Examples
 
@@ -111,7 +112,6 @@ Parsimmon is also compatible with [fantasyland][]. It implements Semigroup, Appl
 [@laughinghan]: https://github.com/laughinghan
 [@jneen]: https://github.com/jneen
 [@wavebeem]: https://github.com/wavebeem
-[api]: https://github.com/jneen/parsimmon/blob/master/API.md
 [examples]: https://github.com/jneen/parsimmon/tree/master/examples
 [unpkg homepage]: https://unpkg.com/#/
 [unpkg version]: https://unpkg.com/parsimmon
