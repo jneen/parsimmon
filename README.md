@@ -41,8 +41,9 @@ npm install --save parsimmon
 
 ## API Documentation
 
-- [Full API documentation in `API.md`.](API.md)
+- [Full API documentation in `API.md`](API.md)
 - [Guide with additional questions](GUIDE.md)
+- [Tutorial by Max Tagher](https://medium.com/mercury-bank/a-magic-date-input-using-parser-combinators-in-typescript-3c779741bf4c)
 
 ## Examples
 
