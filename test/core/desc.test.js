@@ -1,7 +1,7 @@
 "use strict";
 
-suite("desc", function() {
-  test("allows custom error messages", function() {
+describe("desc", function() {
+  it("allows custom error messages", function() {
     var x = Parsimmon.string("x").desc("the letter x");
     var y = Parsimmon.string("y").desc("the letter y");
     var parser = x.then(y);
@@ -27,7 +27,7 @@ suite("desc", function() {
     });
   });
 
-  test("allows tagging with `lazy`", function() {
+  it("allows tagging with `lazy`", function() {
     var x = Parsimmon.lazy("the letter x", function() {
       return Parsimmon.string("x");
     });
@@ -57,7 +57,7 @@ suite("desc", function() {
     });
   });
 
-  test("allows multiple descriptions to be passed as an array", function() {
+  it("allows multiple descriptions to be passed as an array", function() {
     var x = Parsimmon.oneOf("xyz")
       .desc(["x", "y", "z"])
       .atLeast(1);

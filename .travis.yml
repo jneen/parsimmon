@@ -6,5 +6,11 @@ node_js:
   - "8"
   - "7"
   - "6"
+test:
+  - npm test
+  - npm run build
+  - npm run test:chrome
 after_success: npm run coverage
 cache: npm
+addons:
+  chrome: stable

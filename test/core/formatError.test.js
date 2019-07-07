@@ -8,8 +8,8 @@ function fill(length, filler) {
   return res;
 }
 
-suite("formatError", function() {
-  test("end of input", function() {
+describe("formatError", function() {
+  it("end of input", function() {
     var parser = Parsimmon.alt(
       Parsimmon.fail("a"),
       Parsimmon.fail("b"),
@@ -29,7 +29,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("middle of input", function() {
+  it("middle of input", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("1"),
       Parsimmon.alt(
@@ -52,7 +52,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("milti-line input", function() {
+  it("milti-line input", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("\n")
         .many()
@@ -77,7 +77,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("multi-line line-number padding", function() {
+  it("multi-line line-number padding", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("\n")
         .many()
@@ -102,7 +102,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("multi-line line-number with 3-digits", function() {
+  it("multi-line line-number with 3-digits", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("\n")
         .many()
@@ -129,7 +129,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("multi-line line-number with 3-digit to 4-digit line numbers", function() {
+  it("multi-line line-number with 3-digit to 4-digit line numbers", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("\n")
         .many()
@@ -155,7 +155,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("byte buffer error at the end of the short input", function() {
+  it("byte buffer error at the end of the short input", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x00).many(),
       Parsimmon.Binary.byte(0x01)
@@ -179,7 +179,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("byte buffer error with a value one character long", function() {
+  it("byte buffer error with a value one character long", function() {
     var parser = Parsimmon.seq(Parsimmon.Binary.byte(0x1));
 
     var expectation =
@@ -200,7 +200,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("byte buffer error with multi-line input", function() {
+  it("byte buffer error with multi-line input", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x00).many(),
       Parsimmon.Binary.byte(0x01)
@@ -252,7 +252,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("byte buffer error at the first line of the multi-line input", function() {
+  it("byte buffer error at the first line of the multi-line input", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x00).many(),
       Parsimmon.Binary.byte(0x01)
@@ -280,7 +280,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("byte buffer error at the end of the multi-line input", function() {
+  it("byte buffer error at the end of the multi-line input", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x00).many(),
       Parsimmon.Binary.byte(0x01)
@@ -324,7 +324,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("parsing error in a large byte buffer", function() {
+  it("parsing error in a large byte buffer", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x00).many(),
       Parsimmon.Binary.byte(0x01)
@@ -370,7 +370,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("error marker is padded with correctly in an error on a fourth byte", function() {
+  it("error marker is padded with correctly in an error on a fourth byte", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x01),
       Parsimmon.Binary.byte(0x00),
@@ -398,7 +398,7 @@ suite("formatError", function() {
     assert.deepEqual(answer, expectation);
   });
 
-  test("error marker is padded with correctly in an error on a fifth byte", function() {
+  it("error marker is padded with correctly in an error on a fifth byte", function() {
     var parser = Parsimmon.seq(
       Parsimmon.Binary.byte(0x01),
       Parsimmon.Binary.byte(0x00),

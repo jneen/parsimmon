@@ -1,7 +1,7 @@
 "use strict";
 
-suite("map", function() {
-  test("with a function, pipes the value in and uses that return value", function() {
+describe("map", function() {
+  it("with a function, pipes the value in and uses that return value", function() {
     var piped;
     var parser = Parsimmon.string("x").map(function(x) {
       piped = x;
@@ -11,7 +11,7 @@ suite("map", function() {
     assert.equal(piped, "x");
   });
 
-  test("asserts that a function was given", function() {
+  it("asserts that a function was given", function() {
     assert.throws(function() {
       Parsimmon.string("x").map("not a function");
     });

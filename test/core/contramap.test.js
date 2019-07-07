@@ -1,6 +1,6 @@
 "use strict";
 
-suite("contramap", function() {
+describe("contramap", function() {
   function toLower(x) {
     return x.toLowerCase();
   }
@@ -9,20 +9,20 @@ suite("contramap", function() {
     return b.toString("ascii");
   }
 
-  test("with a function, transforms the input and parses that", function() {
+  it("with a function, transforms the input and parses that", function() {
     var parser = Parsimmon.string("x").contramap(function(x) {
       return x.toLowerCase();
     });
     assert.deepEqual(parser.parse("X"), { status: true, value: "x" });
   });
 
-  test("asserts that a function was given", function() {
+  it("asserts that a function was given", function() {
     assert.throws(function() {
       Parsimmon.string("x").contramap("not a function");
     });
   });
 
-  test("upholds contravariant law of composition", function() {
+  it("upholds contravariant law of composition", function() {
     var parser1 = Parsimmon.string("a")
       .contramap(toLower)
       .contramap(chrs);
@@ -34,7 +34,7 @@ suite("contramap", function() {
     assert.deepEqual(parser1.parse(input), parser2.parse(input));
   });
 
-  test("embedded contramaps make sense", function() {
+  it("embedded contramaps make sense", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("a"),
       Parsimmon.seq(Parsimmon.string("c"), Parsimmon.string("d"))
@@ -47,7 +47,7 @@ suite("contramap", function() {
     assert.deepEqual(parser.parse("abcd"), { status: true, value: "acd" });
   });
 
-  test("backtracking with contramaps works", function() {
+  it("backtracking with contramaps works", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("a"),
       Parsimmon.seq(Parsimmon.string("c"), Parsimmon.string("d"))

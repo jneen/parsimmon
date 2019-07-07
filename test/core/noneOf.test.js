@@ -1,7 +1,7 @@
 "use strict";
 
-suite("noneOf", function() {
-  test("matches EVERYTHING BUT the characters specified", function() {
+describe("noneOf", function() {
+  it("matches EVERYTHING BUT the characters specified", function() {
     var parser = Parsimmon.noneOf("abc");
     var a = "a".charCodeAt(0);
     var c = "c".charCodeAt(0);

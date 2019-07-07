@@ -2,8 +2,8 @@
 
 var H = require("../helpers");
 
-suite("Fantasy Land Semigroup", function() {
-  test("associativity", function() {
+describe("Fantasy Land Semigroup", function() {
+  it("associativity", function() {
     var a = Parsimmon.string("a");
     var b = Parsimmon.string("b");
     var c = Parsimmon.string("c");

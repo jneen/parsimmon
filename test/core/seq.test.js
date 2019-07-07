@@ -1,6 +1,6 @@
 "use strict";
 
-test("Parsimmon.seq", function() {
+it("Parsimmon.seq", function() {
   var parser = Parsimmon.seq(
     Parsimmon.string("("),
     Parsimmon.regexp(/[^)]/)

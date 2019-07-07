@@ -1,6 +1,6 @@
 "use strict";
 
-test("Parsimmon.string", function() {
+it("Parsimmon.string", function() {
   var parser = Parsimmon.string("x");
   var res = parser.parse("x");
   assert.ok(res.status);

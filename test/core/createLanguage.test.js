@@ -1,15 +1,15 @@
 "use strict";
 
-suite("Parsimmon.createLanguage", function() {
-  setup(function() {
+describe("Parsimmon.createLanguage", function() {
+  before(function() {
     Object.prototype.NASTY = "dont extend Object.prototype please";
   });
 
-  teardown(function() {
+  after(function() {
     delete Object.prototype.NASTY;
   });
 
-  test("should return an object of parsers", function() {
+  it("should return an object of parsers", function() {
     var lang = Parsimmon.createLanguage({
       a: function() {
         return Parsimmon.string("a");
@@ -22,7 +22,7 @@ suite("Parsimmon.createLanguage", function() {
     assert.ok(Parsimmon.isParser(lang.b));
   });
 
-  test("should allow direct recursion in parsers", function() {
+  it("should allow direct recursion in parsers", function() {
     var lang = Parsimmon.createLanguage({
       Parentheses: function(r) {
         return Parsimmon.alt(
@@ -36,7 +36,7 @@ suite("Parsimmon.createLanguage", function() {
     lang.Parentheses.tryParse("(((())))");
   });
 
-  test("should ignore non-own properties", function() {
+  it("should ignore non-own properties", function() {
     var obj = Object.create({
       foo: function() {
         return Parsimmon.of(1);
@@ -46,7 +46,7 @@ suite("Parsimmon.createLanguage", function() {
     assert.strictEqual(lang.foo, undefined);
   });
 
-  test("should allow indirect recursion in parsers", function() {
+  it("should allow indirect recursion in parsers", function() {
     var lang = Parsimmon.createLanguage({
       Value: function(r) {
         return Parsimmon.alt(r.Number, r.Symbol, r.List);

@@ -1,7 +1,7 @@
 "use strict";
 
-suite("Parsimmon.seqObj", function() {
-  test("does not accept duplicate keys", function() {
+describe("Parsimmon.seqObj", function() {
+  it("does not accept duplicate keys", function() {
     assert.throws(function() {
       Parsimmon.seqObj(
         ["a", Parsimmon.of(1)],
@@ -11,13 +11,13 @@ suite("Parsimmon.seqObj", function() {
     });
   });
 
-  test("requires at least one key", function() {
+  it("requires at least one key", function() {
     assert.throws(function() {
       Parsimmon.seqObj();
     });
   });
 
-  test("every key is present in the result object", function() {
+  it("every key is present in the result object", function() {
     var parser = Parsimmon.seqObj(
       ["a", Parsimmon.of(1)],
       ["b", Parsimmon.of(2)],
@@ -31,7 +31,7 @@ suite("Parsimmon.seqObj", function() {
     });
   });
 
-  test("every parser is used", function() {
+  it("every parser is used", function() {
     var parser = Parsimmon.seqObj(
       ["a", Parsimmon.of(1)],
       ["b", Parsimmon.of(2)],
@@ -41,7 +41,7 @@ suite("Parsimmon.seqObj", function() {
     assert.strictEqual(result.status, false);
   });
 
-  test("every parser is used", function() {
+  it("every parser is used", function() {
     var parser = Parsimmon.seqObj(
       Parsimmon.string("a"),
       ["b", Parsimmon.string("b")],
@@ -56,7 +56,7 @@ suite("Parsimmon.seqObj", function() {
     });
   });
 
-  test("named parser arrays are formed properly", function() {
+  it("named parser arrays are formed properly", function() {
     assert.throws(function() {
       Parsimmon.seqObj([]);
     });
@@ -74,7 +74,7 @@ suite("Parsimmon.seqObj", function() {
     });
   });
 
-  test("accepts 'constructor' as a key", function() {
+  it("accepts 'constructor' as a key", function() {
     var parser = Parsimmon.seqObj(["constructor", Parsimmon.of(1)]);
     var result = parser.tryParse("");
     assert.deepStrictEqual(result, {

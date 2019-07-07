@@ -2,8 +2,8 @@
 
 var H = require("../helpers");
 
-suite("Fantasy Land Functor", function() {
-  test("identity", function() {
+describe("Fantasy Land Functor", function() {
+  it("identity", function() {
     var p1 = Parsimmon.digits;
     var p2 = Parsimmon.digits.map(function(x) {
       return x;
@@ -11,7 +11,7 @@ suite("Fantasy Land Functor", function() {
     H.equivalentParsers(p1, p2, ["091", "111111", "46782792", "oops"]);
   });
 
-  test("composition", function() {
+  it("composition", function() {
     function increment(x) {
       return x + 1;
     }

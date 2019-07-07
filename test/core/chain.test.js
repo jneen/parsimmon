@@ -1,7 +1,7 @@
 "use strict";
 
-suite("chain", function() {
-  test("asserts that a parser is returned", function() {
+describe("chain", function() {
+  it("asserts that a parser is returned", function() {
     var parser1 = Parsimmon.letter.chain(function() {
       return "not a parser";
     });
@@ -14,7 +14,7 @@ suite("chain", function() {
     });
   });
 
-  test("with a function that returns a parser, continues with that parser", function() {
+  it("with a function that returns a parser, continues with that parser", function() {
     var piped;
     var parser = Parsimmon.string("x").chain(function(x) {
       piped = x;

@@ -1,6 +1,6 @@
 "use strict";
 
-test("Parsimmon.makeSuccess", function() {
+it("Parsimmon.makeSuccess", function() {
   var index = 11;
   var value = "a lucky number";
   var result = Parsimmon.makeSuccess(index, value);

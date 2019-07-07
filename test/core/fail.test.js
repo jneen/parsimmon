@@ -1,10 +1,10 @@
 "use strict";
 
-suite("fail", function() {
+describe("fail", function() {
   var fail = Parsimmon.fail;
   var succeed = Parsimmon.succeed;
 
-  test("use Parsimmon.fail to fail dynamically", function() {
+  it("use Parsimmon.fail to fail dynamically", function() {
     var parser = Parsimmon.any
       .chain(function(ch) {
         return fail("a character besides " + ch);
@@ -23,7 +23,7 @@ suite("fail", function() {
     assert.equal(parser.parse("x").value, "x");
   });
 
-  test("use Parsimmon.succeed or Parsimmon.fail to branch conditionally", function() {
+  it("use Parsimmon.succeed or Parsimmon.fail to branch conditionally", function() {
     var allowedOperator;
 
     var parser = Parsimmon.string("x")

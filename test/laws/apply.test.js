@@ -2,8 +2,8 @@
 
 var H = require("../helpers");
 
-suite("Fantasy Land Apply", function() {
-  test("composition", function() {
+describe("Fantasy Land Apply", function() {
+  it("composition", function() {
     function reverse(s) {
       return s
         .split("")

@@ -1,6 +1,6 @@
 "use strict";
 
-suite("Parsimmon.sepBy/sepBy1", function() {
+describe("Parsimmon.sepBy/sepBy1", function() {
   var chars = Parsimmon.regexp(/[a-zA-Z]+/);
   var comma = Parsimmon.string(",");
   var csvSep = Parsimmon.sepBy(chars, comma);
@@ -8,7 +8,7 @@ suite("Parsimmon.sepBy/sepBy1", function() {
   var csvSepB = chars.sepBy(comma);
   var csvSep1B = chars.sepBy1(comma);
 
-  test("successful, returns an array of parsed elements", function() {
+  it("successful, returns an array of parsed elements", function() {
     var input = "Heres,a,csv,string,in,our,restrictive,dialect";
     var output = [
       "Heres",
@@ -35,7 +35,7 @@ suite("Parsimmon.sepBy/sepBy1", function() {
     });
   });
 
-  test("sepBy succeeds with the empty list on empty input, sepBy1 fails", function() {
+  it("sepBy succeeds with the empty list on empty input, sepBy1 fails", function() {
     assert.deepEqual(csvSep.parse("").value, []);
     assert.deepEqual(csvSepB.parse("").value, []);
     var failure = {
@@ -51,7 +51,7 @@ suite("Parsimmon.sepBy/sepBy1", function() {
     assert.deepEqual(csvSep1B.parse(""), failure);
   });
 
-  test("does not tolerate trailing separators", function() {
+  it("does not tolerate trailing separators", function() {
     var input = "Heres,a,csv,with,a,trailing,comma,";
     var output = {
       status: false,

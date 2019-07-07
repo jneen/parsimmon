@@ -2,8 +2,8 @@
 
 var H = require("../helpers");
 
-suite("Fantasy Land Applicative", function() {
-  test("identity", function() {
+describe("Fantasy Land Applicative", function() {
+  it("identity", function() {
     var p1 = Parsimmon.any;
     var p2 = p1.ap(
       Parsimmon.of(function(x) {
@@ -13,7 +13,7 @@ suite("Fantasy Land Applicative", function() {
     H.equivalentParsers(p1, p2, ["x", "z", "æ", "1", ""]);
   });
 
-  test("homomorphism", function() {
+  it("homomorphism", function() {
     function fn(s) {
       return s.toUpperCase();
     }
@@ -23,7 +23,7 @@ suite("Fantasy Land Applicative", function() {
     assert.deepEqual(p1.parse(""), p2.parse(""));
   });
 
-  test("interchange", function() {
+  it("interchange", function() {
     function increment(x) {
       return x + 1;
     }

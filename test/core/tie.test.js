@@ -1,7 +1,7 @@
 "use strict";
 
-suite("parser.tie()", function() {
-  test("concatenates all the results", function() {
+describe("parser.tie()", function() {
+  it("concatenates all the results", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("<| "),
       Parsimmon.letter,
@@ -13,7 +13,7 @@ suite("parser.tie()", function() {
     assert.strictEqual(result, text);
   });
 
-  test("only accept array of string parsers", function() {
+  it("only accept array of string parsers", function() {
     assert.throws(function() {
       Parsimmon.of(1)
         .tie()

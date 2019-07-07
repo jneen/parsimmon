@@ -1,19 +1,19 @@
 "use strict";
 
-suite("Parsimmon.lookahead", function() {
-  test("should handle a string", function() {
+describe("Parsimmon.lookahead", function() {
+  it("should handle a string", function() {
     Parsimmon.lookahead("");
   });
 
-  test("should handle a regexp", function() {
+  it("should handle a regexp", function() {
     Parsimmon.lookahead(/./);
   });
 
-  test("should handle a parser", function() {
+  it("should handle a parser", function() {
     Parsimmon.lookahead(Parsimmon.digit);
   });
 
-  test("can be chained as prototype", function() {
+  it("can be chained as prototype", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("abc").lookahead("d"),
       Parsimmon.string("d")
@@ -22,7 +22,7 @@ suite("Parsimmon.lookahead", function() {
     assert.deepEqual(answer.value, ["abc", "d"]);
   });
 
-  test("does not consume from a string", function() {
+  it("does not consume from a string", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("abc"),
       Parsimmon.lookahead("d"),
@@ -32,7 +32,7 @@ suite("Parsimmon.lookahead", function() {
     assert.deepEqual(answer.value, ["abc", "", "d"]);
   });
 
-  test("does not consume from a regexp", function() {
+  it("does not consume from a regexp", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("abc"),
       Parsimmon.lookahead(/d/),
@@ -42,7 +42,7 @@ suite("Parsimmon.lookahead", function() {
     assert.deepEqual(answer.value, ["abc", "", "d"]);
   });
 
-  test("does not consume from a parser", function() {
+  it("does not consume from a parser", function() {
     var weirdParser = Parsimmon.string("Q").or(Parsimmon.string("d"));
     var parser = Parsimmon.seq(
       Parsimmon.string("abc"),
@@ -53,7 +53,7 @@ suite("Parsimmon.lookahead", function() {
     assert.deepEqual(answer.value, ["abc", "", "d"]);
   });
 
-  test("raises error if argument is not a string, regexp, or parser", function() {
+  it("raises error if argument is not a string, regexp, or parser", function() {
     assert.throws(function() {
       Parsimmon.lookahead({});
     });

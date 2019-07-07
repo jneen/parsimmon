@@ -1,6 +1,6 @@
 "use strict";
 
-test("Parsimmon.alt", function() {
+it("Parsimmon.alt", function() {
   var toNode = function(nodeType) {
     return function(value) {
       return { type: nodeType, value: value };

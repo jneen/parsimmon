@@ -1,6 +1,6 @@
 "use strict";
 
-test(".empty()", function() {
+it(".empty()", function() {
   var emptyParse = {
     status: false,
     expected: ["fantasy-land/empty"],

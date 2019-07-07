@@ -1,7 +1,7 @@
 "use strict";
 
-suite(".parse", function() {
-  test("Unique and sorted .expected array", function() {
+describe(".parse", function() {
+  it("Unique and sorted .expected array", function() {
     var parser = Parsimmon.alt(
       Parsimmon.fail("c"),
       Parsimmon.fail("a"),
@@ -15,7 +15,7 @@ suite(".parse", function() {
     assert.deepEqual(result.expected, ["a", "b", "c"]);
   });
 
-  test("throws when given a non-string argument", function() {
+  it("throws when given a non-string argument", function() {
     assert.throws(function() {
       Parsimmon.of("kaboom").parse(0);
     });

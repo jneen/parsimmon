@@ -1,7 +1,7 @@
 "use strict";
 
-suite("oneOf", function() {
-  test("matches ONLY the characters specified", function() {
+describe("oneOf", function() {
+  it("matches ONLY the characters specified", function() {
     var parser = Parsimmon.oneOf("abc");
     var a = "a".charCodeAt(0);
     var c = "c".charCodeAt(0);

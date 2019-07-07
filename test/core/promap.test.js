@@ -1,6 +1,6 @@
 "use strict";
 
-suite("promap", function() {
+describe("promap", function() {
   function toLower(x) {
     return x.toLowerCase();
   }
@@ -21,12 +21,12 @@ suite("promap", function() {
     return x - 1;
   }
 
-  test("with a function, transforms the input and parses that, and transforms the output", function() {
+  it("with a function, transforms the input and parses that, and transforms the output", function() {
     var parser = Parsimmon.string("a").promap(toLower, ord);
     assert.deepEqual(parser.parse("A"), { status: true, value: 0x61 });
   });
 
-  test("asserts that a function was given", function() {
+  it("asserts that a function was given", function() {
     assert.throws(function() {
       Parsimmon.string("x").promap("not a function", toLower);
     });
@@ -36,7 +36,7 @@ suite("promap", function() {
     });
   });
 
-  test("upholds profunctor law of composition", function() {
+  it("upholds profunctor law of composition", function() {
     var parser1 = Parsimmon.string("aa")
       .promap(toLower, length)
       .promap(chrs, sub1);
