@@ -1,6 +1,7 @@
-## version ?.?.? (????-??-??)
+## version 1.12.1 (2019-07-07)
 
-- Adds links to within documentation
+- Adds links within documentation
+- Fixes standalone browser version to not crash on load because Buffer is not defined
 
 ## version 1.12.0 (2018-07-12)
 
