@@ -1,7 +1,7 @@
 "use strict";
 
-suite("Fantasy Land Chain", function() {
-  test("associativity", function() {
+describe("Fantasy Land Chain", function() {
+  it("associativity", function() {
     function appender(x) {
       return function(xs) {
         return Parsimmon.of(xs.concat(x));

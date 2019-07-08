@@ -1,7 +1,7 @@
 "use strict";
 
-suite("Fantasy Land Monad", function() {
-  test("left identity", function() {
+describe("Fantasy Land Monad", function() {
+  it("left identity", function() {
     function upperCase(x) {
       return Parsimmon.of(x.toUpperCase());
     }
@@ -18,7 +18,7 @@ suite("Fantasy Land Monad", function() {
     assert.deepEqual(out1, output);
   });
 
-  test("right identity", function() {
+  it("right identity", function() {
     var input = "monad burrito";
     var output = {
       status: true,

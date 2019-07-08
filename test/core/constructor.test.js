@@ -1,7 +1,7 @@
 "use strict";
 
-suite("Parsimmon()", function() {
-  test("should work in general", function() {
+describe("Parsimmon()", function() {
+  it("should work in general", function() {
     var good = "just a Q";
     var bad = "all I wanted was a Q";
     var justQ = Parsimmon(function(str, i) {
@@ -28,7 +28,7 @@ suite("Parsimmon()", function() {
     });
   });
 
-  test("unsafeUnion works on poorly formatted custom parser", function() {
+  it("unsafeUnion works on poorly formatted custom parser", function() {
     var p1 = Parsimmon.string("a").or(Parsimmon.string("b"));
     var p2 = Parsimmon(function(str, i) {
       return {

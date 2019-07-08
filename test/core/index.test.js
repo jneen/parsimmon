@@ -1,6 +1,6 @@
 "use strict";
 
-test("index", function() {
+it("index", function() {
   var parser = Parsimmon.regexp(/^[x\n]*/).then(Parsimmon.index);
   assert.deepEqual(parser.parse("").value, {
     offset: 0,

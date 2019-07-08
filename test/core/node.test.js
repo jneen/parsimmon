@@ -1,6 +1,6 @@
 "use strict";
 
-test(".node(name)", function() {
+it(".node(name)", function() {
   var ys = Parsimmon.regexp(/^y*/).node("Y");
   var parser = ys.trim(Parsimmon.optWhitespace);
   assert.deepEqual(parser.parse("").value, {

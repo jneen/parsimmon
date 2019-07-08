@@ -1,13 +1,13 @@
 "use strict";
 
-suite("times", function() {
-  test("zero case", function() {
+describe("times", function() {
+  it("zero case", function() {
     var zeroLetters = Parsimmon.letter.times(0);
     assert.deepEqual(zeroLetters.parse("").value, []);
     assert.ok(!zeroLetters.parse("x").status);
   });
 
-  test("nonzero case", function() {
+  it("nonzero case", function() {
     var threeLetters = Parsimmon.letter.times(3);
     assert.deepEqual(threeLetters.parse("xyz").value, ["x", "y", "z"]);
     assert.ok(!threeLetters.parse("xy").status);
@@ -19,7 +19,7 @@ suite("times", function() {
     assert.ok(!thenDigit.parse("xyzw").status);
   });
 
-  test("with a min and max", function() {
+  it("with a min and max", function() {
     var someLetters = Parsimmon.letter.times(2, 4);
     assert.deepEqual(someLetters.parse("xy").value, ["x", "y"]);
     assert.deepEqual(someLetters.parse("xyz").value, ["x", "y", "z"]);
@@ -36,7 +36,7 @@ suite("times", function() {
     assert.ok(!thenDigit.parse("x1").status);
   });
 
-  test("checks that argument types are correct", function() {
+  it("checks that argument types are correct", function() {
     assert.throws(function() {
       Parsimmon.string("x").times("not a number");
     });
@@ -51,7 +51,7 @@ suite("times", function() {
     });
   });
 
-  test("prefer longest branch in .times() too", function() {
+  it("prefer longest branch in .times() too", function() {
     var parser = Parsimmon.string("abc")
       .then(Parsimmon.string("def"))
       .or(Parsimmon.string("a"))

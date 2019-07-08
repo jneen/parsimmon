@@ -20,8 +20,13 @@
   "main": "src/parsimmon.js",
   "browser": "build/parsimmon.umd.min.js",
   "devDependencies": {
+    "chai": "^4.2.0",
     "coveralls": "^2.13.1",
     "eslint": "^3.6.0",
+    "karma": "^4.1.0",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-mocha": "^1.3.0",
     "mkdirp": "^0.5.1",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
@@ -44,6 +49,7 @@
     "pretest": "npm run lint",
     "test": "nyc --reporter=lcov --reporter=text-summary npm run test:mocha",
     "test:mocha": "mocha --reporter dot",
-    "test:watch": "mocha --reporter min --watch"
+    "test:watch": "mocha --reporter min --watch",
+    "test:chrome": "karma start"
   }
 }

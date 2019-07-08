@@ -1,7 +1,7 @@
 "use strict";
 
-suite("Parsimmon.notFollowedBy", function() {
-  test("fails when its parser argument matches", function() {
+describe("Parsimmon.notFollowedBy", function() {
+  it("fails when its parser argument matches", function() {
     var weirdParser = Parsimmon.string("dx");
     var parser = Parsimmon.seq(
       Parsimmon.string("abc"),
@@ -12,7 +12,7 @@ suite("Parsimmon.notFollowedBy", function() {
     assert.deepEqual(answer.expected, ['not "dx"']);
   });
 
-  test("does not consume from its input", function() {
+  it("does not consume from its input", function() {
     var weirdParser = Parsimmon.string("Q");
     var parser = Parsimmon.seq(
       Parsimmon.string("abc"),
@@ -23,7 +23,7 @@ suite("Parsimmon.notFollowedBy", function() {
     assert.deepEqual(answer.value, ["abc", null, "d"]);
   });
 
-  test("can be chained from prototype", function() {
+  it("can be chained from prototype", function() {
     var parser = Parsimmon.seq(
       Parsimmon.string("abc").notFollowedBy(Parsimmon.string("Q")),
       Parsimmon.string("d")

@@ -1,14 +1,14 @@
 "use strict";
 
-suite("or", function() {
-  test("two parsers", function() {
+describe("or", function() {
+  it("two parsers", function() {
     var parser = Parsimmon.string("x").or(Parsimmon.string("y"));
     assert.equal(parser.parse("x").value, "x");
     assert.equal(parser.parse("y").value, "y");
     assert.ok(!parser.parse("z").status);
   });
 
-  test("with chain", function() {
+  it("with chain", function() {
     var parser = Parsimmon.string("\\")
       .chain(function() {
         return Parsimmon.string("y");
@@ -19,13 +19,13 @@ suite("or", function() {
     assert.ok(!parser.parse("\\z").status);
   });
 
-  test("asserts that a parser was given", function() {
+  it("asserts that a parser was given", function() {
     assert.throws(function() {
       Parsimmon.string("x").or("not a parser");
     });
   });
 
-  test("prefer longest branch", function() {
+  it("prefer longest branch", function() {
     var parser = Parsimmon.string("abc")
       .then(Parsimmon.string("def"))
       .or(Parsimmon.string("ab").then(Parsimmon.string("cd")));
@@ -41,7 +41,7 @@ suite("or", function() {
     });
   });
 
-  test("prefer last of equal length branches", function() {
+  it("prefer last of equal length branches", function() {
     var parser = Parsimmon.string("abc")
       .then(Parsimmon.string("def"))
       .or(Parsimmon.string("abc").then(Parsimmon.string("d")));
@@ -57,7 +57,7 @@ suite("or", function() {
     });
   });
 
-  test("prefer longest branch even after a success", function() {
+  it("prefer longest branch even after a success", function() {
     var parser = Parsimmon.string("abcdef")
       .then(Parsimmon.string("g"))
       .or(Parsimmon.string("ab"))
@@ -75,7 +75,7 @@ suite("or", function() {
     });
   });
 
-  test("prefer longest branch even in a .many()", function() {
+  it("prefer longest branch even in a .many()", function() {
     var list = Parsimmon.lazy(function() {
       return atom
         .or(sexpr)
@@ -111,7 +111,7 @@ suite("or", function() {
     });
   });
 
-  test("prefer longest branch in .or() nested in .many()", function() {
+  it("prefer longest branch in .or() nested in .many()", function() {
     var parser = Parsimmon.string("abc")
       .then(Parsimmon.string("def"))
       .or(Parsimmon.string("a"))

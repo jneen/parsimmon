@@ -1,9 +1,9 @@
+/* global equivalentParsers */
+
 "use strict";
 
-var H = require("../helpers");
-
-suite("Fantasy Land Apply", function() {
-  test("composition", function() {
+describe("Fantasy Land Apply", function() {
+  it("composition", function() {
     function reverse(s) {
       return s
         .split("")
@@ -31,6 +31,6 @@ suite("Fantasy Land Apply", function() {
       Parsimmon.of(reverse).ap(Parsimmon.of(upperCase).map(compose))
     );
 
-    H.equivalentParsers(p1, p2, ["ok cool"]);
+    equivalentParsers(p1, p2, ["ok cool"]);
   });
 });

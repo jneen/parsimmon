@@ -1,6 +1,6 @@
 "use strict";
 
-test("takeWhile", function() {
+it("takeWhile", function() {
   var parser = Parsimmon.takeWhile(function(ch) {
     return ch !== ".";
   }).skip(Parsimmon.all);

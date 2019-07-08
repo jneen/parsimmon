@@ -1,7 +1,7 @@
 "use strict";
 
-suite("Parsimmon.custom", function() {
-  test("simple parser definition", function() {
+describe("Parsimmon.custom", function() {
+  it("simple parser definition", function() {
     function customAny() {
       return Parsimmon.custom(function(success) {
         return function(input, i) {
@@ -48,7 +48,7 @@ suite("Parsimmon.custom", function() {
     }
   });
 
-  test("failing parser", function() {
+  it("failing parser", function() {
     function failer() {
       return Parsimmon.custom(function(success, failure) {
         return function(input, i) {
@@ -68,7 +68,7 @@ suite("Parsimmon.custom", function() {
     });
   });
 
-  test("composes with existing parsers", function() {
+  it("composes with existing parsers", function() {
     function notChar(char) {
       return Parsimmon.custom(function(success, failure) {
         return function(input, i) {

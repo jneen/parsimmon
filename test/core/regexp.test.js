@@ -1,7 +1,7 @@
 "use strict";
 
-suite("Parsimmon.regexp", function() {
-  test("general usage", function() {
+describe("Parsimmon.regexp", function() {
+  it("general usage", function() {
     var parser = Parsimmon.regexp(/[0-9]/);
 
     assert.equal(parser.parse("1").value, "1");
@@ -32,17 +32,17 @@ suite("Parsimmon.regexp", function() {
     });
   });
 
-  test("rejects /g flag", function() {
+  it("rejects /g flag", function() {
     assert.throws(function() {
       Parsimmon.regexp(/a/g);
     });
   });
 
-  test("has alias Parsimmon.regex", function() {
+  it("has alias Parsimmon.regex", function() {
     assert.equal(Parsimmon.regex, Parsimmon.regexp);
   });
 
-  test("supports groups", function() {
+  it("supports groups", function() {
     var parser0 = Parsimmon.regexp(/(\w)(\d)/, 0);
     var parser1 = Parsimmon.regexp(/(\w)(\d)/, 1);
     var parser2 = Parsimmon.regexp(/(\w)(\d)/, 2);

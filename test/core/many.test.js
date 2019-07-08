@@ -1,7 +1,7 @@
 "use strict";
 
-suite("many", function() {
-  test("simple case", function() {
+describe("many", function() {
+  it("simple case", function() {
     var letters = Parsimmon.letter.many();
     assert.deepEqual(letters.parse("x").value, ["x"]);
     assert.deepEqual(letters.parse("xyz").value, ["x", "y", "z"]);
@@ -10,7 +10,7 @@ suite("many", function() {
     assert.ok(!letters.parse("xyz1").status);
   });
 
-  test("followed by then", function() {
+  it("followed by then", function() {
     var parser = Parsimmon.string("x")
       .many()
       .then(Parsimmon.string("y"));
@@ -19,7 +19,7 @@ suite("many", function() {
     assert.equal(parser.parse("xxxxxy").value, "y");
   });
 
-  test("throws on parsers that accept zero characters", function() {
+  it("throws on parsers that accept zero characters", function() {
     var parser = Parsimmon.regexp(/a*/).many();
     assert.throws(function() {
       parser.parse("a");

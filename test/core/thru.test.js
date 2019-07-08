@@ -1,7 +1,7 @@
 "use strict";
 
-suite("parser.thru", function() {
-  test("should return wrapper(this)", function() {
+describe("parser.thru", function() {
+  it("should return wrapper(this)", function() {
     function arrayify(x) {
       return [x];
     }
