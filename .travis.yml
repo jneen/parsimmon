@@ -6,7 +6,7 @@ node_js:
   - "8"
   - "7"
   - "6"
-test:
+script:
   - npm test
   - npm run build
   - npm run test:chrome
