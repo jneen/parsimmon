@@ -100,7 +100,7 @@ function bufferExists() {
 function ensureBuffer() {
   if (!bufferExists()) {
     throw new Error(
-      "Buffer global does not exist; please consider using https://github.com/feross/buffer if you are running Parsimmon in a browser."
+      "Buffer global does not exist; please use webpack if you need to parse Buffers in the browser."
     );
   }
 }
@@ -211,8 +211,8 @@ function bitSeqObj(namedAlignments) {
 }
 
 function parseBufferFor(other, length) {
-  ensureBuffer();
   return new Parsimmon(function(input, i) {
+    ensureBuffer();
     if (i + length > input.length) {
       return makeFailure(i, length + " bytes for " + other);
     }

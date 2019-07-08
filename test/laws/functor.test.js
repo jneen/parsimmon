@@ -1,6 +1,6 @@
-"use strict";
+/* global equivalentParsers */
 
-var H = require("../helpers");
+"use strict";
 
 describe("Fantasy Land Functor", function() {
   it("identity", function() {
@@ -8,7 +8,7 @@ describe("Fantasy Land Functor", function() {
     var p2 = Parsimmon.digits.map(function(x) {
       return x;
     });
-    H.equivalentParsers(p1, p2, ["091", "111111", "46782792", "oops"]);
+    equivalentParsers(p1, p2, ["091", "111111", "46782792", "oops"]);
   });
 
   it("composition", function() {
@@ -19,7 +19,7 @@ describe("Fantasy Land Functor", function() {
       return increment(Number(x));
     });
     var p2 = Parsimmon.digits.map(Number).map(increment);
-    H.equivalentParsers(p1, p2, [
+    equivalentParsers(p1, p2, [
       "12",
       "98789",
       "89772371298389217387128937979839821738",

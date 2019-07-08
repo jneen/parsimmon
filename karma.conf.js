@@ -1,7 +1,9 @@
+"use strict";
+
 // Karma configuration
 // Generated on Sun Jul 07 2019 10:17:21 GMT-0800 (GMT-08:00)
 
-module.exports = config => {
+module.exports = function(config) {
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: "",
@@ -11,10 +13,10 @@ module.exports = config => {
     frameworks: ["mocha", "chai"],
 
     // list of files / patterns to load in the browser
-    files: ["build/parsimmon.umd.min.js", "test/**/*.js"],
+    files: ["build/parsimmon.umd.min.js", "test/setup.js", "test/**/*.test.js"],
 
     // list of files / patterns to exclude
-    exclude: [],
+    exclude: ["test/buffer/*"],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor

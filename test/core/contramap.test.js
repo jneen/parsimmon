@@ -1,14 +1,6 @@
 "use strict";
 
 describe("contramap", function() {
-  function toLower(x) {
-    return x.toLowerCase();
-  }
-
-  function chrs(b) {
-    return b.toString("ascii");
-  }
-
   it("with a function, transforms the input and parses that", function() {
     var parser = Parsimmon.string("x").contramap(function(x) {
       return x.toLowerCase();
@@ -20,18 +12,6 @@ describe("contramap", function() {
     assert.throws(function() {
       Parsimmon.string("x").contramap("not a function");
     });
-  });
-
-  it("upholds contravariant law of composition", function() {
-    var parser1 = Parsimmon.string("a")
-      .contramap(toLower)
-      .contramap(chrs);
-    var parser2 = Parsimmon.string("a").contramap(function(x) {
-      return toLower(chrs(x));
-    });
-    var input = Buffer.from([0x61]);
-
-    assert.deepEqual(parser1.parse(input), parser2.parse(input));
   });
 
   it("embedded contramaps make sense", function() {

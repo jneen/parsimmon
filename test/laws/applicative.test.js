@@ -1,6 +1,6 @@
-"use strict";
+/* global equivalentParsers */
 
-var H = require("../helpers");
+"use strict";
 
 describe("Fantasy Land Applicative", function() {
   it("identity", function() {
@@ -10,7 +10,7 @@ describe("Fantasy Land Applicative", function() {
         return x;
       })
     );
-    H.equivalentParsers(p1, p2, ["x", "z", "æ", "1", ""]);
+    equivalentParsers(p1, p2, ["x", "z", "æ", "1", ""]);
   });
 
   it("homomorphism", function() {
