@@ -849,6 +849,12 @@ _.tryParse = function(str) {
   }
 };
 
+_.assert = function(condition, errorMessage) {
+  return this.chain(function(value) {
+    return condition(value) ? succeed(value) : fail(errorMessage);
+  });
+};
+
 _.or = function(alternative) {
   return alt(this, alternative);
 };
