@@ -74,7 +74,9 @@ Only fail a parse if the rest of the document couldn't possibly make sense.
 const fastWhitespace = Parsimmon.regexp(/[ \t\r\n]*/);
 
 // Slow! Have to examine one character at a time and make an array
-const slowWhitespace = Parsimmon.oneOf(" \t\r\n").many().tie();
+const slowWhitespace = Parsimmon.oneOf(" \t\r\n")
+  .many()
+  .tie();
 ```
 
 ## Negative constructions

@@ -17,7 +17,7 @@ Parsimmon supports IE7 and newer browsers, along with [Node.js][]. It can be use
 
 ## Code of Conduct
 
-Everyone is expected to abide by the [Contributor Covenant](CODE_OF_CONDUCT.md). Please send reports to <brian@mockbrian.com>.
+Everyone is expected to abide by the [Contributor Covenant](CODE_OF_CONDUCT.md). Please send reports to <mailto:brian@mockbrian.com>.
 
 <!--
 
