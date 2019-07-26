@@ -74,6 +74,7 @@
   * [parser.lookahead(anotherParser)](#parserlookaheadanotherparser)
   * [parser.lookahead(string)](#parserlookaheadstring)
   * [parser.lookahead(regexp)](#parserlookaheadregexp)
+  * [parser.assert(condition, message)](#parserassertcondition-message)
   * [parser.tie()](#parsertie)
   * [parser.many()](#parsermany)
   * [parser.times(n)](#parsertimesn)
@@ -1090,6 +1091,30 @@ Returns a parser that looks for `string` but does not consume it. Yields the sam
 ## parser.lookahead(regexp)
 
 Returns a parser that wants the input to match `regexp`. Yields the same result as `parser`. Equivalent to `parser.skip(Parsimmon.lookahead(regexp))`.
+
+## parser.assert(condition, message)
+
+Passes the result of `parser` to the function `condition`, which returns a boolean. If the the condition is false, returns a failed parse with the given `message`. Else is returns the original result of `parser`.
+
+```js
+var evenLengthNumber =
+  P.digits
+    .assert(
+      function(s) {
+        return s.length % 2 === 0;
+      },
+      "even length number"
+    )
+    .map(Number);
+
+evenLengthNumber.parse("34");
+// { status: true, value: 34 }
+
+evenLengthNumber.parse("1");
+// { status: false,
+//   expected: ["even length number"],
+//   index: {...} }
+```
 
 ## parser.tieWith(separator)
 

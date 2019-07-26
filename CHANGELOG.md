@@ -1,3 +1,7 @@
+## version 1.13.0 (2019-07-25)
+
+- Adds `parser.assert(condition, message)`
+
 ## version 1.12.1 (2019-07-07)
 
 - Adds links within documentation
