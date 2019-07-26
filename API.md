@@ -1094,7 +1094,7 @@ Returns a parser that wants the input to match `regexp`. Yields the same result 
 
 ## parser.assert(condition, message)
 
-Passes the result of `parser` to the function `condition`, which returns a boolean. If the the condition is false, returns a failed parse with the given `message`.
+Passes the result of `parser` to the function `condition`, which returns a boolean. If the the condition is false, returns a failed parse with the given `message`. Else is returns the original result of `parser`.
 
 ```js
 var evenLengthNumber =
