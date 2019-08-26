@@ -449,7 +449,7 @@ A parser that expects to be at the end of the input (zero characters left).
 
 ## Parsimmon.index
 
-A parser that consumes no input and yields an object an object representing the current offset into the parse: it has a 0-based character `offset` property and 1-based `line` and `column` properties. Example:
+A parser that consumes no input and yields an object representing the current offset into the parse: it has a 0-based character `offset` property and 1-based `line` and `column` properties. Example:
 
 ```js
 Parsimmon.seqMap(
