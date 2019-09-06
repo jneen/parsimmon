@@ -974,7 +974,7 @@ The same caveat for contramap above applies to promap.
 
 ## parser.result(value)
 
-Returns a new parser with the same behavior, but which yields `value`. Equivalent to `parser.map(function(x) { return x; }.bind(value))`.
+Returns a new parser with the same behavior, but which yields `value`. Equivalent to `parser.map(function(x) { return x; }.bind(null, value))`.
 
 ## parser.fallback(value)
 
