@@ -355,6 +355,8 @@ function mergeReplies(result, last) {
   };
 }
 
+// Hold a simple memoize for the last value
+var lastLineColumnIndex = {};
 function makeLineColumnIndex(input, i) {
   if (isBuffer(input)) {
     return {
@@ -363,16 +365,25 @@ function makeLineColumnIndex(input, i) {
       column: -1
     };
   }
+  // if we are calling this function with the same arguments as last time
+  // return the memoized value to prevent expensive processing below
+  if (lastLineColumnIndex.input === input && lastLineColumnIndex.i === i) {
+    return lastLineColumnIndex.value;
+  }
   var lines = input.slice(0, i).split("\n");
   // Note that unlike the character offset, the line and column offsets are
   // 1-based.
   var lineWeAreUpTo = lines.length;
   var columnWeAreUpTo = lines[lines.length - 1].length + 1;
-  return {
+  var value = {
     offset: i,
     line: lineWeAreUpTo,
     column: columnWeAreUpTo
   };
+  lastLineColumnIndex.input = input;
+  lastLineColumnIndex.i = i;
+  lastLineColumnIndex.value = value;
+  return value;
 }
 
 // Returns the sorted set union of two arrays of strings
