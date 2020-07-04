@@ -1,3 +1,7 @@
+## version 1.14.0 (2020-??-??)
+
+- Improves peformance of `parser.mark`, `parser.node`, and `Parsimmon.index`
+
 ## version 1.13.0 (2019-07-25)
 
 - Adds `parser.assert(condition, message)`
