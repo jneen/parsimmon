@@ -377,6 +377,18 @@ function makeLineColumnIndex(input, i) {
 
 // Returns the sorted set union of two arrays of strings
 function union(xs, ys) {
+  // for newer browsers/node we can improve performance by using
+  // modern JS
+  if (Parsimmon.Set && Array.from) {
+    // eslint-disable-next-line no-undef
+    var set = new Parsimmon.Set(xs);
+    for (var y = 0; y < ys.length; y++) {
+      set.add(ys[y]);
+    }
+    var arr = Array.from(set);
+    arr.sort();
+    return arr;
+  }
   var obj = {};
   for (var i = 0; i < xs.length; i++) {
     obj[xs[i]] = true;
@@ -1384,5 +1396,9 @@ Parsimmon.Binary = {
   doubleBE: doubleBE(),
   doubleLE: doubleLE()
 };
+
+// For use later, we set Set if it is available
+// eslint-disable-next-line no-undef
+Parsimmon.Set = typeof Set !== "undefined" ? Set : undefined;
 
 module.exports = Parsimmon;

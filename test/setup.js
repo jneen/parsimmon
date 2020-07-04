@@ -28,3 +28,23 @@ globalThis.equivalentParsers = function equivalentParsers(p1, p2, inputs) {
     assert.deepEqual(p1.parse(inputs[i]), p2.parse(inputs[i]));
   }
 };
+
+globalThis.testSetScenario = function testSetScenario(fn) {
+  describe("", function() {
+    var origSet = Parsimmon.Set;
+    after(function() {
+      Parsimmon.Set = origSet;
+    });
+
+    fn();
+
+    if (typeof Set !== "undefined") {
+      describe("no Set", function() {
+        beforeEach(function() {
+          Parsimmon.Set = undefined;
+        });
+        fn();
+      });
+    }
+  });
+};
