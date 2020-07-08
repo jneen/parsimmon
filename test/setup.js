@@ -31,18 +31,18 @@ globalThis.equivalentParsers = function equivalentParsers(p1, p2, inputs) {
 
 globalThis.testSetScenario = function testSetScenario(fn) {
   describe("", function() {
-    var origSet = Parsimmon.Set;
-    after(function() {
-      Parsimmon.Set = origSet;
-    });
-
     fn();
 
     if (typeof Set !== "undefined") {
       describe("no Set", function() {
-        beforeEach(function() {
-          Parsimmon.Set = undefined;
+        before(function() {
+          Parsimmon._supportsSet = false;
         });
+
+        after(function() {
+          Parsimmon._supportsSet = undefined;
+        });
+
         fn();
       });
     }

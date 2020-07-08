@@ -97,6 +97,15 @@ function bufferExists() {
   return typeof Buffer !== "undefined";
 }
 
+function setExists() {
+  if (Parsimmon._supportsSet !== undefined) {
+    return Parsimmon._supportsSet;
+  }
+  var exists = typeof Set !== "undefined";
+  Parsimmon._supportsSet = exists;
+  return exists;
+}
+
 function ensureBuffer() {
   if (!bufferExists()) {
     throw new Error(
@@ -379,9 +388,9 @@ function makeLineColumnIndex(input, i) {
 function union(xs, ys) {
   // for newer browsers/node we can improve performance by using
   // modern JS
-  if (Parsimmon.Set && Array.from) {
+  if (setExists() && Array.from) {
     // eslint-disable-next-line no-undef
-    var set = new Parsimmon.Set(xs);
+    var set = new Set(xs);
     for (var y = 0; y < ys.length; y++) {
       set.add(ys[y]);
     }
@@ -1396,9 +1405,5 @@ Parsimmon.Binary = {
   doubleBE: doubleBE(),
   doubleLE: doubleLE()
 };
-
-// For use later, we set Set if it is available
-// eslint-disable-next-line no-undef
-Parsimmon.Set = typeof Set !== "undefined" ? Set : undefined;
 
 module.exports = Parsimmon;
