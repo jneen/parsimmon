@@ -1,6 +1,7 @@
-## version 1.14.0 (2020-??-??)
+## version 1.14.0 (2020-07-08)
 
 - Improves peformance of `parser.mark`, `parser.node`, and `Parsimmon.index`
+- Improves performance of `many` and `times`
 
 ## version 1.13.0 (2019-07-25)
 
