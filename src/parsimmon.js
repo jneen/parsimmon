@@ -97,6 +97,15 @@ function bufferExists() {
   return typeof Buffer !== "undefined";
 }
 
+function setExists() {
+  if (Parsimmon._supportsSet !== undefined) {
+    return Parsimmon._supportsSet;
+  }
+  var exists = typeof Set !== "undefined";
+  Parsimmon._supportsSet = exists;
+  return exists;
+}
+
 function ensureBuffer() {
   if (!bufferExists()) {
     throw new Error(
@@ -388,6 +397,18 @@ function makeLineColumnIndex(input, i) {
 
 // Returns the sorted set union of two arrays of strings
 function union(xs, ys) {
+  // for newer browsers/node we can improve performance by using
+  // modern JS
+  if (setExists() && Array.from) {
+    // eslint-disable-next-line no-undef
+    var set = new Set(xs);
+    for (var y = 0; y < ys.length; y++) {
+      set.add(ys[y]);
+    }
+    var arr = Array.from(set);
+    arr.sort();
+    return arr;
+  }
   var obj = {};
   for (var i = 0; i < xs.length; i++) {
     obj[xs[i]] = true;

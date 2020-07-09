@@ -5,6 +5,7 @@
   },
   "globals":{
     "Parsimmon": true,
-    "assert": true
+    "assert": true,
+    "testSetScenario": true
   }
 }
