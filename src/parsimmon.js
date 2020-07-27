@@ -459,10 +459,10 @@ function assertRegexp(x) {
   var f = flags(x);
   for (var i = 0; i < f.length; i++) {
     var c = f.charAt(i);
-    // Only allow regexp flags [imu] for now, since [g] and [y] specifically
+    // Only allow regexp flags [imus] for now, since [g] and [y] specifically
     // mess up Parsimmon. If more non-stateful regexp flags are added in the
     // future, this will need to be revisited.
-    if (c !== "i" && c !== "m" && c !== "u") {
+    if (c !== "i" && c !== "m" && c !== "u" && c !== "s") {
       throw new Error('unsupported regexp flag "' + c + '": ' + x);
     }
   }
