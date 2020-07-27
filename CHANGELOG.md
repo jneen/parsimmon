@@ -1,3 +1,7 @@
+## version 1.15.0 (2020-07-27)
+
+- Adds support for the `s` (`dotAll`) flag in `Parsimmon.regexp`
+
 ## version 1.14.0 (2020-07-08)
 
 - Improves peformance of `parser.mark`, `parser.node`, and `Parsimmon.index`
