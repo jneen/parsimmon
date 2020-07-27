@@ -56,10 +56,4 @@ describe("Parsimmon.regexp", function() {
       index: { column: 1, line: 1, offset: 0 }
     });
   });
-
-  it("support dotAll regex flag (/s)", function() {
-    var parser = Parsimmon.regexp(/"""(.*)"""/s, 1);
-    var multilineString = '"""line1\nline2"""';
-    assert.equal(parser.parse(multilineString).value, "line1\nline2");
-  });
 });
