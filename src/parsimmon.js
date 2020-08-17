@@ -694,13 +694,17 @@ function formatError(input, error) {
 }
 
 function flags(re) {
-  var s = "" + re;
-  var fs = s.slice(s.lastIndexOf("/") + 1);
-  if (fs === "undefined") {
-    // MS Edge v15-18 workaround
-    return ""
+  if (re.flags !== undefined) {
+    return re.flags;
   }
-  return fs
+  // legacy browser support
+  return [
+    re.global ? "g" : "",
+    re.ignoreCase ? "i" : "",
+    re.multiline ? "m" : "",
+    re.unicode ? "u" : "",
+    re.sticky ? "y" : "",
+  ].join("");
 }
 
 function anchoredRegexp(re) {
