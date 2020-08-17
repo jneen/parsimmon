@@ -695,7 +695,12 @@ function formatError(input, error) {
 
 function flags(re) {
   var s = "" + re;
-  return s.slice(s.lastIndexOf("/") + 1);
+  var fs = s.slice(s.lastIndexOf("/") + 1);
+  if (fs === "undefined") {
+    // MS Edge v15-18 workaround
+    return ""
+  }
+  return fs
 }
 
 function anchoredRegexp(re) {
