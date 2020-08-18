@@ -1,0 +1,3 @@
+- [ ] I have run `npm run lint:fix` to ensure Prettier and ESLint have passed
+- [ ] Coveralls bot has replied that the tests pass with 100% code coverage (`npm test`)
+- [ ] I have updated `CHANGELOG.md` (and `API.md` if this is an API change)
