@@ -34,6 +34,7 @@
   - [Parsimmon.lazy(fn)](#parsimmonlazyfn)
   - [Parsimmon.lazy(description, fn)](#parsimmonlazydescription-fn)
   - [Parsimmon.fail(message)](#parsimmonfailmessage)
+  - [Parsimmon.flags(regexp)](#parsimmonflagsregexp)
   - [Parsimmon.letter](#parsimmonletter)
   - [Parsimmon.letters](#parsimmonletters)
   - [Parsimmon.digit](#parsimmondigit)
@@ -376,6 +377,10 @@ Equivalent to `Parsimmon.lazy(f).desc(description)`.
 ## Parsimmon.fail(message)
 
 Returns a failing parser with the given message.
+
+## Parsimmon.flags(regexp)
+
+Returns the flags set on the given `RegExp` object. Polyfilled for old browsers.
 
 ## Parsimmon.letter
 

@@ -1,3 +1,8 @@
+## version 1.16.0 (2020-08-25)
+
+- Adds `Parsimmon.flags(regexp)` export
+- Fixes `Parsimmon.flags(regexp)` to work in older browsers (Edge versions 15-18)
+
 ## version 1.15.0 (2020-07-27)
 
 - Adds support for the `s` (`dotAll`) flag in `Parsimmon.regexp`
