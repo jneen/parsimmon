@@ -1365,7 +1365,6 @@ Parsimmon.empty = empty;
 Parsimmon.end = end;
 Parsimmon.eof = eof;
 Parsimmon.fail = fail;
-Parsimmon.flags = flags;
 Parsimmon.formatError = formatError;
 Parsimmon.index = index;
 Parsimmon.isParser = isParser;
