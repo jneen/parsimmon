@@ -1,6 +1,6 @@
 ## version 1.16.0 (2020-08-25)
 
-- Fixes `flags(regexp)` to work in older browsers (Edge versions 15-18), which fixes crashes on startup in those old clients
+- Fixes a crash in MS Edge 15-18 when using `Parsimmon.regexp` (thanks @ekilah)
 
 ## version 1.15.0 (2020-07-27)
 
