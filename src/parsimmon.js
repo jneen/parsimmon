@@ -703,7 +703,7 @@ function flags(re) {
     re.ignoreCase ? "i" : "",
     re.multiline ? "m" : "",
     re.unicode ? "u" : "",
-    re.sticky ? "y" : "",
+    re.sticky ? "y" : ""
   ].join("");
 }
 
