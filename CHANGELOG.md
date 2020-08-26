@@ -1,3 +1,7 @@
+## version 1.16.0 (2020-08-25)
+
+- Fixes a crash in MS Edge 15-18 when using `Parsimmon.regexp` (thanks @ekilah)
+
 ## version 1.15.0 (2020-07-27)
 
 - Adds support for the `s` (`dotAll`) flag in `Parsimmon.regexp`

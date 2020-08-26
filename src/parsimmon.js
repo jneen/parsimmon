@@ -694,8 +694,17 @@ function formatError(input, error) {
 }
 
 function flags(re) {
-  var s = "" + re;
-  return s.slice(s.lastIndexOf("/") + 1);
+  if (re.flags !== undefined) {
+    return re.flags;
+  }
+  // legacy browser support
+  return [
+    re.global ? "g" : "",
+    re.ignoreCase ? "i" : "",
+    re.multiline ? "m" : "",
+    re.unicode ? "u" : "",
+    re.sticky ? "y" : ""
+  ].join("");
 }
 
 function anchoredRegexp(re) {
