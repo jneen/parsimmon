@@ -97,6 +97,6 @@ Parsimmon is also compatible with [fantasyland][]. It implements Semigroup, Appl
 [promises-aplus]: https://promisesaplus.com/
 [parsec]: https://hackage.haskell.org/package/parsec
 [fantasyland]: https://github.com/fantasyland/fantasy-land
-[perf]: https://sap.github.io/chevrotain/performance/
+[perf]: https://chevrotain.io/performance/
 [es5]: https://kangax.github.io/compat-table/es5/
 [es5-shim]: https://github.com/es-shims/es5-shim
