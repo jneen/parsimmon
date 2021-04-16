@@ -18,3 +18,28 @@ it("index", function() {
     column: 3
   });
 });
+
+it("multiple index", function() {
+  var parser = Parsimmon.seqMap(
+    Parsimmon.index,
+    Parsimmon.string("a\nb"),
+    Parsimmon.index,
+    function(i1, s, i2) {
+      return { index1: i1, str: s, index2: i2 };
+    }
+  );
+
+  assert.deepEqual(parser.parse("a\nb").value, {
+    index1: {
+      column: 1,
+      line: 1,
+      offset: 0
+    },
+    index2: {
+      column: 2,
+      line: 2,
+      offset: 3
+    },
+    str: "a\nb"
+  });
+});
