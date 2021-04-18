@@ -1,3 +1,7 @@
+## 1.17.0 (2021-04-16)
+
+- Improves the performance of line/column number tracking (contributed by @brendo-m)
+
 ## 1.16.0 (2020-08-25)
 
 - Fixes a crash in MS Edge 15-18 when using `Parsimmon.regexp` (thanks @ekilah)

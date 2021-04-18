@@ -364,8 +364,11 @@ function mergeReplies(result, last) {
   };
 }
 
-// Hold a simple memoize for the last value
-var lastLineColumnIndex = {};
+// index of { input => { index => { lineNumber, startOfLine } } }
+// when we see a new index we just walk backwards to the last seen index and
+// compute the new lineNumber and startOfLine from there so we don't have to
+// recompute from the whole input
+var lineColumnIndex = {};
 function makeLineColumnIndex(input, i) {
   if (isBuffer(input)) {
     return {
@@ -374,25 +377,50 @@ function makeLineColumnIndex(input, i) {
       column: -1
     };
   }
-  // if we are calling this function with the same arguments as last time
-  // return the memoized value to prevent expensive processing below
-  if (lastLineColumnIndex.input === input && lastLineColumnIndex.i === i) {
-    return lastLineColumnIndex.value;
+
+  // initialize if we haven't seen this input yet
+  if (!(input in lineColumnIndex)) {
+    lineColumnIndex[input] = {};
   }
-  var lines = input.slice(0, i).split("\n");
-  // Note that unlike the character offset, the line and column offsets are
-  // 1-based.
-  var lineWeAreUpTo = lines.length;
-  var columnWeAreUpTo = lines[lines.length - 1].length + 1;
-  var value = {
+
+  var inputIndex = lineColumnIndex[input];
+
+  var prevLine = 0;
+  var newLines = 0;
+  var lineStart = 0;
+  var j = i;
+  while (j >= 0) {
+    if (input.charAt(j) === "\n") {
+      newLines++;
+      // lineStart === 0 when this is the first new line we have found
+      if (lineStart === 0) {
+        lineStart = j + 1;
+      }
+    }
+    if (j in inputIndex) {
+      prevLine = inputIndex[j].line;
+      // lineStart === 0 when we haven't found a new line on the walk
+      // back from i, so we are on the same line as the previously cached
+      // index
+      if (lineStart === 0) {
+        lineStart = inputIndex[j].lineStart;
+      }
+      break;
+    }
+    j--;
+  }
+
+  var lineWeAreUpTo = prevLine + newLines;
+  var columnWeAreUpTo = i - lineStart;
+
+  inputIndex[i] = { line: lineWeAreUpTo, lineStart: lineStart };
+
+  // lines and columns are 1-indexed
+  return {
     offset: i,
-    line: lineWeAreUpTo,
-    column: columnWeAreUpTo
+    line: lineWeAreUpTo + 1,
+    column: columnWeAreUpTo + 1
   };
-  lastLineColumnIndex.input = input;
-  lastLineColumnIndex.i = i;
-  lastLineColumnIndex.value = value;
-  return value;
 }
 
 // Returns the sorted set union of two arrays of strings
@@ -861,18 +889,26 @@ _.parse = function(input) {
       ".parse must be called with a string or Buffer as its argument"
     );
   }
-  var result = this.skip(eof)._(input, 0);
-  if (result.status) {
-    return {
+  var parseResult = this.skip(eof)._(input, 0);
+
+  var result;
+  if (parseResult.status) {
+    result = {
       status: true,
-      value: result.value
+      value: parseResult.value
+    };
+  } else {
+    result = {
+      status: false,
+      index: makeLineColumnIndex(input, parseResult.furthest),
+      expected: parseResult.expected
     };
   }
-  return {
-    status: false,
-    index: makeLineColumnIndex(input, result.furthest),
-    expected: result.expected
-  };
+
+  // release memory from lineColumnIndex now we are done parsing
+  delete lineColumnIndex[input];
+
+  return result;
 };
 
 // -*- Other Methods -*-
