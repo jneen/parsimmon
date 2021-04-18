@@ -1,4 +1,4 @@
-## 1.17.0 (2021-04-16)
+## 1.17.0 (2021-04-18)
 
 - Improves the performance of line/column number tracking (contributed by @brendo-m)
 
