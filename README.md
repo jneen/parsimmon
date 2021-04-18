@@ -17,27 +17,7 @@ Parsimmon supports IE7 and newer browsers, along with [Node.js][]. It can be use
 
 ## Code of Conduct
 
-Everyone is expected to abide by the [Contributor Covenant](CODE_OF_CONDUCT.md). Please send reports to [brian@mockbrian.com](mailto:brian@mockbrian.com).
-
-<!--
-
-Parsimmon is officially tested against Node.js 4.x and higher. It should also work in [browsers with ES5 support][es5] (IE9* and up).
-
-If you need IE8 support, you may be able to get Parsimmon to work by using [es5-shim][], but this is **not officially supported**. Alternately, you can use an older version of Parsimmon which supports IE8.
-
-\* _IE9 does not support "strict mode", but Parsimmon does not require it._
-
-## Module usage
-
-```
-npm install --save parsimmon
-```
-
-## Browser usage
-
- To download the latest browser build, use the [unpkg version][]. Parsimmon is exposed as a global variable called `Parsimmon`. For more information on how to use unpkg, see the [unpkg homepage][].
-
--->
+Everyone is expected to abide by the [Contributor Covenant](CODE_OF_CONDUCT.md). Please send reports to [brian@wavebeem.com](mailto:brian@wavebeem.com).
 
 ## API Documentation
 
