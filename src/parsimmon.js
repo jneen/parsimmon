@@ -390,13 +390,6 @@ function makeLineColumnIndex(input, i) {
   var lineStart = 0;
   var j = i;
   while (j >= 0) {
-    if (input.charAt(j) === "\n") {
-      newLines++;
-      // lineStart === 0 when this is the first new line we have found
-      if (lineStart === 0) {
-        lineStart = j + 1;
-      }
-    }
     if (j in inputIndex) {
       prevLine = inputIndex[j].line;
       // lineStart === 0 when we haven't found a new line on the walk
@@ -406,6 +399,13 @@ function makeLineColumnIndex(input, i) {
         lineStart = inputIndex[j].lineStart;
       }
       break;
+    }
+    if (input.charAt(j) === "\n") {
+      newLines++;
+      // lineStart === 0 when this is the first new line we have found
+      if (lineStart === 0) {
+        lineStart = j + 1;
+      }
     }
     j--;
   }
