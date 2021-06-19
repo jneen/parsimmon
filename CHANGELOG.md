@@ -1,7 +1,7 @@
-## 1.18.0 (2021-06-17)
+## 1.18.0 (2021-06-19)
 
 - Fixes a bug in the line/column number tracking when parsing optional newlines
-  
+
 ## 1.17.0 (2021-04-18)
 
 - Improves the performance of line/column number tracking (contributed by @brendo-m)
