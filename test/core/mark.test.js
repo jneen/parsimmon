@@ -19,3 +19,24 @@ it("mark", function() {
     end: { offset: 3, line: 2, column: 3 }
   });
 });
+
+it("should correctly report line number when parsing optional newlines", function() {
+  var parser = Parsimmon.seq(
+    Parsimmon.newline,
+    Parsimmon.newline.many()
+  ).mark();
+
+  assert.deepEqual(parser.parse("\n").value, {
+    start: {
+      column: 0,
+      line: 2,
+      offset: 0
+    },
+    end: {
+      column: 1,
+      line: 2,
+      offset: 1
+    },
+    value: ["\n", []]
+  });
+});
