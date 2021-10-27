@@ -400,7 +400,11 @@ function makeLineColumnIndex(input, i) {
       }
       break;
     }
-    if (input.charAt(j) === "\n") {
+
+    if (
+      input.charAt(j) === "\n" ||
+      (input.charAt(j) === "\r" && input.charAt(j + 1) !== "\n")
+    ) {
       newLines++;
       // lineStart === 0 when this is the first new line we have found
       if (lineStart === 0) {
