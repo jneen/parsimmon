@@ -20,23 +20,29 @@ it("mark", function() {
   });
 });
 
-it("should correctly report line number when parsing optional newlines", function() {
-  var parser = Parsimmon.seq(
-    Parsimmon.newline,
-    Parsimmon.newline.many()
-  ).mark();
+["\n", "\r"].forEach(function(eol) {
+  it(
+    "should correctly report line number when parsing optional " +
+      JSON.stringify(eol),
+    function() {
+      var parser = Parsimmon.seq(
+        Parsimmon.newline,
+        Parsimmon.newline.many()
+      ).mark();
 
-  assert.deepEqual(parser.parse("\n").value, {
-    start: {
-      column: 0,
-      line: 2,
-      offset: 0
-    },
-    end: {
-      column: 1,
-      line: 2,
-      offset: 1
-    },
-    value: ["\n", []]
-  });
+      assert.deepEqual(parser.parse(eol).value, {
+        start: {
+          column: 0,
+          line: 2,
+          offset: 0
+        },
+        end: {
+          column: 1,
+          line: 2,
+          offset: 1
+        },
+        value: [eol, []]
+      });
+    }
+  );
 });
