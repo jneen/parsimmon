@@ -1,3 +1,7 @@
+## 1.18.1 (2021-10-27)
+
+- Fixes a further bug in the line/column number tracking dealing with ^M linebreaks
+
 ## 1.18.0 (2021-06-19)
 
 - Fixes a bug in the line/column number tracking when parsing optional newlines
