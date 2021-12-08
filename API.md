@@ -911,7 +911,6 @@ var pNum = Parsimmon.regexp(/[0-9]+/)
 
 pNum.parse("9"); // => {status: true, value: 10}
 pNum.parse("123"); // => {status: true, value: 124}
-pNum.parse("3.1"); // => {status: true, value: 4.1}
 ```
 
 ## parser.contramap(fn)
