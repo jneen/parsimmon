@@ -20,7 +20,7 @@ it("mark", function() {
   });
 });
 
-["\n", "\r"].forEach(function(eol) {
+["\n", "\r", "\r\n"].forEach(function(eol) {
   it(
     "should correctly report line number when parsing optional " +
       JSON.stringify(eol),
@@ -37,9 +37,9 @@ it("mark", function() {
           offset: 0
         },
         end: {
-          column: 1,
+          column: eol.length,
           line: 2,
-          offset: 1
+          offset: eol.length
         },
         value: [eol, []]
       });
