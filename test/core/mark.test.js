@@ -26,22 +26,27 @@ it("mark", function() {
       JSON.stringify(eol),
     function() {
       var parser = Parsimmon.seq(
-        Parsimmon.newline,
-        Parsimmon.newline.many()
+        Parsimmon.string("foo"),
+        Parsimmon.newline
       ).mark();
 
-      assert.deepEqual(parser.parse(eol).value, {
+      var input = "foo" + eol
+
+      assert.deepEqual(parser.parse(input).value, {
         start: {
-          column: 0,
-          line: 2,
+          column: 1,
+          line: 1,
           offset: 0
         },
         end: {
-          column: eol.length,
+          column: 1,
           line: 2,
-          offset: eol.length
+          offset: input.length
         },
-        value: [eol, []]
+        value: [
+          "foo",
+          eol
+        ]
       });
     }
   );

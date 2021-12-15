@@ -401,29 +401,16 @@ function makeLineColumnIndex(input, i) {
       break;
     }
 
-    /**
-     * Defined as \r not followed by \n
-     */
-    var isCrAlone = function () {
-      return (input.charAt(j) === "\r" && input.charAt(j + 1) !== "\n");
-    }
-
-    /**
-     * Defined as \n not preceded by \r
-     */
-    var isLfAlone = function () {
-      return (input.charAt(j) === "\n" && input.charAt(j - 1) !== "\r");
-    }
-
-    /**
-     * Defined as \r followed by \n
-     */
-    var isCrLf = function () {
-      return (input.charAt(j) === "\r" && input.charAt(j + 1) === "\n");
-    }
-
     if (
-      isCrAlone() || isLfAlone() || isCrLf()
+      /**
+       * increment for every \n
+       */
+      (input.charAt(j) === "\n") ||
+      /**
+       * increment for every \r
+       * i.e. not followed by \n
+       */
+      (input.charAt(j) === "\r" && input.charAt(j + 1) !== "\n")
     ) {
       newLines++;
       // lineStart === 0 when this is the first new line we have found
