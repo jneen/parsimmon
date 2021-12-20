@@ -1,6 +1,6 @@
-## 1.18.1 (2021-10-27)
+## 1.18.1 (2021-12-19)
 
-- Fixes a further bug in the line/column number tracking dealing with ^M linebreaks
+- Fixes a bug in the line/column number tracking for Mac OS 9 linebreaks
 
 ## 1.18.0 (2021-06-19)
 

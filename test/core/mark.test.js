@@ -30,7 +30,7 @@ it("mark", function() {
         Parsimmon.newline
       ).mark();
 
-      var input = "foo" + eol
+      var input = "foo" + eol;
 
       assert.deepEqual(parser.parse(input).value, {
         start: {
@@ -43,10 +43,7 @@ it("mark", function() {
           line: 2,
           offset: input.length
         },
-        value: [
-          "foo",
-          eol
-        ]
+        value: ["foo", eol]
       });
     }
   );
