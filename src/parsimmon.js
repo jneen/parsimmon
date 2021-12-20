@@ -402,14 +402,9 @@ function makeLineColumnIndex(input, i) {
     }
 
     if (
-      /**
-       * increment for every \n
-       */
-      (input.charAt(j) === "\n") ||
-      /**
-       * increment for every \r
-       * i.e. not followed by \n
-       */
+      // Unix LF (\n) or Windows CRLF (\r\n) line ending
+      input.charAt(j) === "\n" ||
+      // Old Mac CR (\r) line ending
       (input.charAt(j) === "\r" && input.charAt(j + 1) !== "\n")
     ) {
       newLines++;
