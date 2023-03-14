@@ -5,11 +5,15 @@
 
 <a href="https://github.com/jneen/parsimmon"><img align="right" src="https://i.imgur.com/wyKOf.png" alt="Parsimmon"></a>
 
+> **!!! PARSIMMON IS CURRENTLY UNMAINTAINED !!!**
+> 
+> Please contact [@jneen][] if you would like to become the new maintainer.
+
 # Parsimmon
 
-**Authors:** [@jneen][] and [@laughinghan][]
+**Original Authors:** [@jneen][] and [@laughinghan][]
 
-**Maintainer:** [@wavebeem][]
+**Previous Maintainer:** [@wavebeem][]
 
 Parsimmon is a small library for writing big parsers made up of lots of little parsers. The API is inspired by [parsec][] and [Promises/A+][promises-aplus].
 
@@ -17,7 +21,9 @@ Parsimmon supports IE7 and newer browsers, along with [Node.js][]. It can be use
 
 ## Code of Conduct
 
-Everyone is expected to abide by the [Contributor Covenant](CODE_OF_CONDUCT.md). Please send reports to [brian@wavebeem.com](mailto:brian@wavebeem.com).
+Everyone is expected to abide by the [Contributor Covenant](CODE_OF_CONDUCT.md).
+
+<!-- Please send reports to _nobody_. -->
 
 ## API Documentation
 
